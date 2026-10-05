@@ -1,0 +1,20 @@
+# Katalog für Deutsch: Stand, Geltungsbereich und Zustandswörter.
+# Die Einträge stehen in den übrigen TOML-Dateien dieses Ordners.
+
+[katalog]
+# Healthchecks-Version, für die der Katalog vollständig ist (Vollständigkeitstest, Browsertests).
+stand = "v4.4"
+
+[bereich]
+# Vorlagen, in denen Text-Einträge wirken und englische Reste gesucht werden.
+vorlagen = ["templates/**/*.html", "hc/integrations/*/templates/*.html"]
+# Die Doku bleibt englisch.
+ausnahmen = ["templates/docs/**", "templates/front/docs_*.html"]
+
+[zustaende]
+up = "in Ordnung"
+grace = "verspätet"
+down = "ausgefallen"
+started = "gestartet"
+paused = "pausiert"
+new = "neu"

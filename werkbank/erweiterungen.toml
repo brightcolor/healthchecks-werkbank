@@ -1,0 +1,25 @@
+# Erweiterungen, die der Bau in jeder Sprache einsetzt (sprache.py bauen).
+# en ist der Anker in Healthchecks, de der Ersatz. Greift ein Eintrag nicht, bricht der
+# Bau ab: Die Vorlagen der Werkbank nutzen den Filter zustand und das Tag werkbank_mail.
+
+[[quelltext]]
+datei = "hc/front/templatetags/hc_extras.py"
+anzahl = 1
+en = '''
+register = template.Library()
+'''
+de = '''
+register = template.Library()
+
+
+@register.filter
+def zustand(status: str) -> str:
+    """Zustand eines Checks in Worten der Werkbank (WERKBANK_ZUSTAENDE), sonst unverändert."""
+    return getattr(settings, "WERKBANK_ZUSTAENDE", {}).get(status, status)
+
+
+@register.simple_tag
+def werkbank_mail(name: str) -> str:
+    """Wert einer Mail-Einstellung der Werkbank, etwa WB_MAIL_IMPRESSUM_URL; leer, wenn nicht gesetzt."""
+    return getattr(settings, name, "")
+'''
