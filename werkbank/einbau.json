@@ -1,0 +1,16 @@
+{
+  "_info": "Einbauplan für Healthchecks. Jede Zeile kommt direkt vor ihren Anker; jeder Anker muss in der Vorlage genau einmal vorkommen. Der Platzhalter wird in den Dateien aus fassung_in durch die Fassung des Images ersetzt.",
+  "vorlage": "templates/base.html",
+  "einfuegungen": [
+    {
+      "anker": "</head>",
+      "zeile": "<link rel=\"stylesheet\" href=\"{% static 'bc/werkbank.css' %}?v=@@WERKBANK_FASSUNG@@\" type=\"text/css\">"
+    },
+    {
+      "anker": "<nav class=\"navbar navbar-default\">",
+      "zeile": "{% include \"bc/leiste.html\" %}"
+    }
+  ],
+  "platzhalter": "@@WERKBANK_FASSUNG@@",
+  "fassung_in": ["templates/base.html", "templates/bc/leiste.html"]
+}
