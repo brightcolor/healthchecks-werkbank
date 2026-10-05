@@ -22,7 +22,7 @@ hc.bcsrv.de, das selbst betriebene Healthchecks auf docker-a1, bekommt die Werkb
 | Automatik | bei Grün bauen, prüfen und ausliefern; bei Rot Stopp mit Meldung, Anpassung in einer Sitzung |
 | Sichtbarkeit | öffentliches Repo `brightcolor/healthchecks-werkbank`, Image `ghcr.io/brightcolor/healthchecks-werkbank` |
 | Auslieferung | docker-a1 holt neue Images selbst über einen Timer; GitHub hat keinen Zugang zum Server |
-| Texte | Die Oberfläche bleibt englisch wie Healthchecks. Leiste, Kopfzeile, Meldungen und Vorlesetexte des Themes nutzen dieselbe Sprache und dieselben Begriffe. Der Gruß „Moin.“ auf der Anmeldeseite bleibt. Skripte auf dem Server melden auf Deutsch. |
+| Texte | Die Oberfläche bleibt englisch wie Healthchecks. Leiste, Kopfzeile, Meldungen und Vorlesetexte des Themes nutzen dieselbe Sprache und dieselben Begriffe. Der Gruß „Moin.“ auf der Anmeldeseite bleibt. Skripte auf dem Server melden auf Deutsch. Seit 1.1 spricht die Oberfläche Deutsch, siehe `2026-10-05-healthchecks-werkbank-deutsch-design.md`. |
 | Lizenz | BSD 2-Clause wie die übrigen Theme-Repos von bright color. Die Lizenz von Healthchecks (BSD 3-Clause) liegt als `UPSTREAM-LICENCE` bei, die Schriften mit ihrer OFL. Die Logos sind Marken von bright color und von der Repo-Lizenz ausgenommen. |
 
 ## 3. Ausgangslage

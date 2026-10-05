@@ -1053,7 +1053,7 @@ en = '''
                If there are multiple bots in the group, type
                <strong><code>/start@{{ bot_name }}</code></strong> instead.'''
 de = '''
-<p>Schick den Befehl <strong><code>/start</code></strong>. Sind mehrere Bots in der Gruppe, schick stattdessen <strong><code>/start@{{ bot_name }}</code></strong>.'''
+<p>Schick den Befehl <strong><code>/start</code></strong>. Sind mehrere Bots in der Gruppe, schick <strong><code>/start@{{ bot_name }}</code></strong>.'''
 
 [[quelltext]]
 datei = "hc/integrations/telegram/templates/add_telegram.html"
@@ -1616,7 +1616,7 @@ If the room does not have a Published Address,
                 look up its <strong>Internal Room ID</strong>
                 from the <strong>Room Settings › Advanced</strong> screen instead.'''
 de = '''
-Hat der Raum keine Published Address, nimm stattdessen die <strong>Internal Room ID</strong> aus <strong>Room Settings › Advanced</strong>.'''
+Hat der Raum keine Published Address, nimm die <strong>Internal Room ID</strong> aus <strong>Room Settings › Advanced</strong>.'''
 
 [[quelltext]]
 datei = "hc/integrations/matrix/templates/add_matrix.html"
