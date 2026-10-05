@@ -135,7 +135,7 @@ Onyx, 256 px breit, fest links, scrollt in sich, in beiden Modi gleich. Healthch
 
 - Unter 900 px fährt die Leiste aus dem Bild. Der Menüknopf holt sie herein, der Fokus wandert hinein, und ein Schleier legt sich über den Inhalt. Escape oder ein Fingertipp auf den Schleier schließen sie und geben den Fokus an den Menüknopf zurück. Eingeklappt ist sie `visibility: hidden` und damit aus der Tab-Reihenfolge.
 - Unter 640 px sind Listen zweizeilig: oben fett der Titel, darunter leise die übrigen Angaben, getrennt mit „ · “. Die Umstellung geschieht allein über CSS auf dem Markup von Healthchecks.
-  - Checks: Titel ist der Name, darunter letzter Ping · Zeitplan · Tags.
+  - Checks: Titel ist der Name mit den Tags darunter, so wie Healthchecks sie in derselben Zelle setzt; darunter leise letzter Ping · Zeitplan.
   - Integrations: Titel ist der Name der Integration, darunter ihre übrigen Spalten.
   - Ping-Log: Titel ist das Ereignis mit Zeitpunkt, darunter die übrigen Spalten.
 
@@ -168,7 +168,7 @@ Ein Workflow `build.yml` auf den Runnern von GitHub (`ubuntu-latest` für amd64,
 
 **2 · Bauen**
 
-- Je Plattform ein Job mit `docker buildx`. Das Ergebnis geht per Digest ohne Tag nach ghcr.io.
+- Je Plattform ein Job mit `docker buildx`. Das Ergebnis geht unter einem Arbeits-Tag je Plattform (`ci-amd64`, `ci-arm64`) nach ghcr.io; die eigentlichen Tags entstehen erst bei Grün.
 - Pull Requests bauen amd64 und laden das Image lokal.
 
 **3 · Prüfen**
