@@ -1,0 +1,10 @@
+[Unit]
+Description=healthchecks-werkbank: neue Fassung holen und mit Sicherung einspielen
+Documentation=https://github.com/brightcolor/healthchecks-werkbank
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hc-run hc-werkbank-update -- /usr/local/sbin/hc-werkbank-update

@@ -1,0 +1,9 @@
+[Unit]
+Description=healthchecks-werkbank: stündlich nach einer neuen Fassung sehen
+
+[Timer]
+OnCalendar=*-*-* *:37:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

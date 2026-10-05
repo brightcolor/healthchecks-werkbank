@@ -1,0 +1,35 @@
+# Einstellungen für hc-werkbank-update. Datei: /etc/hc-werkbank.conf, root:root, Rechte 600.
+# Jede Zeile NAME=Wert. Ohne Zeile gilt die Vorgabe, hier jeweils auskommentiert.
+# Kommentare beginnen mit # am Zeilenanfang.
+
+# Verfolgtes Image ohne Tag.
+#IMAGE=ghcr.io/brightcolor/healthchecks-werkbank
+# Beweglicher Tag, auf den das Skript schaut.
+#TRACK_TAG=latest
+# Ordner mit compose.yaml und .env von Healthchecks.
+#COMPOSE_DIR=/opt/healthchecks
+# Name des Dienstes in der Compose-Datei.
+#SERVICE=healthchecks
+# Variable in der .env, die den Tag der laufenden Fassung hält.
+#TAG_VARIABLE=HC_IMAGE_TAG
+# Pfad der SQLite-Datei im Container; leer: Wert von DB_NAME aus der .env.
+#DB_PATH=
+# Ablage der Sicherungen und wie viele davon bleiben (1 bis 100).
+#BACKUP_DIR=/root/backups/healthchecks
+#BACKUP_KEEP=10
+# Frist in Sekunden, bis der neue Container gesund sein muss (30 bis 1800).
+#WAIT_SECONDS=180
+# Port von Healthchecks im Container (1 bis 65535).
+#APP_PORT=8000
+# Pfade, die nach dem Start mit 200 antworten müssen, durch Leerzeichen getrennt.
+#CHECK_PATHS="/api/v3/status/ /accounts/login/"
+# Frist in Sekunden je Prüfanfrage (1 bis 120).
+#CHECK_TIMEOUT=10
+# Text, den jede geprüfte HTML-Seite enthalten muss.
+#STYLE_MARKER=bc/werkbank
+# Protokoll der Läufe und Sperrdatei.
+#LOG_FILE=/var/log/hc-werkbank-update.log
+#LOCK_FILE=/run/lock/hc-werkbank-update.lock
+# Vermerk einer zurückgenommenen Fassung; spätere Läufe lassen sie aus, bis
+# hc-werkbank-update --erneut läuft oder eine neuere Fassung erscheint.
+#FAILED_FILE=/var/lib/hc-werkbank-update/failed-version

@@ -1,0 +1,335 @@
+#!/usr/bin/env bash
+# hc-werkbank-update: holt die neueste Fassung von healthchecks-werkbank und
+# spielt sie mit Sicherung der Datenbank und Rückweg ein.
+#
+# Aufruf:   hc-werkbank-update [--einstellungen DATEI] [--nur-pruefen] [--erneut]
+#           --nur-pruefen  prüft nur die Einstellungen
+#           --erneut       versucht eine zurückgenommene Fassung noch einmal
+# Rückgabe: 0 aktuell oder gewechselt; 1 Update gescheitert und zurückgenommen,
+#           Fassung ausgelassen oder Image nicht erreichbar; 2 ungültige
+#           Einstellung; 3 Rückweg gescheitert.
+#
+# Läuft als root über hc-werkbank-update.timer, eingehüllt von hc-run.
+# Einstellungen: /etc/hc-werkbank.conf (Muster: hc-werkbank.conf.beispiel).
+set -euo pipefail
+
+# --- Vorgaben: jede Einstellung mit ihrem Wert an einer Stelle ----------------
+IMAGE="ghcr.io/brightcolor/healthchecks-werkbank"
+TRACK_TAG="latest"
+COMPOSE_DIR="/opt/healthchecks"
+SERVICE="healthchecks"
+TAG_VARIABLE="HC_IMAGE_TAG"
+DB_PATH=""
+BACKUP_DIR="/root/backups/healthchecks"
+BACKUP_KEEP="10"
+WAIT_SECONDS="180"
+APP_PORT="8000"
+CHECK_PATHS="/api/v3/status/ /accounts/login/"
+CHECK_TIMEOUT="10"
+STYLE_MARKER="bc/werkbank"
+LOG_FILE="/var/log/hc-werkbank-update.log"
+LOCK_FILE="/run/lock/hc-werkbank-update.lock"
+FAILED_FILE="/var/lib/hc-werkbank-update/failed-version"
+
+ERLAUBT="IMAGE TRACK_TAG COMPOSE_DIR SERVICE TAG_VARIABLE DB_PATH BACKUP_DIR BACKUP_KEEP WAIT_SECONDS APP_PORT CHECK_PATHS CHECK_TIMEOUT STYLE_MARKER LOG_FILE LOCK_FILE FAILED_FILE"
+EINSTELLUNGEN="${HC_WERKBANK_EINSTELLUNGEN:-/etc/hc-werkbank.conf}"
+COMPOSE_MINDEST="2.21.0"   # ab dieser Fassung kennt docker compose up --wait-timeout
+VERSION_LABEL="org.opencontainers.image.version"
+TAG_MUSTER='^[A-Za-z0-9_][A-Za-z0-9._-]{0,127}$'
+nur_pruefen=nein
+erneut=nein
+compose_datei=""
+pfade=()
+alt=""
+neu=""
+sicherung=""
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--einstellungen) EINSTELLUNGEN="${2:?--einstellungen braucht einen Dateipfad}"; shift 2 ;;
+		--nur-pruefen) nur_pruefen=ja; shift ;;
+		--erneut) erneut=ja; shift ;;
+		-h|--help) sed -n '2,13p' "$0"; exit 0 ;;
+		*) echo "Unbekannte Option $1. Erlaubt sind --einstellungen DATEI, --nur-pruefen und --erneut. Es wurde nichts geändert." >&2; exit 2 ;;
+	esac
+done
+
+abbruch_einstellung() { # Name, Satz
+	echo "Einstellung $1: $2 Trage einen gültigen Wert in $EINSTELLUNGEN ein. Es wurde nichts geändert." >&2
+	exit 2
+}
+
+lies_einstellungen() {
+	[ -e "$EINSTELLUNGEN" ] || return 0
+	if [ "${HC_WERKBANK_BESITZ_PRUEFEN:-ja}" != nein ]; then
+		local besitzer rechte
+		besitzer="$(stat -c %u "$EINSTELLUNGEN")"
+		rechte="$(stat -c %a "$EINSTELLUNGEN")"
+		if [ "$besitzer" != 0 ] || [ $((8#$rechte & 8#022)) -ne 0 ]; then
+			echo "$EINSTELLUNGEN gehört nicht root oder ist für andere schreibbar (Besitzer $besitzer, Rechte $rechte). Mit chown root:root und chmod 600 korrigieren. Es wurde nichts geändert." >&2
+			exit 2
+		fi
+	fi
+	local zeile schluessel wert nummer=0
+	while IFS= read -r zeile || [ -n "$zeile" ]; do
+		nummer=$((nummer + 1))
+		zeile="${zeile%$'\r'}"
+		case "$zeile" in ''|'#'*) continue ;; esac
+		if [[ ! "$zeile" =~ ^([A-Z_]+)=(.*)$ ]]; then
+			echo "Zeile $nummer in $EINSTELLUNGEN hat nicht die Form NAME=Wert: $zeile. Es wurde nichts geändert." >&2
+			exit 2
+		fi
+		schluessel="${BASH_REMATCH[1]}"
+		wert="${BASH_REMATCH[2]}"
+		case " $ERLAUBT " in
+			*" $schluessel "*) ;;
+			*) echo "Unbekannte Einstellung $schluessel in Zeile $nummer von $EINSTELLUNGEN. Erlaubt sind: $ERLAUBT. Es wurde nichts geändert." >&2; exit 2 ;;
+		esac
+		if [[ "$wert" =~ ^\"(.*)\"$ ]] || [[ "$wert" =~ ^\'(.*)\'$ ]]; then
+			wert="${BASH_REMATCH[1]}"
+		fi
+		printf -v "$schluessel" '%s' "$wert"
+	done < "$EINSTELLUNGEN"
+}
+
+env_lesen() { # Name; Wert aus der .env von Healthchecks
+	local wert=""
+	wert="$(grep -E "^$1=" "$COMPOSE_DIR/.env" | tail -n 1 | cut -d= -f2-)" || true
+	wert="${wert%$'\r'}"
+	if [[ "$wert" =~ ^\"(.*)\"$ ]] || [[ "$wert" =~ ^\'(.*)\'$ ]]; then
+		wert="${BASH_REMATCH[1]}"
+	fi
+	printf '%s' "$wert"
+}
+
+env_setzen() { # Name, Wert (ein geprüfter Tag)
+	sed -i "s|^$1=.*|$1=$2|" "$COMPOSE_DIR/.env"
+}
+
+lies_alt() { # Tag der laufenden Fassung aus der .env
+	alt="$(env_lesen "$TAG_VARIABLE")"
+	if ! [[ "$alt" =~ $TAG_MUSTER ]]; then
+		echo "In $COMPOSE_DIR/.env steht $TAG_VARIABLE=${alt}; das ist kein gültiger Tag. Den Tag der laufenden Fassung eintragen, etwa 4.4-wb1.0.0. Es wurde nichts geändert." >&2
+		exit 2
+	fi
+}
+
+ganzzahl() { # Name, Wert, Minimum, Maximum
+	if ! [[ "$2" =~ ^[0-9]+$ ]] || [ "$2" -lt "$3" ] || [ "$2" -gt "$4" ]; then
+		abbruch_einstellung "$1" "$1 ist ${2:-leer}. Erlaubt sind ganze Zahlen von $3 bis $4."
+	fi
+}
+
+absolut() { # Name, Wert
+	[[ "$2" == /* ]] || abbruch_einstellung "$1" "$1 ist ${2:-leer}. Erwartet ist ein absoluter Pfad, der mit / beginnt."
+}
+
+pruefe_einstellungen() {
+	if ! [[ "$IMAGE" =~ ^[a-z0-9][a-z0-9._:/-]*[a-z0-9]$ ]] || [[ "${IMAGE##*/}" == *:* ]]; then
+		abbruch_einstellung IMAGE "IMAGE ist ${IMAGE:-leer}. Erwartet ist ein Image-Name ohne Tag, etwa ghcr.io/brightcolor/healthchecks-werkbank."
+	fi
+	[[ "$TRACK_TAG" =~ $TAG_MUSTER ]] || abbruch_einstellung TRACK_TAG "TRACK_TAG ist ${TRACK_TAG:-leer}. Erlaubt sind Buchstaben, Ziffern, Punkt, Minus und Unterstrich, etwa latest."
+	absolut COMPOSE_DIR "$COMPOSE_DIR"
+	[ -d "$COMPOSE_DIR" ] || abbruch_einstellung COMPOSE_DIR "Den Ordner $COMPOSE_DIR gibt es nicht."
+	local name
+	for name in compose.yaml compose.yml docker-compose.yaml docker-compose.yml; do
+		if [ -f "$COMPOSE_DIR/$name" ]; then compose_datei="$COMPOSE_DIR/$name"; break; fi
+	done
+	[ -n "$compose_datei" ] || abbruch_einstellung COMPOSE_DIR "In $COMPOSE_DIR liegt keine compose.yaml."
+	[ -f "$COMPOSE_DIR/.env" ] || abbruch_einstellung COMPOSE_DIR "In $COMPOSE_DIR fehlt die Datei .env, in der $TAG_VARIABLE steht."
+	[[ "$SERVICE" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]*$ ]] || abbruch_einstellung SERVICE "SERVICE ist ${SERVICE:-leer}. Erwartet ist der Name des Dienstes aus der Compose-Datei, etwa healthchecks."
+	[[ "$TAG_VARIABLE" =~ ^[A-Z_][A-Z0-9_]*$ ]] || abbruch_einstellung TAG_VARIABLE "TAG_VARIABLE ist ${TAG_VARIABLE:-leer}. Erwartet ist ein Variablenname in Großbuchstaben, etwa HC_IMAGE_TAG."
+	grep -qE "^${TAG_VARIABLE}=" "$COMPOSE_DIR/.env" || abbruch_einstellung TAG_VARIABLE "In $COMPOSE_DIR/.env fehlt die Zeile ${TAG_VARIABLE}=…; sie hält den Tag der laufenden Fassung."
+	if [ -z "$DB_PATH" ]; then DB_PATH="$(env_lesen DB_NAME)"; fi
+	[ -n "$DB_PATH" ] || abbruch_einstellung DB_PATH "DB_PATH ist leer, und in $COMPOSE_DIR/.env steht kein DB_NAME. Den Pfad der SQLite-Datei im Container eintragen, etwa /data/hc.sqlite."
+	absolut DB_PATH "$DB_PATH"
+	absolut BACKUP_DIR "$BACKUP_DIR"
+	ganzzahl BACKUP_KEEP "$BACKUP_KEEP" 1 100
+	ganzzahl WAIT_SECONDS "$WAIT_SECONDS" 30 1800
+	ganzzahl APP_PORT "$APP_PORT" 1 65535
+	ganzzahl CHECK_TIMEOUT "$CHECK_TIMEOUT" 1 120
+	# read -a teilt an Leerzeichen und lässt Zeichen wie * als Text stehen.
+	read -r -a pfade <<< "$CHECK_PATHS"
+	[ "${#pfade[@]}" -gt 0 ] || abbruch_einstellung CHECK_PATHS "CHECK_PATHS ist leer. Mindestens einen Pfad eintragen, etwa /api/v3/status/."
+	local pfad
+	for pfad in "${pfade[@]}"; do
+		[[ "$pfad" == /* ]] || abbruch_einstellung CHECK_PATHS "Der Pfad $pfad beginnt nicht mit /."
+		[[ "$pfad" =~ ^/[A-Za-z0-9._~/%-]*$ ]] || abbruch_einstellung CHECK_PATHS "Der Pfad $pfad enthält andere Zeichen als Buchstaben, Ziffern und ._~/%-."
+	done
+	[ -n "$STYLE_MARKER" ] || abbruch_einstellung STYLE_MARKER "STYLE_MARKER ist leer. Erwartet ist ein Text, den jede geprüfte HTML-Seite enthält, etwa bc/werkbank."
+	absolut LOG_FILE "$LOG_FILE"
+	absolut LOCK_FILE "$LOCK_FILE"
+	absolut FAILED_FILE "$FAILED_FILE"
+	lies_alt
+}
+
+log() {
+	local zeile
+	zeile="$(date -u +%Y-%m-%dT%H:%M:%SZ) $*"
+	echo "$zeile"
+	echo "$zeile" >> "$LOG_FILE"
+}
+
+compose() { docker compose --project-directory "$COMPOSE_DIR" "$@"; }
+
+ausgelassen() { # gelingt, wenn $neu als gescheitert vermerkt ist
+	[ -f "$FAILED_FILE" ] && [ "$(head -n 1 "$FAILED_FILE")" = "$neu" ]
+}
+
+vermerke_gescheitert() {
+	mkdir -p "$(dirname "$FAILED_FILE")"
+	printf '%s\n%s\n' "$neu" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$FAILED_FILE"
+}
+
+pruefe_dienst() {
+	local behaelter zustand ergebnis
+	behaelter="$(compose ps -q "$SERVICE")"
+	if [ -z "$behaelter" ]; then log "Der Container von $SERVICE läuft nicht."; return 1; fi
+	zustand="$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}ohne Prüfung{{end}}' "$behaelter")"
+	if [ "$zustand" != healthy ]; then log "Der Container ist $zustand, erwartet ist healthy."; return 1; fi
+	if ! ergebnis="$(compose exec -T "$SERVICE" python - "$APP_PORT" "$CHECK_TIMEOUT" "$STYLE_MARKER" "${pfade[@]}" 2>&1 <<'PY'
+import os
+import sys
+import urllib.error
+import urllib.request
+from urllib.parse import urlparse
+
+port, frist, merkmal, pfade = sys.argv[1], float(sys.argv[2]), sys.argv[3], sys.argv[4:]
+seite = urlparse(os.getenv("SITE_ROOT", "http://localhost:8000"))
+basis = seite.path.rstrip("/")
+fehler = []
+for pfad in pfade:
+    anfrage = urllib.request.Request(f"http://localhost:{port}{basis}{pfad}", headers={"Host": seite.netloc})
+    try:
+        with urllib.request.urlopen(anfrage, timeout=frist) as antwort:
+            text = antwort.read().decode("utf-8", "replace")
+            if "text/html" in antwort.headers.get("Content-Type", "") and merkmal not in text:
+                fehler.append(f"{pfad} enthält {merkmal} nicht")
+    except urllib.error.HTTPError as err:
+        fehler.append(f"{pfad} antwortet mit HTTP {err.code}")
+    except OSError as err:
+        fehler.append(f"{pfad} ist nicht erreichbar ({err})")
+print("; ".join(fehler) if fehler else "Prüfung bestanden")
+sys.exit(1 if fehler else 0)
+PY
+)"; then
+		log "Prüfung im Container gescheitert: $ergebnis"
+		return 1
+	fi
+	log "Prüfung im Container: $ergebnis"
+}
+
+sichern() {
+	mkdir -p "$BACKUP_DIR"
+	chmod 700 "$BACKUP_DIR"
+	sicherung="$BACKUP_DIR/healthchecks-$alt-$(date -u +%Y%m%dT%H%M%SZ).sqlite"
+	local im_behaelter="/tmp/hc-werkbank-sicherung.sqlite" ausgabe
+	if ! ausgabe="$(compose exec -T "$SERVICE" python - "$DB_PATH" "$im_behaelter" 2>&1 <<'PY'
+import sqlite3
+import sys
+
+quelle = sqlite3.connect(f"file:{sys.argv[1]}?mode=ro", uri=True)
+ziel = sqlite3.connect(sys.argv[2])
+quelle.backup(ziel)
+ergebnis = ziel.execute("PRAGMA integrity_check").fetchone()[0]
+ziel.close()
+quelle.close()
+if ergebnis != "ok":
+    print(f"Die Integritätsprüfung der Sicherung meldet: {ergebnis}")
+    sys.exit(1)
+PY
+)"; then
+		log "Die Sicherung der Datenbank $DB_PATH ist gescheitert: $ausgabe Es wurde nichts geändert; $alt läuft weiter, der nächste Lauf versucht es erneut."
+		exit 1
+	fi
+	if ! compose cp "$SERVICE:$im_behaelter" "$sicherung" >/dev/null 2>&1; then
+		log "Die Sicherung ließ sich nicht aus dem Container nach $BACKUP_DIR kopieren. Es wurde nichts geändert; $alt läuft weiter. Platz und Rechte in $BACKUP_DIR prüfen."
+		exit 1
+	fi
+	compose exec -T "$SERVICE" rm -f "$im_behaelter" >/dev/null 2>&1 || true
+	chmod 600 "$sicherung"
+	log "Sicherung angelegt: $sicherung."
+	find "$BACKUP_DIR" -maxdepth 1 -name 'healthchecks-*.sqlite' -printf '%T@ %p\n' | sort -rn \
+		| tail -n +"$((BACKUP_KEEP + 1))" | cut -d' ' -f2- | xargs -r -d '\n' rm -f --
+}
+
+rueckweg() {
+	vermerke_gescheitert
+	log "Rückweg: zurück auf $alt mit der Datenbank aus $sicherung."
+	env_setzen "$TAG_VARIABLE" "$alt"
+	compose stop "$SERVICE" >/dev/null 2>&1 || true
+	# shellcheck disable=SC2016 # $1 wertet die Shell im Container aus
+	if compose run --rm --no-deps -T --user root --entrypoint sh "$SERVICE" \
+			-c 'rm -f "$1-wal" "$1-shm" && cat > "$1" && chown --reference="$(dirname "$1")" "$1"' sh "$DB_PATH" \
+			< "$sicherung" >/dev/null 2>&1 \
+		&& compose up -d --wait --wait-timeout "$WAIT_SECONDS" "$SERVICE" >/dev/null 2>&1 \
+		&& pruefe_dienst; then
+		log "Rückweg erledigt: $alt läuft wieder mit der Datenbank von vor dem Update. Spätere Läufe lassen $neu aus; den Grund nennen die Zeilen darüber und docker compose logs $SERVICE. Nach der Klärung versucht hc-werkbank-update --erneut die Fassung noch einmal."
+		exit 1
+	fi
+	log "Rückweg gescheitert. Handarbeit: In $COMPOSE_DIR/.env steht schon $TAG_VARIABLE=$alt. Die Datenbank aus $sicherung nach $DB_PATH im Volume von $SERVICE kopieren, dann in $COMPOSE_DIR docker compose up -d ausführen."
+	exit 3
+}
+
+lies_einstellungen
+pruefe_einstellungen
+if [ "$nur_pruefen" = ja ]; then
+	echo "Einstellungen in Ordnung ($EINSTELLUNGEN)."
+	exit 0
+fi
+
+if ! command -v docker >/dev/null 2>&1; then
+	echo "docker fehlt auf diesem System. Das Skript läuft auf dem Docker-Host von Healthchecks. Es wurde nichts geändert." >&2
+	exit 2
+fi
+compose_fassung="$(docker compose version --short 2>/dev/null || true)"
+compose_fassung="${compose_fassung#v}"
+if [ -z "$compose_fassung" ] || [ "$(printf '%s\n' "$COMPOSE_MINDEST" "$compose_fassung" | sort -V | head -n 1)" != "$COMPOSE_MINDEST" ]; then
+	echo "docker compose ${compose_fassung:-fehlt} ist zu alt; gebraucht wird $COMPOSE_MINDEST oder neuer (für --wait-timeout). Docker Compose aktualisieren. Es wurde nichts geändert." >&2
+	exit 2
+fi
+compose config --services 2>/dev/null | grep -qx "$SERVICE" || abbruch_einstellung SERVICE "Den Dienst $SERVICE gibt es in $compose_datei nicht."
+
+mkdir -p "$(dirname "$LOG_FILE")" "$(dirname "$LOCK_FILE")"
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+	log "Ein anderer Lauf arbeitet noch (Sperre $LOCK_FILE). Dieser Lauf endet ohne Änderung."
+	exit 0
+fi
+
+lies_alt
+if ! fehler="$({ docker pull -q "$IMAGE:$TRACK_TAG" >/dev/null; } 2>&1)"; then
+	log "Das Image $IMAGE:$TRACK_TAG ließ sich nicht holen ($fehler). Die laufende Fassung $alt bleibt; der nächste Lauf versucht es erneut. Hält der Fehler an, die Verbindung zur Registry prüfen."
+	exit 1
+fi
+neu="$(docker image inspect -f "{{ index .Config.Labels \"$VERSION_LABEL\" }}" "$IMAGE:$TRACK_TAG" 2>/dev/null || true)"
+if ! [[ "$neu" =~ $TAG_MUSTER ]]; then
+	log "Das Image $IMAGE:$TRACK_TAG trägt kein gültiges Label $VERSION_LABEL (gefunden: ${neu:-nichts}). Die laufende Fassung $alt bleibt. IMAGE und TRACK_TAG in $EINSTELLUNGEN prüfen; die Images aus der CI von healthchecks-werkbank tragen das Label."
+	exit 1
+fi
+if [ "$neu" = "$alt" ]; then
+	log "Aktuell: $alt läuft bereits."
+	exit 0
+fi
+if ausgelassen; then
+	if [ "$erneut" = nein ]; then
+		log "Die Fassung $neu ist am $(sed -n 2p "$FAILED_FILE") gescheitert und wurde zurückgenommen; $alt läuft weiter. Dieser Lauf lässt sie aus. Nach der Klärung versucht hc-werkbank-update --erneut sie noch einmal."
+		exit 1
+	fi
+	log "Neuer Versuch mit $neu auf Wunsch (--erneut)."
+fi
+if ! docker pull -q "$IMAGE:$neu" >/dev/null 2>&1; then
+	log "Der feste Tag $IMAGE:$neu fehlt in der Registry. Die laufende Fassung $alt bleibt; der nächste Lauf versucht es erneut."
+	exit 1
+fi
+log "Neue Fassung $neu gefunden, laufend ist $alt."
+sichern
+env_setzen "$TAG_VARIABLE" "$neu"
+log "Starte $SERVICE mit $neu."
+if start="$(compose up -d --wait --wait-timeout "$WAIT_SECONDS" "$SERVICE" 2>&1)" && pruefe_dienst; then
+	rm -f "$FAILED_FILE"
+	log "Gewechselt auf $neu. Sicherung: $sicherung."
+	exit 0
+fi
+log "Die neue Fassung $neu besteht die Prüfung nicht. ${start##*$'\n'}"
+rueckweg
