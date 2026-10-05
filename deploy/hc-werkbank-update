@@ -249,7 +249,8 @@ PY
 		log "Die Sicherung ließ sich nicht aus dem Container nach $BACKUP_DIR kopieren. Es wurde nichts geändert; $alt läuft weiter. Platz und Rechte in $BACKUP_DIR prüfen."
 		exit 1
 	fi
-	compose exec -T "$SERVICE" rm -f "$im_behaelter" >/dev/null 2>&1 || true
+	# </dev/null: compose exec liest sonst die Standardeingabe des Aufrufers mit.
+	compose exec -T "$SERVICE" rm -f "$im_behaelter" </dev/null >/dev/null 2>&1 || true
 	chmod 600 "$sicherung"
 	log "Sicherung angelegt: $sicherung."
 	find "$BACKUP_DIR" -maxdepth 1 -name 'healthchecks-*.sqlite' -printf '%T@ %p\n' | sort -rn \
