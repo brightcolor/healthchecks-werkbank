@@ -1,0 +1,259 @@
+import json
+import sys
+import tomllib
+from pathlib import Path
+
+import pytest
+
+WURZEL = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(WURZEL / "werkbank"))
+import sprache  # noqa: E402
+
+KATALOG_KONFIG = """
+[katalog]
+stand = "v9.9"
+
+[bereich]
+vorlagen = ["templates/**/*.html"]
+ausnahmen = ["templates/docs/**"]
+
+[zustaende]
+down = "ausgefallen"
+"""
+
+ERWEITERUNG = """
+[[quelltext]]
+datei = "hc/extras.py"
+anzahl = 1
+en = '''
+register = 1
+'''
+de = '''
+register = 1
+erweitert = True
+'''
+"""
+
+EINSTELLUNGEN = 'SPRACHE = "@@WB_SPRACHE@@"\nZUSTAENDE = @@WB_ZUSTAENDE@@\nFORMATE = "@@WB_FORMATMODUL@@"\n'
+
+
+def aufbau(tmp_path, katalog="", dateien=None, erweiterung=ERWEITERUNG):
+    wurzel = tmp_path / "hc-wurzel"
+    werkbank = tmp_path / "werkbank"
+    formate = werkbank / "django" / "werkbank_formate" / "de"
+    (werkbank / "deutsch").mkdir(parents=True)
+    formate.mkdir(parents=True)
+    (werkbank / "deutsch" / "katalog.toml").write_bytes(KATALOG_KONFIG.encode())
+    (werkbank / "deutsch" / "test.toml").write_bytes(katalog.encode())
+    (werkbank / "erweiterungen.toml").write_bytes(erweiterung.encode())
+    (werkbank / "django" / "werkbank_einstellungen.py").write_bytes(EINSTELLUNGEN.encode())
+    (werkbank / "django" / "werkbank_formate" / "__init__.py").write_bytes(b"")
+    (formate / "__init__.py").write_bytes(b"")
+    (formate / "formats.py").write_bytes(b'DECIMAL_SEPARATOR = "."\n')
+    alle = {"hc/extras.py": "import x\nregister = 1\n"}
+    alle.update(dateien or {})
+    for rel, inhalt in alle.items():
+        pfad = wurzel / rel
+        pfad.parent.mkdir(parents=True, exist_ok=True)
+        pfad.write_bytes(inhalt.encode("utf-8"))
+    return wurzel, werkbank
+
+
+def lies(wurzel, rel):
+    return (wurzel / rel).read_bytes().decode("utf-8")
+
+
+def text(datei, en, de):
+    return f'[[text]]\ndatei = "{datei}"\nen = "{en}"\nde = "{de}"\n\n'
+
+
+def test_text_ersetzt_ganze_stuecke_und_behaelt_leerraum(tmp_path):
+    katalog = text("templates/a.html", "Last Ping", "Letzter Ping") + text("templates/a.html", "Log", "Protokoll")
+    wurzel, werkbank = aufbau(tmp_path, katalog, {"templates/a.html": "<th>\n  Last   Ping\n</th><a>Login</a><b>Log</b>"})
+    sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/a.html") == "<th>\n  Letzter Ping\n</th><a>Login</a><b>Protokoll</b>"
+
+
+def test_sichtbare_attribute_und_knoepfe(tmp_path):
+    katalog = (text("*", "Search", "Suchen") + text("*", "Save", "Speichern") + text("*", "Close", "Schließen")
+               + text("*", "Logo", "Logo der Instanz"))
+    quelle = ('<input type="text" placeholder="Search" value="Save" class="Save">'
+              '<input type="submit" value="Save"><button title="Close" aria-label="Close">x</button>'
+              '<img alt="Logo" src="Logo"><a href="Close">y</a>')
+    wurzel, werkbank = aufbau(tmp_path, katalog, {"templates/b.html": quelle})
+    sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/b.html") == (
+        '<input type="text" placeholder="Suchen" value="Save" class="Save">'
+        '<input type="submit" value="Speichern"><button title="Schließen" aria-label="Schließen">x</button>'
+        '<img alt="Logo der Instanz" src="Logo"><a href="Close">y</a>')
+
+
+def test_opake_bereiche_und_kommentare_bleiben(tmp_path):
+    quelle = ("<script>var t = 'Close';</script><style>.Close{}</style><pre>Close</pre><code>Close</code>"
+              "<textarea>Close</textarea><!-- Close -->{# Close #}{% comment %}Close{% endcomment %}<p>Close</p>")
+    wurzel, werkbank = aufbau(tmp_path, text("*", "Close", "Schließen"), {"templates/c.html": quelle})
+    sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/c.html") == quelle.replace("<p>Close</p>", "<p>Schließen</p>")
+
+
+def test_quelltext_ersetzt_alle_und_prueft_die_anzahl(tmp_path):
+    katalog = """
+[[quelltext]]
+datei = "hc/views.py"
+en = '"Saved!"'
+de = '"Gespeichert."'
+
+[[quelltext]]
+datei = "hc/views.py"
+anzahl = 1
+en = '"Removed"'
+de = '"Entfernt"'
+"""
+    quelle = 'a = "Saved!"\nb = "Saved!"\nc = "Removed"\nd = "Removed"\n'
+    wurzel, werkbank = aufbau(tmp_path, katalog, {"hc/views.py": quelle})
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "hc/views.py") == 'a = "Gespeichert."\nb = "Gespeichert."\nc = "Removed"\nd = "Removed"\n'
+    assert bericht["ohne_fundstelle"] == [
+        {"datei": "hc/views.py", "art": "quelltext", "en": '"Removed"', "grund": "2-mal gefunden, erwartet 1"}]
+
+
+def test_dateieigene_eintraege_gehen_vor(tmp_path):
+    katalog = text("*", "Close", "Schließen") + text("templates/d.html", "Close", "Zu")
+    wurzel, werkbank = aufbau(tmp_path, katalog, {"templates/d.html": "<b>Close</b>", "templates/e.html": "<b>Close</b>"})
+    sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/d.html") == "<b>Zu</b>"
+    assert lies(wurzel, "templates/e.html") == "<b>Schließen</b>"
+
+
+def test_erkennung_meldet_nur_unberuehrte_englische_stuecke(tmp_path):
+    katalog = text("*", "Last Ping", "Letzter Ping") + text("*", "Slack", "Slack") + """
+[[quelltext]]
+datei = "templates/f.html"
+en = "<p>Run <b>now</b></p>"
+de = "<p>Jetzt <b>starten</b></p>"
+"""
+    quelle = "<h1>Hello world</h1><td>Last Ping</td><i>Slack</i><p>Run <b>now</b></p>{{ check.name }}"
+    wurzel, werkbank = aufbau(tmp_path, katalog, {"templates/f.html": quelle})
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert bericht["englisch"] == [{"datei": "templates/f.html", "text": "Hello world"}]
+
+
+def test_fehlende_datei_und_unbenutzte_globale_eintraege(tmp_path):
+    katalog = text("templates/fehlt.html", "Hello", "Hallo") + text("*", "Nowhere", "Nirgends")
+    wurzel, werkbank = aufbau(tmp_path, katalog, {"templates/g.html": "<b>x</b>"})
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert {"datei": "templates/fehlt.html", "art": "text", "en": "Hello", "grund": "Datei fehlt"} in bericht["ohne_fundstelle"]
+    assert {"datei": "*", "art": "text", "en": "Nowhere", "grund": "in keiner Vorlage gefunden"} in bericht["ohne_fundstelle"]
+
+
+def test_ausnahmen_bleiben_unberuehrt_und_ungemeldet(tmp_path):
+    wurzel, werkbank = aufbau(tmp_path, text("*", "Hello", "Hallo"),
+                              {"templates/docs/x.html": "<p>Hello</p><p>Docs only</p>", "templates/h.html": "<p>Hello</p>"})
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/docs/x.html") == "<p>Hello</p><p>Docs only</p>"
+    assert lies(wurzel, "templates/h.html") == "<p>Hallo</p>"
+    assert bericht["englisch"] == []
+
+
+def test_englisch_laesst_die_texte_stehen(tmp_path, monkeypatch):
+    monkeypatch.setenv("WB_SPRACHE", "en")
+    wurzel, werkbank = aufbau(tmp_path, text("*", "Hello", "Hallo"), {"templates/i.html": "<p>Hello</p>"})
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/i.html") == "<p>Hello</p>"
+    assert bericht["sprache"] == "en"
+    assert 'SPRACHE = "en"' in lies(wurzel, "hc/werkbank_einstellungen.py")
+    assert "ZUSTAENDE = {}" in lies(wurzel, "hc/werkbank_einstellungen.py")
+    assert "erweitert = True" in lies(wurzel, "hc/extras.py")
+
+
+def test_einstellungsmodul_formatmodul_und_local_settings(tmp_path):
+    wurzel, werkbank = aufbau(tmp_path)
+    sprache.bauen(wurzel, werkbank)
+    modul = lies(wurzel, "hc/werkbank_einstellungen.py")
+    assert 'SPRACHE = "de"' in modul
+    assert 'ZUSTAENDE = {"down": "ausgefallen"}' in modul
+    assert 'FORMATE = "hc.werkbank_formate"' in modul
+    assert lies(wurzel, "hc/werkbank_formate/de/formats.py") == 'DECIMAL_SEPARATOR = "."\n'
+    assert lies(wurzel, "hc/local_settings.py").startswith("from hc.werkbank_einstellungen import *")
+
+
+def test_andere_ziele_fuer_module(tmp_path, monkeypatch):
+    monkeypatch.setenv("WB_EINSTELLUNGSMODUL", "hc/eigene_einstellungen.py")
+    monkeypatch.setenv("WB_FORMATMODUL", "hc/eigene_formate")
+    monkeypatch.setenv("WB_LOCAL_SETTINGS", "hc/andere_settings.py")
+    wurzel, werkbank = aufbau(tmp_path)
+    sprache.bauen(wurzel, werkbank)
+    assert 'FORMATE = "hc.eigene_formate"' in lies(wurzel, "hc/eigene_einstellungen.py")
+    assert (wurzel / "hc/eigene_formate/de/formats.py").is_file()
+    assert lies(wurzel, "hc/andere_settings.py").startswith("from hc.eigene_einstellungen import *")
+
+
+@pytest.mark.parametrize("katalog, meldung", [
+    ("text = [", "kein gültiges TOML"),
+    ("[[foo]]\nx = 1\n", "unbekannte Abschnitte foo"),
+    ('[[text]]\ndatei = "*"\nen = "A"\ndee = "B"\n', "unbekannte Schlüssel dee"),
+    ('[[text]]\ndatei = "*"\nen = "A"\nde = " "\n', "de fehlt oder ist leer"),
+    ('[[text]]\ndatei = "*"\nen = "A"\nde = "B"\nanzahl = 2\n', "anzahl gilt nur für"),
+    ('[[quelltext]]\ndatei = "x.py"\nen = "A"\nde = "B"\nanzahl = 0\n', "anzahl ist 0"),
+    ('[[quelltext]]\ndatei = "*"\nen = "A"\nde = "B"\n', "brauchen eine bestimmte Datei"),
+    (text("*", "A", "B") + text("*", "A", "C"), "doppelt"),
+])
+def test_ungueltiger_katalog(tmp_path, katalog, meldung):
+    wurzel, werkbank = aufbau(tmp_path, katalog)
+    with pytest.raises(sprache.SprachFehler, match=meldung):
+        sprache.bauen(wurzel, werkbank)
+
+
+def test_attribut_ersatz_mit_anfuehrungszeichen(tmp_path):
+    katalog = '[[text]]\ndatei = "*"\nen = "Close"\nde = \'Das "Ende"\'\n'
+    wurzel, werkbank = aufbau(tmp_path, katalog, {"templates/j.html": '<a title="Close">x</a>'})
+    with pytest.raises(sprache.SprachFehler, match="Anführungszeichen"):
+        sprache.bauen(wurzel, werkbank)
+
+
+@pytest.mark.parametrize("name, wert, meldung", [
+    ("WB_SPRACHE", "fr", "WB_SPRACHE ist 'fr'"),
+    ("WB_KATALOG", "fehlt", "Den Katalog-Ordner"),
+    ("WB_LOCAL_SETTINGS", "../draussen.py", "WB_LOCAL_SETTINGS ist '../draussen.py'"),
+])
+def test_ungueltige_einstellungen(tmp_path, monkeypatch, name, wert, meldung):
+    monkeypatch.setenv(name, wert)
+    wurzel, werkbank = aufbau(tmp_path)
+    with pytest.raises(sprache.SprachFehler, match=meldung):
+        sprache.bauen(wurzel, werkbank)
+
+
+def test_erweiterung_ohne_anker_bricht_ab(tmp_path):
+    wurzel, werkbank = aufbau(tmp_path, dateien={"hc/extras.py": "import x\n"})
+    with pytest.raises(sprache.SprachFehler, match="Anker steht 0-mal in hc/extras.py"):
+        sprache.bauen(wurzel, werkbank)
+
+
+def test_crlf_bleibt_erhalten(tmp_path):
+    wurzel, werkbank = aufbau(tmp_path, text("*", "Hello", "Hallo"), {"templates/k.html": "<p>\r\nHello\r\n</p>\r\n"})
+    sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/k.html") == "<p>\r\nHallo\r\n</p>\r\n"
+
+
+def test_inventur_liefert_gueltiges_toml(tmp_path):
+    wurzel, werkbank = aufbau(tmp_path, dateien={
+        "templates/l.html": '<p>Hello world</p><b>Cancel</b><p>Say "hi"</p>',
+        "templates/m.html": "<b>Cancel</b>"})
+    geruest = tomllib.loads(sprache.inventur(wurzel, werkbank, global_ab=2))
+    eintraege = {(e["datei"], e["en"]) for e in geruest["text"]}
+    assert ("*", "Cancel") in eintraege
+    assert ("templates/l.html", "Hello world") in eintraege
+    assert ("templates/l.html", 'Say "hi"') in eintraege
+    assert all(e["de"] == "" for e in geruest["text"])
+    assert lies(wurzel, "templates/l.html").startswith("<p>Hello world</p>")
+
+
+def test_bericht_wird_als_abschnitt_eingefuegt(tmp_path):
+    wurzel, werkbank = aufbau(tmp_path, text("*", "Hello", "Hallo"), {"templates/n.html": "<p>Hello</p>"})
+    bericht = tmp_path / "bericht.json"
+    bericht.write_text(json.dumps({"fassung": "x"}), encoding="utf-8")
+    sprache.bauen(wurzel, werkbank, bericht)
+    daten = json.loads(bericht.read_text(encoding="utf-8"))
+    assert daten["fassung"] == "x"
+    assert daten["uebersetzung"]["ersetzt"] == 1
+    assert daten["uebersetzung"]["stand"] == "v9.9"
