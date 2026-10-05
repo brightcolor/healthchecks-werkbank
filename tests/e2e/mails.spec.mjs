@@ -20,27 +20,36 @@ for (const name of mails) {
     const html = readFileSync(path.join(ordner, `${name}.html`), 'utf8');
     // Über die Adresse der Instanz ausliefern: Logo und Schriften kommen dann aus derselben Quelle.
     await page.route('**/__werkbank-mail', (route) => route.fulfill({ contentType: 'text/html; charset=utf-8', body: html }));
+    const befunde = [];
     for (const breite of breiten) {
       await page.setViewportSize({ width: breite, height: 900 });
       await page.goto('/__werkbank-mail');
       await page.evaluate(() => document.fonts.ready);
       const ueber = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-      expect(ueber, `${name} ist bei ${breite} px ${ueber} px zu breit`).toBeLessThanOrEqual(0);
+      if (ueber > 0) befunde.push(`bei ${breite} px ${ueber} px zu breit`);
       await page.screenshot({ path: `${bilder}/mail-${name}-${breite}.png`, fullPage: true });
     }
     const k = await kontrast(page);
-    expect(k.findings, `Kontrast ${name}: ${k.summary}`).toEqual([]);
+    if (k.findings.length) befunde.push(`Kontrast: ${k.summary}`);
     const logo = page.locator('img[alt="bright color"]');
-    await expect(logo, `${name} steht im Werkbank-Layout`).toHaveCount(1, { timeout: 5000 });
-    expect(await logo.evaluate((img) => img.naturalWidth), 'Logo geladen').toBeGreaterThan(0);
-    if (katalogStand) {
-      const betreff = readFileSync(path.join(ordner, `${name}-betreff.txt`), 'utf8');
-      expect(betreff, `Betreff von ${name}`).not.toMatch(englisch);
-      // Nur-Text-Fassung: Zeilen bis 78 Zeichen; Adressen ohne Leerzeichen und Tabellenzeilen dürfen länger sein.
-      const zeilen = readFileSync(path.join(ordner, `${name}.txt`), 'utf8').split('\n');
-      const lang = zeilen.filter((z) => z.length > 78 && z.trim().includes(' ') && !/^[+|]/.test(z));
-      expect(lang, `Zeilen über 78 Zeichen in ${name}.txt`).toEqual([]);
-      expect(zeilen.filter((z) => z === '--'), `Signaturtrenner in ${name}.txt ohne Leerzeichen`).toEqual([]);
+    if ((await logo.count()) === 1) {
+      expect(await logo.evaluate((img) => img.naturalWidth), 'Logo geladen').toBeGreaterThan(0);
+    } else {
+      befunde.push('steht nicht im Werkbank-Layout');
     }
+    // Die deutschen Mails gelten für die Version aus katalog.toml. Ändert Healthchecks eine Vorlage,
+    // bleibt sie englisch im Original; das ist ein Hinweis (Issue „uebersetzung“), kein Halt.
+    if (!katalogStand) {
+      if (befunde.length) test.info().annotations.push({ type: 'Hinweis', description: `${name}: ${befunde.join('; ')}` });
+      return;
+    }
+    expect(befunde, `Mail ${name}`).toEqual([]);
+    const betreff = readFileSync(path.join(ordner, `${name}-betreff.txt`), 'utf8');
+    expect(betreff, `Betreff von ${name}`).not.toMatch(englisch);
+    // Nur-Text-Fassung: Zeilen bis 78 Zeichen; Adressen ohne Leerzeichen und Tabellenzeilen dürfen länger sein.
+    const zeilen = readFileSync(path.join(ordner, `${name}.txt`), 'utf8').split('\n');
+    const lang = zeilen.filter((z) => z.length > 78 && z.trim().includes(' ') && !/^[+|]/.test(z));
+    expect(lang, `Zeilen über 78 Zeichen in ${name}.txt`).toEqual([]);
+    expect(zeilen.filter((z) => z === '--'), `Signaturtrenner in ${name}.txt ohne Leerzeichen`).toEqual([]);
   });
 }

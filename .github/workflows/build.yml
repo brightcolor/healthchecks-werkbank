@@ -134,6 +134,8 @@ jobs:
         env:
           WB_BROWSER_KANAL: chrome
           WB_BASIS_URL: http://localhost:8000
+          # Texte von Healthchecks prüft der Browser nur gegen die Version aus katalog.toml.
+          WB_HC_VERSION: ${{ env.HC_TAG }}
         run: |
           npm ci
           tools/ci/schritt.sh browser -- npx playwright test
@@ -142,13 +144,23 @@ jobs:
         if: matrix.arch == 'amd64'
         run: tools/ci/schritt.sh update-probe -- tests/update/probe.sh wb-test:lokal
 
-      - name: Bericht der Farbableitung
+      - name: Bericht des Baus
         if: always() && matrix.arch == 'amd64'
+        env:
+          WB_HC_VERSION: ${{ env.HC_TAG }}
         run: |
           mkdir -p artefakte
           if docker run --rm --entrypoint cat wb-test:lokal /opt/healthchecks/werkbank-bericht.json > artefakte/werkbank-bericht.json; then
             python tools/ci/bericht.py artefakte/werkbank-bericht.json >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Bericht für das Hinweis-Issue sichern
+        if: always() && matrix.arch == 'amd64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bericht
+          path: artefakte/werkbank-bericht.json
+          if-no-files-found: ignore
 
       - name: Ergebnisse sichern
         if: always()
@@ -236,6 +248,19 @@ jobs:
           GH_REPO: ${{ github.repository }}
           LAUF_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: tools/ci/meldung.sh gruen
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: bericht
+          path: bericht
+      - name: Hinweis zur Übersetzung
+        # Die Fassung ist veröffentlicht; ein Hinweis ändert daran nichts.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          LAUF_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: tools/ci/hinweis.sh bericht/werkbank-bericht.json
 
   meldung:
     name: Meldung bei Rot
