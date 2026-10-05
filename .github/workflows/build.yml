@@ -71,8 +71,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Feste Ubuntu-Fassung für beide Plattformen: Browser und Shellcheck bleiben gleich.
           - arch: amd64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
           - arch: arm64
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}

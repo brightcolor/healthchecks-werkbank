@@ -204,7 +204,9 @@ for pfad in pfade:
     try:
         with urllib.request.urlopen(anfrage, timeout=frist) as antwort:
             text = antwort.read().decode("utf-8", "replace")
-            if "text/html" in antwort.headers.get("Content-Type", "") and merkmal not in text:
+            # Das Merkmal gehört in HTML-Dokumente. Django liefert auch die schlichte
+            # Statusantwort "OK" als text/html aus; sie enthält kein <html>.
+            if "<html" in text.lower() and merkmal not in text:
                 fehler.append(f"{pfad} enthält {merkmal} nicht")
     except urllib.error.HTTPError as err:
         fehler.append(f"{pfad} antwortet mit HTTP {err.code}")
