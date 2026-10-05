@@ -1,0 +1,12 @@
+{
+  "name": "healthchecks-werkbank-pruefung",
+  "private": true,
+  "type": "module",
+  "description": "Browserprüfung der Werkbank für Healthchecks",
+  "scripts": {
+    "pruefen": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}
