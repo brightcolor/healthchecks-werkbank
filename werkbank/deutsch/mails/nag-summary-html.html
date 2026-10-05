@@ -1,0 +1,41 @@
+{% load humanize hc_extras %}
+{% regroup checks by project as groups %}
+{% spaceless %}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%; margin:0 0 24px;">
+    {% for group in groups %}
+    <tr>
+        <td style="padding:24px 8px 8px 0; font-weight:700; color:#111111; word-break:break-word;">
+            {{ group.grouper|mangle_link }}
+        </td>
+        <td style="padding:24px 0 8px 8px; font-size:12px; line-height:18px; color:#4a4a4a; text-align:right; vertical-align:bottom; white-space:nowrap;">Letzter Ping</td>
+    </tr>
+    {% for check in group.list|sortchecks:"name" %}
+    <tr>
+        <td valign="top" style="padding:12px 8px 12px 0; border-top:1px solid #e3e0d8; word-break:break-word;">
+            <span style="display:inline-block; margin:0 0 4px; padding:1px 6px; background-color:#d61f7a; color:#ffffff; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">ausgefallen</span><br>
+            {% if check.name %}
+                {{ check.name|mangle_link }}
+            {% else %}
+                <span style="color:#4a4a4a; font-style:italic;">unbenannt</span>
+            {% endif %}
+            {% if check.tags %}
+                <br>
+                {% for tag in check.tags_list %}
+                <span style="display:inline-block; margin:4px 4px 0 0; padding:0 4px; background-color:#f2f0eb; font-size:12px; line-height:18px; color:#4a4a4a;">{{ tag|mangle_link }}</span>
+                {% endfor %}
+            {% endif %}
+        </td>
+        <td valign="top" style="padding:12px 0 12px 8px; border-top:1px solid #e3e0d8; font-size:14px; line-height:20px; text-align:right;">
+            {% if check.last_ping %}
+                {{ check.last_ping|naturaltime }}
+            {% else %}
+                nie
+            {% endif %}
+            <br>
+            <a href="{{ check.cloaked_url }}" target="_blank" style="color:#8b3a6f; text-decoration:underline;">Details</a>
+        </td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
+</table>
+{% endspaceless %}

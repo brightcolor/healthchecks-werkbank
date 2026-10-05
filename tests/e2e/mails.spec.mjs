@@ -36,6 +36,11 @@ for (const name of mails) {
     if (katalogStand) {
       const betreff = readFileSync(path.join(ordner, `${name}-betreff.txt`), 'utf8');
       expect(betreff, `Betreff von ${name}`).not.toMatch(englisch);
+      // Nur-Text-Fassung: Zeilen bis 78 Zeichen; Adressen ohne Leerzeichen und Tabellenzeilen dürfen länger sein.
+      const zeilen = readFileSync(path.join(ordner, `${name}.txt`), 'utf8').split('\n');
+      const lang = zeilen.filter((z) => z.length > 78 && z.trim().includes(' ') && !/^[+|]/.test(z));
+      expect(lang, `Zeilen über 78 Zeichen in ${name}.txt`).toEqual([]);
+      expect(zeilen.filter((z) => z === '--'), `Signaturtrenner in ${name}.txt ohne Leerzeichen`).toEqual([]);
     }
   });
 }

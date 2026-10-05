@@ -1,0 +1,20 @@
+{% load hc_extras %}
+{% block content %}Hallo,
+{% if membership %}
+{{ membership.project.owner.email }} lädt dich in ein Konto auf {% site_name %} ein.
+
+{% if membership.role == "r" %}Dort siehst du die bestehenden Checks und kannst sie lesen.{% else %}Dort verwaltest du die bestehenden Checks und legst neue an.{% endif %}
+Hast du schon ein eigenes Konto auf {% site_name %}, wechselst du einfach
+zwischen beiden.{% endif %}
+
+Über diesen Link meldest du dich bei {% site_name %} an:
+
+{{ button_url }}
+
+Viele Grüße
+{% site_name %}
+
+Hilfe für den Einstieg steht in der Doku (englisch):
+{% site_root %}{% url 'hc-docs' %}
+Bei Fragen oder Problemen antworte einfach auf diese Mail.
+{% endblock %}

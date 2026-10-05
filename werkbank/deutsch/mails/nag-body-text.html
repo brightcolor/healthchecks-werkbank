@@ -1,0 +1,33 @@
+{% load asciitable hc_extras humanize %}Hallo,
+
+dies ist eine {% if nag_period == 3600 %}stündliche {% endif %}{% if nag_period == 86400 %}tägliche {% endif %}Erinnerung von {% site_name %}.
+{% if num_down == 1 %}Ein Check ist gerade AUSGEFALLEN:{% else %}{{ num_down }} Checks sind gerade AUSGEFALLEN:{% endif %}
+{% regroup checks by project as groups %}{% for group in groups %}
+
+Projekt „{{ group.grouper|safe }}“
+{% table %}
+    {% row %}
+        {% cell %}Zustand{% endcell %}
+        {% cell %}Name{% endcell %}
+        {% cell %}Letzter Ping{% endcell %}
+    {% endrow %}
+    {% for check in group.list|sortchecks:"name" %}
+        {% row %}
+            {% cell %}{% if check.get_status == "down" %}AUSGEFALLEN{% else %}{{ check.get_status|zustand }}{% endif %}{% endcell %}
+            {% cell %}{{ check.name_then_code|safe }}{% endcell %}
+            {% cell %}{% if check.last_ping %}{{ check.last_ping|naturaltime }}{% else %}nie{% endif %}{% endcell %}
+        {% endrow %}
+    {% endfor %}
+{% endtable %}
+{% endfor %}
+
+Zu viele Erinnerungen? Auf der Seite „Mail-Berichte“ stellst du ein,
+welche Mails du bekommst:
+{{ notifications_url }}
+
+Viele Grüße
+{% site_name %}
+
+-- 
+Abbestellen:
+{{ unsub_link }}

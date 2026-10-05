@@ -1,0 +1,55 @@
+{% load humanize hc_extras tz %}
+{% regroup checks by project as groups %}
+{% timezone tz %}
+{% spaceless %}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%; margin:0 0 24px;">
+    {% for group in groups %}
+    <tr>
+        <td style="padding:24px 8px 8px 0; font-weight:700; color:#111111; word-break:break-word;">
+            {{ group.grouper|mangle_link }}
+        </td>
+        {% for dt in boundaries %}
+        <td style="padding:24px 0 8px 8px; font-size:12px; line-height:18px; color:#4a4a4a; text-align:right; vertical-align:bottom;">
+            {% if report_period == "weekly" %}
+                {{ dt|date:"j. M" }} – {{ dt|add6days|date:"j. M" }}
+            {% elif report_period == "daily" %}
+                {{ dt|date:"j. F" }}
+            {% else %}
+                {{ dt|date:"N Y" }}
+            {% endif %}
+        </td>
+        {% endfor %}
+    </tr>
+    {% for check in group.list|sortbydowntime %}
+    <tr>
+        <td valign="top" style="padding:12px 8px 12px 0; border-top:1px solid #e3e0d8; word-break:break-word;">
+            {% with check.get_status as status %}
+            <span style="display:inline-block; margin:0 0 4px; padding:1px 6px; {% if status == "down" %}background-color:#d61f7a; color:#ffffff;{% elif status == "grace" %}background-color:#fed329; color:#111111;{% elif status == "up" %}background-color:#bfd535; color:#111111;{% else %}background-color:#e3e0d8; color:#111111;{% endif %} font-size:11px; line-height:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">{{ status|zustand }}</span><br>
+            {% endwith %}
+            {% if check.name %}
+                {{ check.name|mangle_link }}
+            {% else %}
+                <span style="color:#4a4a4a; font-style:italic;">unbenannt</span>
+            {% endif %}
+            {% if check.tags %}
+                <br>
+                {% for tag in check.tags_list %}
+                <span style="display:inline-block; margin:4px 4px 0 0; padding:0 4px; background-color:#f2f0eb; font-size:12px; line-height:18px; color:#4a4a4a;">{{ tag|mangle_link }}</span>
+                {% endfor %}
+            {% endif %}
+        </td>
+        {% for d in check.past_downtimes %}
+        <td valign="top" style="padding:12px 0 12px 8px; border-top:1px solid #e3e0d8; font-size:14px; line-height:20px; text-align:right;">
+            {% if d.count %}
+                {{ d.count }}&nbsp;{{ d.count|pluralize:"Ausfall,Ausfälle" }},<br>{{ d.duration|hc_approx_duration }}
+            {% elif not d.no_data %}
+                <span style="color:#4a4a4a;">in Ordnung</span>
+            {% endif %}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    {% endfor %}
+</table>
+{% endspaceless %}
+{% endtimezone %}

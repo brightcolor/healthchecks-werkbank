@@ -1,0 +1,105 @@
+{% load hc_extras humanize linemode tz %}{% linemode %}
+{% timezone tz %}
+
+{% line %}Hallo,{% endline %}
+{% line %}{% endline %}
+{% if flip.new_status == "down" %}
+{% line %}der Check "{{ check.name_then_code|safe }}" ist ausgefallen.{% endline %}
+{% else %}
+{% line %}der Check "{{ check.name_then_code|safe }}" ist wieder in Ordnung.{% endline %}
+{% endif %}
+{% if flip.reason %}
+{% line %}Grund: {{ flip.reason_long }}.{% endline %}
+{% endif %}
+{% if flip.new_status == "up" and flip.down_duration %}
+{% line %}Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.{% endline %}
+{% endif %}
+{% line %}{% endline %}
+
+{% line %}In {% site_name %} ansehen:{% endline %}
+{% line %}{{ check.cloaked_url }}{% endline %}
+
+{% if check.desc %}
+{% line %}{% endline %}
+{% line %}Beschreibung:{% endline %}
+{% line %}-------------{% endline %}
+{% line %}{{ check.desc|safe|wordwrap:78 }}{% endline %}
+{% endif %}
+
+{% line %}{% endline %}
+{% line %}Details:{% endline %}
+{% line %}--------{% endline %}
+
+{% if check.project.name %}
+    {% line %}Projekt: {{ check.project.name|safe }}{% endline %}
+{% endif %}
+
+{% if check.tags %}
+    {% line %}Tags: {{ check.tags|safe }}{% endline %}
+{% endif %}
+
+{% if check.kind == "simple" %}
+    {% line %}Intervall: {{ check.timeout|hc_duration }}{% endline %}
+{% endif %}
+
+{% if check.kind == "cron" or check.kind == "oncalendar" %}
+    {% line %}Zeitplan: {{ check.schedule }}{% endline %}
+    {% line %}Zeitzone: {{ check.tz }}{% endline %}
+{% endif %}
+
+{% line %}Pings gesamt: {% if ping %}{{ ping.n }}{% else %}0{% endif %}{% if check.created %} (seit {{ check.created|date:"j. M Y" }}){% endif %}{% endline %}
+
+{% if ping %}
+    {% line %}Letzter Ping: {{ ping.created|naturaltime }}{% if ping.remote_addr %}, von {{ ping.remote_addr }}{% endif %}{% endline %}
+    {% line %}Art des letzten Pings: {{ ping.get_kind_display }}{% endline %}
+    {% if subject %}
+    {% line %}Betreff des letzten Pings: {{ subject }}{% endline %}
+    {% endif %}
+{% endif %}
+
+{% line %}{{ flip.new_status|zustand|capfirst }} seit: {{ flip.created|date:"j. F Y, H:i T" }}{% endline %}
+
+{% if ping and ping.has_body %}
+    {% line %}{% endline %}
+    {% line %}Inhalt des letzten Pings:{% endline %}
+    {% if body|length > 10000 and not ping_attached %}
+        {% line %}Hier stehen die letzten 10000 von insgesamt {{ body|length }} Bytes.{% endline %}
+    {% endif %}
+    {% line %}-------------------------{% endline %}
+    {% if body is None %}
+        {% line %}Der Inhalt wird noch verarbeitet und ist gleich auf der Website{% endline %}
+        {% line %}abrufbar.{% endline %}
+    {% elif ping_attached %}
+        {% line %}Der Inhalt steht im Anhang.{% endline %}
+    {% else %}
+        {% line %}{{ body|safe|slice:"-10000:"|wordwrap:78 }}{% endline %}
+    {% endif %}
+{% endif %}
+
+{% if projects %}
+    {% line %}{% endline %}
+    {% line %}Übersicht der Projekte:{% endline %}
+    {% line %}-----------------------{% endline %}
+
+    {% for project in projects %}
+        {% with project.get_n_down as n_down %}
+            {% if n_down %}
+                {% line %}* {{ project|safe }}: {{ n_down }} {{ n_down|pluralize:"Check,Checks" }} ausgefallen{% endline %}
+            {% else %}
+                {% line %}* {{ project|safe }}: alles in Ordnung{% endline %}
+            {% endif %}
+        {% endwith %}
+    {% endfor %}
+{% endif %}
+
+{% line %}{% endline %}
+{% line %}Viele Grüße{% endline %}
+{% line %}{% site_name %}{% endline %}
+{% line %}{% endline %}
+{% line %}-- {% endline %}
+{% line %}Du bekommst diese Mail, weil du die Benachrichtigungen von{% endline %}
+{% line %}{% site_name %} abonniert hast. Abbestellen:{% endline %}
+{% line %}{{ unsub_link }}{% endline %}
+
+{% endtimezone %}
+{% endlinemode %}

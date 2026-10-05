@@ -1,0 +1,142 @@
+{% extends "emails/base.html" %}
+{% load hc_extras humanize tz %}
+
+{% block title %}{{ check.name_then_code }} ist {% if flip.new_status == "down" %}ausgefallen{% else %}wieder in Ordnung{% endif %}{% endblock %}
+
+{% block vorschau %}{% if flip.new_status == "down" %}{{ check.name_then_code }} ist ausgefallen{% if flip.reason %} ({{ flip.reason_long }}){% endif %}.{% else %}{{ check.name_then_code }} ist wieder in Ordnung.{% if flip.down_duration %} Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.{% endif %}{% endif %}{% endblock %}
+
+{% block etikett %}{% if flip.new_status == "down" %}Check ausgefallen{% else %}Wieder in Ordnung{% endif %}{% endblock %}
+
+{% block ueberschrift %}{{ check.name_then_code }}{% endblock %}
+
+{% block content %}{% timezone tz %}
+<p style="margin:0 0 16px;">Hallo,</p>
+<p style="margin:0 0 16px;">
+    {% if flip.new_status == "down" %}
+    <span style="display:inline-block; padding:2px 8px; background-color:#d61f7a; color:#ffffff; font-size:12px; line-height:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">ausgefallen</span>&nbsp;
+    Der Check <strong>{{ check.name_then_code }}</strong> ist ausgefallen{% if flip.reason %} ({{ flip.reason_long }}){% endif %}.
+    {% else %}
+    <span style="display:inline-block; padding:2px 8px; background-color:#bfd535; color:#111111; font-size:12px; line-height:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">in Ordnung</span>&nbsp;
+    Der Check <strong>{{ check.name_then_code }}</strong> ist wieder in Ordnung.
+    {% if flip.down_duration %}Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.{% endif %}
+    {% endif %}
+</p>
+<p style="margin:0 0 24px;"><a href="{{ check.cloaked_url }}" style="color:#8b3a6f; text-decoration:underline;">In {% site_name %} ansehen</a></p>
+
+{% if check.desc %}
+<p style="margin:0 0 24px;"><strong>Beschreibung</strong><br>{{ check.desc|linebreaksbr }}</p>
+{% endif %}
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
+    {% if check.project.name %}
+    <tr>
+        <td valign="top" style="padding:8px 16px 8px 0; border-top:1px solid #e3e0d8; font-size:14px; line-height:21px; color:#4a4a4a; white-space:nowrap;">Projekt</td>
+        <td valign="top" style="padding:8px 0; border-top:1px solid #e3e0d8;">{{ check.project.name }}</td>
+    </tr>
+    {% endif %}
+    {% if check.tags_list %}
+    <tr>
+        <td valign="top" style="padding:8px 16px 8px 0; border-top:1px solid #e3e0d8; font-size:14px; line-height:21px; color:#4a4a4a; white-space:nowrap;">Tags</td>
+        <td valign="top" style="padding:8px 0; border-top:1px solid #e3e0d8;">{% for tag in check.tags_list %}<span style="display:inline-block; margin:0 4px 4px 0; padding:0 6px; background-color:#f2f0eb; font-size:14px; line-height:22px;">{{ tag }}</span>{% endfor %}</td>
+    </tr>
+    {% endif %}
+    {% if check.kind == "simple" %}
+    <tr>
+        <td valign="top" style="padding:8px 16px 8px 0; border-top:1px solid #e3e0d8; font-size:14px; line-height:21px; color:#4a4a4a; white-space:nowrap;">Intervall</td>
+        <td valign="top" style="padding:8px 0; border-top:1px solid #e3e0d8;">{{ check.timeout|hc_duration }}</td>
+    </tr>
+    {% endif %}
+    {% if check.kind == "cron" or check.kind == "oncalendar" %}
+    <tr>
+        <td valign="top" style="padding:8px 16px 8px 0; border-top:1px solid #e3e0d8; font-size:14px; line-height:21px; color:#4a4a4a; white-space:nowrap;">Zeitplan</td>
+        <td valign="top" style="padding:8px 0; border-top:1px solid #e3e0d8;"><code style="font-family:'IBM Plex Mono', Consolas, monospace; font-size:14px;">{{ check.schedule }}</code></td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:8px 16px 8px 0; border-top:1px solid #e3e0d8; font-size:14px; line-height:21px; color:#4a4a4a; white-space:nowrap;">Zeitzone</td>
+        <td valign="top" style="padding:8px 0; border-top:1px solid #e3e0d8;">{{ check.tz }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td valign="top" style="padding:8px 16px 8px 0; border-top:1px solid #e3e0d8; font-size:14px; line-height:21px; color:#4a4a4a; white-space:nowrap;">Pings gesamt</td>
+        <td valign="top" style="padding:8px 0; border-top:1px solid #e3e0d8;">{% if ping %}{{ ping.n }}{% else %}0{% endif %}{% if check.created %} (seit {{ check.created|date:"j. M Y" }}){% endif %}</td>
+    </tr>
+    {% if ping %}
+    <tr>
+        <td valign="top" style="padding:8px 16px 8px 0; border-top:1px solid #e3e0d8; font-size:14px; line-height:21px; color:#4a4a4a; white-space:nowrap;">Letzter Ping</td>
+        <td valign="top" style="padding:8px 0; border-top:1px solid #e3e0d8;">{{ ping.created|naturaltime }}{% if ping.remote_addr %}, von {{ ping.remote_addr }}{% endif %}</td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:8px 16px 8px 0; border-top:1px solid #e3e0d8; font-size:14px; line-height:21px; color:#4a4a4a; white-space:nowrap;">Art</td>
+        <td valign="top" style="padding:8px 0; border-top:1px solid #e3e0d8;">
+            {% if ping.kind == "ign" %}
+            <span style="display:inline-block; padding:2px 8px; background-color:#e3e0d8; color:#111111; font-size:12px; line-height:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">ignoriert</span>
+            {% elif ping.exitstatus > 0 %}
+            <span style="display:inline-block; padding:2px 8px; background-color:#d61f7a; color:#ffffff; font-size:12px; line-height:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">Exit-Status {{ ping.exitstatus }}</span>
+            {% elif ping.exitstatus == 0 %}
+            <span style="display:inline-block; padding:2px 8px; background-color:#bfd535; color:#111111; font-size:12px; line-height:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">Exit-Status 0</span>
+            {% elif ping.kind == "fail" %}
+            <span style="display:inline-block; padding:2px 8px; background-color:#d61f7a; color:#ffffff; font-size:12px; line-height:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">Fehlschlag</span>
+            {% elif ping.kind == "start" %}
+            <span style="display:inline-block; padding:2px 8px; background-color:#bfd535; color:#111111; font-size:12px; line-height:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">gestartet</span>
+            {% elif ping.kind == "log" %}
+            <span style="display:inline-block; padding:2px 8px; background-color:#e3e0d8; color:#111111; font-size:12px; line-height:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">Log</span>
+            {% else %}
+            <span style="display:inline-block; padding:2px 8px; background-color:#bfd535; color:#111111; font-size:12px; line-height:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">Erfolg</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td valign="top" style="padding:8px 16px 8px 0; border-top:1px solid #e3e0d8; border-bottom:1px solid #e3e0d8; font-size:14px; line-height:21px; color:#4a4a4a; white-space:nowrap;">{{ flip.new_status|zustand|capfirst }} seit</td>
+        <td valign="top" style="padding:8px 0; border-top:1px solid #e3e0d8; border-bottom:1px solid #e3e0d8;">{{ flip.created|date:"j. F Y, H:i T" }}</td>
+    </tr>
+</table>
+
+{% if subject %}
+<p style="margin:24px 0 0;"><strong>Betreff des letzten Pings</strong><br>{{ subject }}</p>
+{% endif %}
+
+{% if ping and ping.has_body %}
+<p style="margin:24px 0 8px;"><strong>Inhalt des letzten Pings</strong>
+    {% if body|length > 10000 and not ping_attached %}
+    <br>Hier stehen die letzten 10000 von insgesamt {{ body|length }} Bytes.
+    <a href="{{ check.cloaked_url }}#ping-{{ ping.n }}" style="color:#8b3a6f; text-decoration:underline;">Ganzen Inhalt ansehen</a>.
+    {% endif %}
+</p>
+{% if body is None %}
+<p style="margin:0;">
+    Der Inhalt wird noch verarbeitet und ist gleich abrufbar.
+    <a href="{{ check.cloaked_url }}#ping-{{ ping.n }}" style="color:#8b3a6f; text-decoration:underline;">Auf der Website ansehen</a>.
+</p>
+{% elif ping_attached %}
+<p style="margin:0;">Der Inhalt steht im Anhang.</p>
+{% else %}
+<pre style="margin:0; padding:12px; background-color:#f2f0eb; font-family:'IBM Plex Mono', Consolas, monospace; font-size:13px; line-height:19px; color:#111111; white-space:pre-wrap; word-break:break-word;">{{ body|slice:"-10000:"|linebreaksbr }}</pre>
+{% endif %}
+{% endif %}
+
+{% if projects %}
+<p style="margin:24px 0 8px;"><strong>Übersicht der Projekte</strong></p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
+    {% for project in projects %}
+    <tr>
+        <td valign="top" style="padding:8px 16px 8px 0; border-top:1px solid #e3e0d8;"><a href="{{ project.checks_url }}" style="color:#8b3a6f; text-decoration:underline;">{{ project }}</a></td>
+        <td valign="top" style="padding:8px 0; border-top:1px solid #e3e0d8; text-align:right;">
+            {% with project.get_n_down as n_down %}
+            {% if n_down %}
+            <span style="display:inline-block; padding:2px 8px; background-color:#d61f7a; color:#ffffff; font-size:12px; line-height:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">{{ n_down }} ausgefallen</span>
+            {% else %}
+            Alles in Ordnung
+            {% endif %}
+            {% endwith %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+<p style="margin:24px 0 0;">Viele Grüße<br>{% site_name %}</p>
+{% endtimezone %}{% endblock %}
+
+{% block grund %}Du bekommst diese Mail, weil du die Benachrichtigungen von {% site_name %}{% if check.project.name %} für das Projekt „{{ check.project.name }}“{% endif %} abonniert hast.{% endblock %}
+
+{% block unsub %} <a href="{{ unsub_link }}" target="_blank" style="color:#8b3a6f; text-decoration:underline;">Abbestellen</a>{% endblock %}

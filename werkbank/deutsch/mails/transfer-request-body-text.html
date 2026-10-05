@@ -1,0 +1,13 @@
+{% load hc_extras %}
+{% block content %}Hallo,
+
+{{ project.owner.email }} möchte dir {% if project.name %}das Projekt
+"{{ project.name }}"{% else %}ein Projekt{% endif %} übertragen.
+
+Annehmen oder ablehnen kannst du die Anfrage in den Projekteinstellungen:
+
+{{ button_url }}
+
+Viele Grüße
+{% site_name %}
+{% endblock %}

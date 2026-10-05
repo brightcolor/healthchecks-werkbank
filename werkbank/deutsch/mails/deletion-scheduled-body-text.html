@@ -1,0 +1,14 @@
+{% load hc_extras %}
+Hallo,
+
+das Konto bei {% site_name %} für {{ owner_email }} wird am
+{{ deletion_scheduled_date|date:"j. F Y" }} gelöscht.
+
+Angaben zum Konto:
+Eigentümer: {{ owner_email }}
+Checks im Konto: {{ num_checks }}
+
+Soll das Konto bleiben, schreib so bald wie möglich an {{ support_email }}.
+
+Viele Grüße
+{% site_name %}

@@ -1,0 +1,29 @@
+{% extends "emails/base.html" %}
+{% load hc_extras %}
+
+{% block title %}Monatliches {{ transport }}-Limit erreicht{% endblock %}
+
+{% block vorschau %}Eine {{ transport }}-Benachrichtigung an {{ recipient|mask_phone }} ging nicht raus, das Monatslimit ist erreicht.{% endblock %}
+
+{% block etikett %}Limit{% endblock %}
+
+{% block ueberschrift %}Limit erreicht{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 16px;">Hallo,</p>
+<p style="margin:0 0 16px;">
+    eine {{ transport }}-Benachrichtigung an <strong>{{ recipient|mask_phone }}</strong> ging nicht raus:
+    Das Konto <strong>{{ owner_email }}</strong> bei {% site_name %} hat sein Monatslimit von
+    <strong>{{ limit }} Nachrichten</strong> erreicht. Das Limit beginnt zum Monatsanfang neu.
+</p>
+<p style="margin:0 0 8px;">Diese Nachricht sollte rausgehen:</p>
+<div style="margin:0 0 8px; padding:16px; background-color:#f2f0eb; border-left:4px solid #1dc3f3; word-break:break-word;">
+    {{ message }}
+</div>
+{% endblock %}
+
+{% block content_more %}
+<p style="margin:0;">Viele Grüße<br>{% site_name %}</p>
+{% endblock %}
+
+{% block grund %}Du bekommst diese Mail, weil {% site_name %} eine Benachrichtigung an dich nicht zustellen konnte.{% endblock %}

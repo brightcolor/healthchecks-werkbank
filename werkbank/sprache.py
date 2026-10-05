@@ -9,10 +9,12 @@ Einstellungsmodul und das Formatmodul ein und wendet bei WB_SPRACHE=de den Katal
 aus werkbank/<WB_KATALOG>/ an. `inventur` gibt die englischen Textstücke ohne Eintrag
 als TOML-Gerüst aus.
 
-Ein Katalog besteht aus TOML-Dateien mit zwei Arten von Einträgen:
+Ein Katalog besteht aus TOML-Dateien mit drei Arten von Einträgen:
   [[text]]       datei, en, de   ganzes sichtbares Textstück oder sichtbarer Attributwert;
                                  datei = "*" gilt für alle Vorlagen im Geltungsbereich
   [[quelltext]]  datei, en, de   genaues Stück Quelle, optional anzahl
+  [[vorlage]]    datei, quelle,  ganze Datei aus dem Katalog-Ordner an Stelle der Vorlage,
+                 sha256          nur solange das Original diese Prüfsumme hat
 Ein Eintrag mit gleichem en und de markiert ein geprüftes Wort, das bleibt.
 
 Die Datei <WB_KATALOG_KONFIG> nennt dazu Stand und Geltungsbereich, die Wörtertabellen
@@ -26,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import fnmatch
+import hashlib
 import json
 import os
 import re
@@ -83,6 +86,8 @@ TOKEN = re.compile(
     r"|" + TAG,
     re.S | re.I,
 )
+# Prüfsumme einer Vorlage von Healthchecks für [[vorlage]] (sha256, kleingeschrieben).
+PRUEFSUMME = re.compile(r"[0-9a-f]{64}")
 ATTRIBUT = re.compile(r"""(?P<name>[A-Za-z_:][-A-Za-z0-9_:.]*)\s*=\s*(?P<q>["'])(?P<wert>.*?)(?P=q)""", re.S)
 TAGNAME = re.compile(r"<([A-Za-z][A-Za-z0-9-]*)")
 # Öffnender Tag eines opaken Bereichs: Sein Inhalt bleibt unberührt, seine Attribute zählen.
@@ -269,10 +274,12 @@ def englische_reste(original: str, ergebnis: str, gleich: set[str]) -> list[str]
 
 def lade_eintraege(pfad: Path) -> list[Eintrag]:
     daten = toml_laden(pfad)
-    fremd = set(daten) - {"text", "quelltext"}
+    fremd = set(daten) - {"text", "quelltext", "vorlage"}
     if fremd:
-        raise SprachFehler(f"{pfad.name}: unbekannte Abschnitte {', '.join(sorted(fremd))}. Erlaubt sind [[text]] und [[quelltext]].")
-    eintraege: list[Eintrag] = []
+        raise SprachFehler(
+            f"{pfad.name}: unbekannte Abschnitte {', '.join(sorted(fremd))}. Erlaubt sind [[text]], [[quelltext]] und [[vorlage]]."
+        )
+    eintraege: list[Eintrag] = lade_vorlagen(pfad, daten.get("vorlage", []))
     for art in ("quelltext", "text"):
         liste = daten.get(art, [])
         if not isinstance(liste, list):
@@ -298,6 +305,30 @@ def lade_eintraege(pfad: Path) -> list[Eintrag]:
                 eintraege.append(Eintrag(art, roh["datei"], norm(roh["en"]), roh["de"].strip(), None, herkunft))
             else:
                 eintraege.append(Eintrag(art, roh["datei"], roh["en"], roh["de"], anzahl, herkunft))
+    return eintraege
+
+
+def lade_vorlagen(pfad: Path, liste) -> list[Eintrag]:
+    """[[vorlage]]: Eintrag mit en = erwartete Prüfsumme des Originals, de = Pfad der Ersatzdatei."""
+    if not isinstance(liste, list):
+        raise SprachFehler(f"{pfad.name}: vorlage muss als [[vorlage]] stehen.")
+    eintraege: list[Eintrag] = []
+    for nr, roh in enumerate(liste, 1):
+        herkunft = f"{pfad.name}, [[vorlage]] Nr. {nr}"
+        fremd = set(roh) - {"datei", "quelle", "sha256"}
+        if fremd:
+            raise SprachFehler(f"{herkunft}: unbekannte Schlüssel {', '.join(sorted(fremd))}. Erlaubt sind datei, quelle und sha256.")
+        for schluessel in ("datei", "quelle", "sha256"):
+            if not isinstance(roh.get(schluessel), str) or not roh[schluessel].strip():
+                raise SprachFehler(f"{herkunft}: {schluessel} fehlt oder ist leer. Jede Vorlage braucht datei, quelle und sha256.")
+        if not PRUEFSUMME.fullmatch(roh["sha256"]):
+            raise SprachFehler(
+                f"{herkunft}: sha256 ist {roh['sha256']!r}. Erwartet sind 64 Hex-Zeichen, die Prüfsumme der Vorlage von Healthchecks."
+            )
+        ersatz = pfad.parent / roh["quelle"]
+        if not ersatz.is_file():
+            raise SprachFehler(f"{herkunft}: {roh['quelle']} fehlt. Die Ersatzdatei liegt im Katalog-Ordner neben {pfad.name}.")
+        eintraege.append(Eintrag("vorlage", roh["datei"], roh["sha256"], str(ersatz), None, herkunft))
     return eintraege
 
 
@@ -336,7 +367,7 @@ def lade_katalog(ordner: Path) -> Katalog:
             eintraege.extend(lade_eintraege(pfad))
     gesehen: dict[tuple[str, str, str], str] = {}
     for e in eintraege:
-        schluessel = (e.art, e.datei, e.en)
+        schluessel = (e.art, e.datei, "" if e.art == "vorlage" else e.en)
         if schluessel in gesehen:
             raise SprachFehler(f"{e.herkunft}: doppelt, dieselbe Stelle steht schon in {gesehen[schluessel]}. Einen der beiden Einträge entfernen.")
         gesehen[schluessel] = e.herkunft
@@ -432,6 +463,19 @@ def uebersetzen(wurzel: Path, katalog: Katalog, schreiben: bool = True) -> dict:
             continue
         original, crlf = lies(pfad)
         text = original
+        for e in eigene:
+            if e.art != "vorlage":
+                continue
+            summe = hashlib.sha256(original.encode("utf-8")).hexdigest()
+            if summe == e.en:
+                text = lies(Path(e.de))[0]
+                ersetzt += 1
+            else:
+                ohne.append({
+                    "datei": rel, "art": "vorlage", "en": Path(e.de).name,
+                    "grund": f"Healthchecks hat die Vorlage geändert (sha256 {summe[:12]}…, erwartet {e.en[:12]}…); "
+                    "die deutsche Fassung bleibt aus, bis sie angepasst ist",
+                })
         for e in eigene:
             if e.art != "quelltext":
                 continue

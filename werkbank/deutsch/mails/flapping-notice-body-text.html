@@ -1,0 +1,24 @@
+{% load hc_extras %}
+Hallo,
+
+der Check "{{ check.name }}" im Projekt "{{ check.project.name }}" wechselt
+ständig den Zustand: In den letzten 24 Stunden sprang er {{ num_flips }}-mal
+zwischen "in Ordnung" und "ausgefallen".
+
+Häufige Ursachen:
+
+* Das überwachte System arbeitet unzuverlässig und wechselt oft zwischen
+  gesund und gestört.
+* Der Check ist falsch eingestellt: Der Zeitplan stimmt nicht, oder die
+  Kulanz ist zu kurz.
+
+Sieh dir bitte an, woher die häufigen Wechsel kommen, und behebe die
+Ursache. Kommst du nicht in dein Konto bei {% site_name %} oder hast du
+Fragen, schreib an {{ support_email }}.
+
+Viele Grüße
+{% site_name %}
+
+-- 
+Diese Pflichtmitteilung informiert dich über ein Problem in deinem Konto
+bei {% site_name %}.

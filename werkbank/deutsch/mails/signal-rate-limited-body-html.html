@@ -1,0 +1,27 @@
+{% extends "emails/base.html" %}
+{% load hc_extras %}
+
+{% block title %}Signal-Benachrichtigung per Mail{% endblock %}
+
+{% block vorschau %}Signal hat den Versand gebremst, deshalb kommt die Benachrichtigung per Mail.{% endblock %}
+
+{% block etikett %}Signal{% endblock %}
+
+{% block ueberschrift %}Per Mail statt Signal{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 16px;">Hallo,</p>
+<p style="margin:0 0 16px;">
+    eine Signal-Benachrichtigung an <strong>{{ recipient|mask_phone }}</strong> ging nicht raus,
+    weil das Signal-Netz den Versand gebremst hat. Deshalb kommt sie per Mail:
+</p>
+<div style="margin:0 0 8px; padding:16px; background-color:#f2f0eb; border-left:4px solid #1dc3f3; word-break:break-word;">
+    {{ message|safe|linebreaksbr }}
+</div>
+{% endblock %}
+
+{% block content_more %}
+<p style="margin:0;">Viele Grüße<br>{% site_name %}</p>
+{% endblock %}
+
+{% block grund %}Du bekommst diese Mail, weil {% site_name %} eine Benachrichtigung über Signal nicht zustellen konnte.{% endblock %}

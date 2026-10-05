@@ -1519,3 +1519,17 @@ datei = "hc/integrations/ntfy/forms.py"
 anzahl = 1
 en = '(0, "Disabled: Will not notify."),'
 de = '(0, "Aus: keine Benachrichtigung."),'
+
+# --- Knöpfe in Mails (hc/accounts/models.py) ------------------------------------------------------
+
+[[quelltext]]
+datei = "hc/accounts/models.py"
+anzahl = 2
+en = '"button_text": "Log In",'
+de = '"button_text": "Anmelden",'
+
+[[quelltext]]
+datei = "hc/accounts/models.py"
+anzahl = 1
+en = '"button_text": "Project Settings",'
+de = '"button_text": "Projekteinstellungen öffnen",'

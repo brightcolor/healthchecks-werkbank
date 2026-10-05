@@ -1,0 +1,29 @@
+{% extends "emails/base.html" %}
+{% load hc_extras %}
+
+{% block title %}Dein Konto ist inaktiv{% endblock %}
+
+{% block vorschau %}Dein Konto bei {% site_name %} ist seit über einem Jahr inaktiv. Melde dich innerhalb von 30 Tagen an, um es zu behalten.{% endblock %}
+
+{% block etikett %}Konto{% endblock %}
+
+{% block ueberschrift %}Dein Konto ist inaktiv{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 16px;">Hallo,</p>
+<p style="margin:0 0 16px;">
+    dein Konto bei {% site_name %} für {{ email }} ist seit einem Jahr oder länger inaktiv.
+    Brauchst du es nicht mehr, schließen wir es und löschen alle zugehörigen Daten endgültig.
+</p>
+<p style="margin:0 0 16px;">
+    Willst du das Konto behalten, melde dich einfach innerhalb von 30 Tagen an. Bleibt es inaktiv,
+    <strong>wird dein Konto nach diesen 30 Tagen endgültig gelöscht</strong>.
+</p>
+<p style="margin:0;">Probleme bei der Anmeldung oder Fragen? Schreib an {{ support_email }}.</p>
+{% endblock %}
+
+{% block content_more %}
+<p style="margin:0;">Viele Grüße<br>{% site_name %}</p>
+{% endblock %}
+
+{% block grund %}Diese einmalige Mitteilung informiert dich über die Schließung deines Kontos.{% endblock %}

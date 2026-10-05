@@ -1,0 +1,49 @@
+{% extends "emails/base.html" %}
+{% load hc_extras %}
+
+{% block title %}{% if membership %}Einladung zu {{ membership.project }}{% else %}Anmeldung bei {% site_name %}{% endif %}{% endblock %}
+
+{% block vorschau %}{% if membership %}{{ membership.project.owner.email }} lädt dich zu {% site_name %} ein.{% else %}Dein Anmeldelink für {% site_name %}.{% endif %}{% endblock %}
+
+{% block etikett %}{% if membership %}Einladung{% else %}Anmeldung{% endif %}{% endblock %}
+
+{% block ueberschrift %}{% if membership %}Du bist eingeladen{% else %}Dein Anmeldelink{% endif %}{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 16px;">Hallo,</p>
+
+{% if membership %}
+<p style="margin:0 0 16px;">
+    {% if membership.project.name %}
+    <strong>{{ membership.project.owner.email }}</strong> lädt dich in das Projekt
+    <strong>{{ membership.project }}</strong> auf
+    <a href="{% site_root %}" style="color:#8b3a6f; text-decoration:underline;">{% site_name %}</a> ein.
+    {% else %}
+    <strong>{{ membership.project.owner.email }}</strong> lädt dich in ein Konto auf
+    <a href="{% site_root %}" style="color:#8b3a6f; text-decoration:underline;">{% site_name %}</a> ein.
+    {% endif %}
+</p>
+<p style="margin:0 0 16px;">
+    {% if membership.role == "r" %}
+    Dort siehst du die bestehenden Checks und kannst sie lesen.
+    {% else %}
+    Dort verwaltest du die bestehenden Checks und legst neue an.
+    {% endif %}
+    Hast du schon ein eigenes Konto auf {% site_name %}, wechselst du einfach zwischen beiden.
+</p>
+{% endif %}
+
+<p style="margin:0;">Mit dem Knopf meldest du dich bei
+<a href="{% site_root %}" style="color:#8b3a6f; text-decoration:underline;">{% site_name %}</a> an:</p>
+{% endblock %}
+
+{% block content_more %}
+<p style="margin:0 0 16px;">Viele Grüße<br>{% site_name %}</p>
+<p style="margin:0; font-size:14px; line-height:21px; color:#4a4a4a;">
+    Hilfe für den Einstieg steht in der
+    <a href="{% site_root %}{% url 'hc-docs' %}" style="color:#8b3a6f; text-decoration:underline;">Doku</a> (englisch).
+    Bei Fragen oder Problemen antworte einfach auf diese Mail.
+</p>
+{% endblock %}
+
+{% block grund %}{% if membership %}Du bekommst diese Mail, weil dich {{ membership.project.owner.email }} zu {% site_name %} eingeladen hat.{% else %}Du bekommst diese Mail, weil jemand für diese Adresse einen Anmeldelink bei {% site_name %} angefordert hat.{% endif %}{% endblock %}

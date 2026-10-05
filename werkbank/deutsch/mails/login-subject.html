@@ -1,0 +1,6 @@
+{% load hc_extras %}
+{% if membership %}
+    Einladung zu {{ membership.project|safe }} auf {% site_name %}
+{% else %}
+    Anmeldung bei {% site_name %}
+{% endif %}

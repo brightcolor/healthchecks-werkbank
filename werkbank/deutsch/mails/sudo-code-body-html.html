@@ -1,0 +1,23 @@
+{% extends "emails/base.html" %}
+{% load hc_extras %}
+
+{% block title %}Bestätigungscode: {{ sudo_code }}{% endblock %}
+
+{% block vorschau %}Dein Bestätigungscode für {% site_name %}: {{ sudo_code }}{% endblock %}
+
+{% block etikett %}Bestätigung{% endblock %}
+
+{% block ueberschrift %}Dein Code{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 16px;">Hallo,</p>
+<p style="margin:0 0 16px;">vor sensiblen Aktionen in {% site_name %} schicken wir einen Bestätigungscode. Dein Code:</p>
+<p style="margin:0 0 16px; font-family:'IBM Plex Mono', Consolas, monospace; font-size:28px; line-height:36px; font-weight:700; letter-spacing:4px; color:#111111;">{{ sudo_code }}</p>
+<p style="margin:0;">Der Code gilt 15 Minuten.</p>
+{% endblock %}
+
+{% block content_more %}
+<p style="margin:0;">Viele Grüße<br>{% site_name %}</p>
+{% endblock %}
+
+{% block grund %}Du bekommst diese Mail, weil in deinem Konto bei {% site_name %} eine Aktion eine Bestätigung braucht.{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "emails/base.html" %}
+{% load hc_extras %}
+
+{% block title %}Ein Projekt soll an dich übergehen{% endblock %}
+
+{% block vorschau %}{{ project.owner.email }} möchte dir {% if project.name %}das Projekt {{ project.name }}{% else %}ein Projekt{% endif %} übertragen.{% endblock %}
+
+{% block etikett %}Projekt{% endblock %}
+
+{% block ueberschrift %}Ein Projekt für dich{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 16px;">Hallo,</p>
+<p style="margin:0 0 16px;">
+    <strong>{{ project.owner.email }}</strong> möchte dir
+    {% if project.name %}das Projekt <strong>{{ project.name }}</strong>{% else %}ein Projekt{% endif %} übertragen.
+</p>
+<p style="margin:0;">Annehmen oder ablehnen kannst du die Anfrage in den Projekteinstellungen:</p>
+{% endblock %}
+
+{% block content_more %}
+<p style="margin:0;">Viele Grüße<br>{% site_name %}</p>
+{% endblock %}
+
+{% block grund %}Du bekommst diese Mail, weil dir jemand ein Projekt auf {% site_name %} übertragen möchte.{% endblock %}

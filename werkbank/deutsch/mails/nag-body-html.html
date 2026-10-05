@@ -1,0 +1,36 @@
+{% extends "emails/base.html" %}
+{% load humanize hc_extras %}
+
+{% block title %}Erinnerung: {{ num_down }} {{ num_down|pluralize:"Check ist,Checks sind" }} noch ausgefallen{% endblock %}
+
+{% block vorschau %}{% if num_down == 1 %}Ein Check ist noch ausgefallen.{% else %}{{ num_down }} Checks sind noch ausgefallen.{% endif %}{% endblock %}
+
+{% block etikett %}Erinnerung{% endblock %}
+
+{% block ueberschrift %}Noch ausgefallen{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 16px;">Hallo,</p>
+<p style="margin:0 0 8px;">
+    dies ist eine {% if nag_period == 3600 %}stündliche{% elif nag_period == 86400 %}tägliche{% endif %} Erinnerung von
+    <a href="{% site_root %}" style="color:#8b3a6f; text-decoration:underline;">{% site_name %}</a>.
+    {% if num_down == 1 %}
+    Ein Check ist gerade <strong>ausgefallen</strong>:
+    {% else %}
+    {{ num_down }} Checks sind gerade <strong>ausgefallen</strong>:
+    {% endif %}
+</p>
+
+{% include "emails/nag-summary-html.html" %}
+
+<p style="margin:0 0 16px;">
+    <strong>Zu viele Erinnerungen?</strong>
+    Auf der Seite <a href="{{ notifications_url }}" style="color:#8b3a6f; text-decoration:underline;">Mail-Berichte</a>
+    in {% site_name %} stellst du ein, welche Mails du bekommst.
+</p>
+<p style="margin:0;">Viele Grüße<br>{% site_name %}</p>
+{% endblock %}
+
+{% block grund %}Du bekommst diese Mail, weil du Erinnerungen von {% site_name %} eingeschaltet hast.{% endblock %}
+
+{% block unsub %} <a href="{{ unsub_link }}" target="_blank" style="color:#8b3a6f; text-decoration:underline;">Abbestellen</a>{% endblock %}

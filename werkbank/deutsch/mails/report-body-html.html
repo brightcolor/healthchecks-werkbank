@@ -1,0 +1,35 @@
+{% extends "emails/base.html" %}
+{% load humanize hc_extras %}
+
+{% block title %}{% if report_period == "monthly" %}Monatsbericht{% elif report_period == "weekly" %}Wochenbericht{% else %}Tagesbericht{% endif %}{% endblock %}
+
+{% block vorschau %}{% if summary_nchecks %}{{ when }} {{ summary_nchecks|pluralize:"hatte,hatten" }} {{ summary_nchecks }} {{ summary_nchecks|pluralize:"Check,Checks" }} insgesamt {{ summary_ntimes }} {{ summary_ntimes|pluralize:"Ausfall,Ausfälle" }}.{% else %}{{ when }} hatte kein Check einen Ausfall.{% endif %}{% endblock %}
+
+{% block etikett %}Bericht{% endblock %}
+
+{% block ueberschrift %}{% if report_period == "monthly" %}Monatsbericht{% elif report_period == "weekly" %}Wochenbericht{% else %}Tagesbericht{% endif %}{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 16px;">Hallo,</p>
+<p style="margin:0 0 8px;">
+    {% if summary_nchecks %}
+    {{ when }} {{ summary_nchecks|pluralize:"hatte,hatten" }}
+    <strong>{{ summary_nchecks }} {{ summary_nchecks|pluralize:"Check,Checks" }}</strong> insgesamt
+    <strong>{{ summary_ntimes }} {{ summary_ntimes|pluralize:"Ausfall,Ausfälle" }}</strong>.
+    {% else %}
+    {{ when }} hatte kein Check einen Ausfall. Schön!
+    {% endif %}
+</p>
+
+{% include "emails/report-summary-html.html" %}
+
+<p style="margin:0 0 16px;">
+    Noch ein Gedanke: <strong>Laufen bei dir weitere Cron-Jobs oder regelmäßige Abläufe, die hier noch fehlen?</strong>
+    Richte auch für sie eine Überwachung ein, dann erfährst du es, wenn sie nicht rechtzeitig laufen.
+</p>
+<p style="margin:0;">Viele Grüße<br>{% site_name %}</p>
+{% endblock %}
+
+{% block grund %}Du bekommst diese Mail, weil du Mail-Berichte von {% site_name %} eingeschaltet hast.{% endblock %}
+
+{% block unsub %} <a href="{{ unsub_link }}" target="_blank" style="color:#8b3a6f; text-decoration:underline;">Abbestellen</a>{% endblock %}

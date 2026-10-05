@@ -1,0 +1,11 @@
+{% load hc_extras %}Hallo,
+
+eine Signal-Benachrichtigung an {{ recipient|mask_phone }} ging nicht raus,
+weil das Signal-Netz den Versand gebremst hat. Deshalb kommt sie per Mail:
+
+***
+{{ plaintext|safe }}
+***
+
+Viele Grüße
+{% site_name %}

@@ -1,0 +1,224 @@
+# Mails auf Deutsch: ganze Vorlagen aus mails/ an Stelle der Vorlagen von Healthchecks.
+# Der Bau setzt eine Vorlage nur ein, solange das Original die genannte Prüfsumme hat;
+# ändert Healthchecks eine Mail, bleibt sie englisch und der Bericht nennt sie.
+# Erzeugt mit artefakte/kq_mails.py aus Healthchecks v4.4.
+
+[[vorlage]]
+datei = "templates/emails/alert-body-html.html"
+quelle = "mails/alert-body-html.html"
+sha256 = "f0641ba68df6ace40c0509edb67e6c5d33b3bcd3f4ef8d5495815cd6115d7a7e"
+
+[[vorlage]]
+datei = "templates/emails/alert-body-text.html"
+quelle = "mails/alert-body-text.html"
+sha256 = "637c699c137c856a32f87aae2f345538d25eb0e48edd41c1a3b9e80fd3bf78b4"
+
+[[vorlage]]
+datei = "templates/emails/alert-subject.html"
+quelle = "mails/alert-subject.html"
+sha256 = "157ad4a31c3ffa1a6301cfa2a4f0212cd41063a161d459ddd77a4874daa1a2ca"
+
+[[vorlage]]
+datei = "templates/emails/deletion-notice-body-html.html"
+quelle = "mails/deletion-notice-body-html.html"
+sha256 = "a40fa4dc45ff17a5b61e2f79a1e2f2b1bc8f164443bc9e28bf99e4734a0f0652"
+
+[[vorlage]]
+datei = "templates/emails/deletion-notice-body-text.html"
+quelle = "mails/deletion-notice-body-text.html"
+sha256 = "ee2a7f4f081749d9fab90b43246c5f28efbc0203b39d0f4b22b3a6064ee9f664"
+
+[[vorlage]]
+datei = "templates/emails/deletion-notice-subject.html"
+quelle = "mails/deletion-notice-subject.html"
+sha256 = "deebbb3ce1b45f41293f24c36099f44e64eab792c9930fefcc2d3f3ec9419edb"
+
+[[vorlage]]
+datei = "templates/emails/deletion-scheduled-body-html.html"
+quelle = "mails/deletion-scheduled-body-html.html"
+sha256 = "63e9a804089810d3bc4785cd0ebcc28cd6a78d048aec7d698acd93e4c4148fcf"
+
+[[vorlage]]
+datei = "templates/emails/deletion-scheduled-body-text.html"
+quelle = "mails/deletion-scheduled-body-text.html"
+sha256 = "ce7db909c600663337f557b13d49329b888e17f222630aae49dc239be0a3f5d2"
+
+[[vorlage]]
+datei = "templates/emails/deletion-scheduled-subject.html"
+quelle = "mails/deletion-scheduled-subject.html"
+sha256 = "990ea8140e16e4a164baa3d6a4c75fc14d802e3df030e2192cd515568c35ba10"
+
+[[vorlage]]
+datei = "templates/emails/flapping-notice-body-html.html"
+quelle = "mails/flapping-notice-body-html.html"
+sha256 = "2ca6fcd723d66bc4c94d6e41ecbb78d2961247554b998882fa13a36600ad9776"
+
+[[vorlage]]
+datei = "templates/emails/flapping-notice-body-text.html"
+quelle = "mails/flapping-notice-body-text.html"
+sha256 = "85ddbeda67119e65ebc4ba53ce2bbc13ec70f1a0415a0f01f022730a24341670"
+
+[[vorlage]]
+datei = "templates/emails/flapping-notice-subject.html"
+quelle = "mails/flapping-notice-subject.html"
+sha256 = "f5f3331eb9db0fe06e9739c77657d2a7e13cfce19f7dea5774efc67103631e94"
+
+[[vorlage]]
+datei = "templates/emails/login-body-html.html"
+quelle = "mails/login-body-html.html"
+sha256 = "2d1ec8b5e26fa1c80b26af1b5ad6debe6ec0158636f452df96abd730d1e450bc"
+
+[[vorlage]]
+datei = "templates/emails/login-body-text.html"
+quelle = "mails/login-body-text.html"
+sha256 = "c67bcacda8e41bc29a0bdbd270aee2a40bff24885d1e3ccc60543d36838e4267"
+
+[[vorlage]]
+datei = "templates/emails/login-subject.html"
+quelle = "mails/login-subject.html"
+sha256 = "5bd6f98e7185269c9866f12e0977844e3f23c83f17b3d2739ff038b92093e94a"
+
+[[vorlage]]
+datei = "templates/emails/nag-body-html.html"
+quelle = "mails/nag-body-html.html"
+sha256 = "2416ff4c575828d9cbc9ee3341911f6eb5907bb2a6ad09c2e252ec685b17251f"
+
+[[vorlage]]
+datei = "templates/emails/nag-body-text.html"
+quelle = "mails/nag-body-text.html"
+sha256 = "253be9378cc389641df853218cb1b1edb0e69470e19dbf153d66e8e0e659a038"
+
+[[vorlage]]
+datei = "templates/emails/nag-subject.html"
+quelle = "mails/nag-subject.html"
+sha256 = "b61f19408982ab100776f582f7fbab255ad5e0f8a537d59361431bf7f0e2a350"
+
+[[vorlage]]
+datei = "templates/emails/nag-summary-html.html"
+quelle = "mails/nag-summary-html.html"
+sha256 = "fee336f8db1e210cdad57790db7c77c11dfa4828a98a1d4e6077372cd978c86a"
+
+[[vorlage]]
+datei = "templates/emails/phone-call-limit-body-html.html"
+quelle = "mails/phone-call-limit-body-html.html"
+sha256 = "22fe2fe615273999541def8dae33fe06b34f40328757dfa107bf7f29d11c139f"
+
+[[vorlage]]
+datei = "templates/emails/phone-call-limit-body-text.html"
+quelle = "mails/phone-call-limit-body-text.html"
+sha256 = "7975baa43798d42c996f0fb0478d94ad39f2d7481a880483fcaf8ada9d0a08f8"
+
+[[vorlage]]
+datei = "templates/emails/phone-call-limit-subject.html"
+quelle = "mails/phone-call-limit-subject.html"
+sha256 = "40026f4d033a344f9338817a358551ba75a05c7e6cf40a8c08058484f0c0b406"
+
+[[vorlage]]
+datei = "templates/emails/report-body-html.html"
+quelle = "mails/report-body-html.html"
+sha256 = "c3e468464655b08bd1fa12719bfa918cd641a94b6052b3977da8421754fd0f73"
+
+[[vorlage]]
+datei = "templates/emails/report-body-text.html"
+quelle = "mails/report-body-text.html"
+sha256 = "cb4ec661ff7d672728a65d2cf939c1c3eb2a4e62b0028f74c09ba8fcf71b6280"
+
+[[vorlage]]
+datei = "templates/emails/report-subject.html"
+quelle = "mails/report-subject.html"
+sha256 = "02c18f00b0591c3a1db0b371be6f868a34bf0018b75b49f05a4aa68efbc6016a"
+
+[[vorlage]]
+datei = "templates/emails/report-summary-html.html"
+quelle = "mails/report-summary-html.html"
+sha256 = "6c6e7897fc2e321bc8fa341809c53de40b07210d8f3ed127343ec33f60b35b09"
+
+[[vorlage]]
+datei = "templates/emails/report-when.html"
+quelle = "mails/report-when.html"
+sha256 = "d380bc322fcbddd9bf17431a28b0d05e2ef4b3407b49be36be35d3c83627fcce"
+
+[[vorlage]]
+datei = "templates/emails/signal-rate-limited-body-html.html"
+quelle = "mails/signal-rate-limited-body-html.html"
+sha256 = "5f3a8e06137fd0588e517aa028fe3683838aeece2ba634a45c06b452a3137198"
+
+[[vorlage]]
+datei = "templates/emails/signal-rate-limited-body-text.html"
+quelle = "mails/signal-rate-limited-body-text.html"
+sha256 = "7a12e50af23902165f08eb6525751e9519db2f23a3b3a2fc6de009f7539b8372"
+
+[[vorlage]]
+datei = "templates/emails/signal-rate-limited-subject.html"
+quelle = "mails/signal-rate-limited-subject.html"
+sha256 = "47b46d9919968e1fc7edb5b6b413a03828f6310785f9c6c30d0386a915e4059d"
+
+[[vorlage]]
+datei = "templates/emails/sms-limit-body-html.html"
+quelle = "mails/sms-limit-body-html.html"
+sha256 = "ad8c220ea6eb63a662f7b6519fd8551bbf8cf7fad927707c97117bf08ffca9d6"
+
+[[vorlage]]
+datei = "templates/emails/sms-limit-body-text.html"
+quelle = "mails/sms-limit-body-text.html"
+sha256 = "52c1dc8d6fff1492e8bcef4b6fd1aa012bafacad45518fea3651b37a9bfaaf95"
+
+[[vorlage]]
+datei = "templates/emails/sms-limit-subject.html"
+quelle = "mails/sms-limit-subject.html"
+sha256 = "ff71991d3d3d6c2c2a7125ffcb1ec28f43c94b05eb54cf08cbbe0c9cfcfee189"
+
+[[vorlage]]
+datei = "templates/emails/sudo-code-body-html.html"
+quelle = "mails/sudo-code-body-html.html"
+sha256 = "7091d4ee144351110541487e6974bec4cb5d11fdcc47a2678d429cce46277f69"
+
+[[vorlage]]
+datei = "templates/emails/sudo-code-body-text.html"
+quelle = "mails/sudo-code-body-text.html"
+sha256 = "908a79856787e0a7f23f116deb8a0e668773a9d966a9626d0d1786d3c0a3cb50"
+
+[[vorlage]]
+datei = "templates/emails/sudo-code-subject.html"
+quelle = "mails/sudo-code-subject.html"
+sha256 = "0e8b8c87eb69cba3d722bb5f8311416201a1958dce465a59369c005b0e4d1776"
+
+[[vorlage]]
+datei = "templates/emails/transfer-request-body-html.html"
+quelle = "mails/transfer-request-body-html.html"
+sha256 = "2d0ac26ddb3f1bc49dd008085fa3afa48dc425cc0a66dc69ae6592a0e8947294"
+
+[[vorlage]]
+datei = "templates/emails/transfer-request-body-text.html"
+quelle = "mails/transfer-request-body-text.html"
+sha256 = "56d2bfcd0953a6f160d4feb58d4526186ebd7a53fef55894858a8f0d12d9fa89"
+
+[[vorlage]]
+datei = "templates/emails/transfer-request-subject.html"
+quelle = "mails/transfer-request-subject.html"
+sha256 = "9a28e64f59df18f8f159174ca1bbe69412c0243e95c3f94e09669e37ff0b3ba2"
+
+[[vorlage]]
+datei = "templates/emails/verify-email-body-html.html"
+quelle = "mails/verify-email-body-html.html"
+sha256 = "2fc3df535b168bf348f4c7b7f010e716b9d02e413b314809a4f39c43f2713043"
+
+[[vorlage]]
+datei = "templates/emails/verify-email-body-text.html"
+quelle = "mails/verify-email-body-text.html"
+sha256 = "1b6602aba2762c053245146f9359ce324633919312c11e8737ccaf6f9ad83a13"
+
+[[vorlage]]
+datei = "templates/emails/verify-email-subject.html"
+quelle = "mails/verify-email-subject.html"
+sha256 = "be6a84f464fedc21ea32fe97ac8cc8fbff0cf084c00eea6c67e005cda70ea2d4"
+
+[[text]]
+datei = "templates/emails/alert-body-html.html"
+en = "Log"
+de = "Log"
+
+[[text]]
+datei = "templates/emails/alert-body-text.html"
+en = "Details:"
+de = "Details:"

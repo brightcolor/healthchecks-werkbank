@@ -1,0 +1,22 @@
+{% extends "emails/base.html" %}
+{% load hc_extras %}
+
+{% block title %}Mail-Adresse für {% site_name %} bestätigen{% endblock %}
+
+{% block vorschau %}Bestätige diese Adresse, damit Benachrichtigungen von {% site_name %} hier ankommen.{% endblock %}
+
+{% block etikett %}Mail-Adresse{% endblock %}
+
+{% block ueberschrift %}Adresse bestätigen{% endblock %}
+
+{% block content %}
+<p style="margin:0 0 16px;">Hallo,</p>
+<p style="margin:0 0 16px;">damit diese Adresse Benachrichtigungen von {% site_name %} bekommt, bestätige sie über diesen Link:</p>
+<p style="margin:0; word-break:break-all;"><a href="{{ verify_link }}" style="color:#8b3a6f; text-decoration:underline;">{{ verify_link }}</a></p>
+{% endblock %}
+
+{% block content_more %}
+<p style="margin:0;">Viele Grüße<br>{% site_name %}</p>
+{% endblock %}
+
+{% block grund %}Du bekommst diese Mail, weil jemand diese Adresse in {% site_name %} für Benachrichtigungen eingetragen hat.{% endblock %}

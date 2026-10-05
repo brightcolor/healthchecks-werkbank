@@ -1203,11 +1203,6 @@ de = "Tags:"
 
 [[text]]
 datei = "*"
-en = "Team"
-de = "Team"
-
-[[text]]
-datei = "*"
 en = "Time Zone"
 de = "Zeitzone"
 

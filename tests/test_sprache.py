@@ -1,4 +1,5 @@
 import gettext
+import hashlib
 import json
 import re
 import sys
@@ -292,6 +293,72 @@ def test_englisch_schreibt_keine_mo_datei(tmp_path, monkeypatch):
 ])
 def test_django_eintraege_werden_geprueft(tmp_path, eintrag, meldung):
     wurzel, werkbank = aufbau(tmp_path, konfig=KATALOG_KONFIG + "\n" + eintrag)
+    with pytest.raises(sprache.SprachFehler, match=re.escape(meldung)):
+        sprache.bauen(wurzel, werkbank)
+
+
+ORIGINAL_MAIL = "{% load hc_extras %}Hello,\n\n<p>Your check is down.</p>\n"
+
+
+def vorlage_aufbau(tmp_path, ersatz, pruefsumme=None, original=ORIGINAL_MAIL):
+    summe = pruefsumme or hashlib.sha256(original.encode("utf-8")).hexdigest()
+    katalog = (
+        "[[vorlage]]\n"
+        'datei = "templates/emails/a.html"\n'
+        'quelle = "mails/a.html"\n'
+        f'sha256 = "{summe}"\n'
+    )
+    wurzel, werkbank = aufbau(tmp_path, katalog, {"templates/emails/a.html": original})
+    (werkbank / "deutsch" / "mails").mkdir()
+    (werkbank / "deutsch" / "mails" / "a.html").write_bytes(ersatz.encode("utf-8"))
+    return wurzel, werkbank
+
+
+def test_vorlage_ersetzt_die_datei_bei_passender_pruefsumme(tmp_path):
+    ersatz = "{% load hc_extras %}Hallo,\n\n<p>Dein Check ist ausgefallen.</p>\n"
+    wurzel, werkbank = vorlage_aufbau(tmp_path, ersatz)
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/emails/a.html") == ersatz
+    assert bericht["englisch"] == [] and bericht["ohne_fundstelle"] == []
+
+
+def test_vorlage_meldet_englische_reste_aus_dem_original(tmp_path):
+    ersatz = "{% load hc_extras %}Hallo,\n\n<p>Your check is down.</p>\n"
+    wurzel, werkbank = vorlage_aufbau(tmp_path, ersatz)
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert [r["text"] for r in bericht["englisch"]] == ["Your check is down."]
+
+
+def test_vorlage_bleibt_aus_wenn_healthchecks_die_datei_aendert(tmp_path):
+    geaendert = ORIGINAL_MAIL.replace("down", "DOWN")
+    wurzel, werkbank = vorlage_aufbau(tmp_path, "Hallo,\n", original=geaendert,
+                                      pruefsumme=hashlib.sha256(ORIGINAL_MAIL.encode()).hexdigest())
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/emails/a.html") == geaendert
+    (ohne,) = bericht["ohne_fundstelle"]
+    assert ohne["art"] == "vorlage" and "geändert" in ohne["grund"]
+    assert "Your check is DOWN." in [r["text"] for r in bericht["englisch"]]
+
+
+def test_englisch_laesst_vorlagen_aus(tmp_path, monkeypatch):
+    monkeypatch.setenv("WB_SPRACHE", "en")
+    wurzel, werkbank = vorlage_aufbau(tmp_path, "Hallo,\n")
+    sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/emails/a.html") == ORIGINAL_MAIL
+
+
+@pytest.mark.parametrize("katalog, meldung", [
+    ('[[vorlage]]\ndatei = "templates/a.html"\nquelle = "mails/a.html"\nsha256 = "abc"\n', "64 Hex-Zeichen"),
+    ('[[vorlage]]\ndatei = "templates/a.html"\nquelle = "mails/fehlt.html"\nsha256 = "' + "0" * 64 + '"\n',
+     "mails/fehlt.html fehlt"),
+    ('[[vorlage]]\ndatei = "templates/a.html"\nsha256 = "' + "0" * 64 + '"\n', "quelle fehlt"),
+    ('[[vorlage]]\ndatei = "templates/a.html"\nquelle = "mails/a.html"\nsha256 = "' + "0" * 64 + '"\nen = "x"\n',
+     "unbekannte Schlüssel en"),
+])
+def test_ungueltige_vorlage(tmp_path, katalog, meldung):
+    wurzel, werkbank = aufbau(tmp_path, katalog)
+    (werkbank / "deutsch" / "mails").mkdir()
+    (werkbank / "deutsch" / "mails" / "a.html").write_bytes(b"Hallo")
     with pytest.raises(sprache.SprachFehler, match=re.escape(meldung)):
         sprache.bauen(wurzel, werkbank)
 

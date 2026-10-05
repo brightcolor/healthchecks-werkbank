@@ -1,0 +1,54 @@
+{% load asciitable linemode hc_extras tz %}{% timezone tz %}{% linemode %}
+
+{% line %}Hallo,{% endline %}
+{% line %}{% endline %}
+
+{% if summary_nchecks %}
+    {% line %}{{ when }} {{ summary_nchecks|pluralize:"hatte,hatten" }} {{ summary_nchecks }} {{ summary_nchecks|pluralize:"Check,Checks" }} insgesamt {{ summary_ntimes }} {{ summary_ntimes|pluralize:"Ausfall,Ausfälle" }}.{% endline %}
+{% else %}
+    {% line %}{{ when }} hatte kein Check einen Ausfall. Schön!{% endline %}
+{% endif %}
+
+{% endlinemode%}{% regroup checks by project as groups %}{% for group in groups %}
+
+Projekt „{{ group.grouper|safe }}“
+{% table %}
+    {% row %}
+        {% cell %}Zustand{% endcell %}
+        {% cell %}Name{% endcell %}
+        {% for dt in boundaries %}
+            {% if report_period == "weekly" %}
+                {% cell %}{{ dt|date:"j. M" }} – {{ dt|add6days|date:"j. M" }}{% endcell %}
+            {% elif report_period == "daily" %}
+                {% cell %}{{ dt|date:"j. F" }}{% endcell %}
+            {% else %}
+                {% cell %}{{ dt|date:"N Y" }}{% endcell %}
+            {% endif %}
+        {% endfor %}
+    {% endrow %}
+    {% for check in group.list|sortbydowntime %}
+        {% row %}
+            {% cell %}{% if check.get_status == "down" %}AUSGEFALLEN{% else %}{{ check.get_status|zustand }}{% endif %}{% endcell %}
+            {% cell %}{{ check.name_then_code|safe }}{% endcell %}
+            {% for d in check.past_downtimes %}
+                {% if d.count %}
+                    {% cell %}{{ d.count }} {{ d.count|pluralize:"Ausfall,Ausfälle" }},
+{{ d.duration|hc_approx_duration }}{% endcell %}
+                {% elif d.no_data %}
+                    {% cell %}{% endcell %}
+                {% else %}
+                    {% cell %}in Ordnung{% endcell %}
+                {% endif %}
+            {% endfor %}
+        {% endrow %}
+    {% endfor %}
+{% endtable %}
+{% endfor %}
+
+Viele Grüße
+{% site_name %}
+
+-- 
+Abbestellen:
+{{ unsub_link }}
+{% endtimezone %}
