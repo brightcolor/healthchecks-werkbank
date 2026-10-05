@@ -1,0 +1,266 @@
+name: Bauen, prüfen, veröffentlichen
+
+# Folgt neuen Healthchecks-Versionen: baut das Werkbank-Image für amd64 und arm64,
+# prüft im Browser und mit der Update-Probe und veröffentlicht nach ghcr.io.
+# Bei Rot geht nichts raus; ein Issue nennt die gescheiterte Prüfung.
+
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      hc_version:
+        description: 'Healthchecks-Version, etwa v4.4 (leer: neuestes Release)'
+        required: false
+        default: ''
+      force:
+        description: 'Neu bauen und veröffentlichen, auch wenn der Tag schon existiert'
+        type: boolean
+        default: false
+
+concurrency:
+  group: werkbank-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  UPSTREAM: healthchecks/healthchecks
+  BASIS_IMAGE: healthchecks/healthchecks
+  ZIEL_IMAGE: ghcr.io/${{ github.repository_owner }}/healthchecks-werkbank
+  NODE_VERSION: '22'
+  PYTHON_VERSION: '3.13'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  entscheiden:
+    name: Entscheiden
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      hc_tag: ${{ steps.e.outputs.hc_tag }}
+      fassung: ${{ steps.e.outputs.fassung }}
+      bauen: ${{ steps.e.outputs.bauen }}
+      veroeffentlichen: ${{ steps.e.outputs.veroeffentlichen }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: e
+        name: Version und Auftrag bestimmen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EINGABE: ${{ inputs.hc_version }}
+          ERZWINGEN: ${{ inputs.force }}
+          EREIGNIS: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+        run: tools/ci/entscheiden.sh
+
+  bauen:
+    name: Bauen und prüfen (${{ matrix.arch }})
+    needs: entscheiden
+    if: needs.entscheiden.outputs.bauen == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
+    env:
+      HC_TAG: ${{ needs.entscheiden.outputs.hc_tag }}
+      FASSUNG: ${{ needs.entscheiden.outputs.fassung }}
+      VEROEFFENTLICHEN: ${{ needs.entscheiden.outputs.veroeffentlichen }}
+      WB_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Image bauen
+        run: |
+          tools/ci/schritt.sh bau -- docker buildx build --load --progress plain -t wb-test:lokal \
+            --build-arg "HC_VERSION=$HC_TAG" --build-arg "WERKBANK_FASSUNG=$FASSUNG" \
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --label "org.opencontainers.image.base.name=docker.io/$BASIS_IMAGE:$HC_TAG" \
+            --label "org.opencontainers.image.licenses=BSD-3-Clause AND BSD-2-Clause AND OFL-1.1" \
+            .
+
+      - uses: actions/setup-python@v5
+        if: matrix.arch == 'amd64'
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Einheitstests
+        if: matrix.arch == 'amd64'
+        run: |
+          python -m pip install -q -r tests/requirements.txt
+          tools/ci/upstream_aus_image.sh "$BASIS_IMAGE:$HC_TAG" ".upstream/$HC_TAG"
+          tools/ci/schritt.sh einheitstests -- python -m pytest -q
+
+      - name: Quelltext prüfen
+        if: matrix.arch == 'amd64'
+        run: |
+          tools/ci/schritt.sh shellcheck -- shellcheck deploy/hc-werkbank-update tools/ci/*.sh tests/update/*.sh
+          tools/ci/schritt.sh lint -- python vendor/hausschrift/scripts/bc_check.py lint werkbank --variant workbench
+
+      - name: Testinstanz mit Musterdaten
+        run: tools/ci/schritt.sh testinstanz -- tools/ci/testinstanz.sh wb-test:lokal
+
+      - name: Werkbank auf der Anmeldeseite
+        if: matrix.arch == 'arm64'
+        run: tools/ci/schritt.sh anmeldeseite -- bash -c 'curl -fsS http://localhost:8000/accounts/login/ | grep -q "bc/werkbank.css"'
+
+      - uses: actions/setup-node@v4
+        if: matrix.arch == 'amd64'
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Browserprüfung
+        if: matrix.arch == 'amd64'
+        env:
+          WB_BROWSER_KANAL: chrome
+          WB_BASIS_URL: http://localhost:8000
+        run: |
+          npm ci
+          tools/ci/schritt.sh browser -- npx playwright test
+
+      - name: Update-Probe
+        if: matrix.arch == 'amd64'
+        run: tools/ci/schritt.sh update-probe -- tests/update/probe.sh wb-test:lokal
+
+      - name: Bericht der Farbableitung
+        if: always() && matrix.arch == 'amd64'
+        run: |
+          mkdir -p artefakte
+          if docker run --rm --entrypoint cat wb-test:lokal /opt/healthchecks/werkbank-bericht.json > artefakte/werkbank-bericht.json; then
+            python tools/ci/bericht.py artefakte/werkbank-bericht.json >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Ergebnisse sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pruefung-${{ matrix.arch }}
+          path: |
+            artefakte/
+            tests/e2e/ergebnisse/
+          if-no-files-found: ignore
+
+      - name: Auszug für das Issue sichern
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fehler-${{ matrix.arch }}
+          path: fehler/
+          if-no-files-found: ignore
+
+      - name: Bei ghcr.io anmelden
+        if: env.VEROEFFENTLICHEN == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image je Plattform hochladen
+        if: env.VEROEFFENTLICHEN == 'true'
+        run: |
+          docker tag wb-test:lokal "$ZIEL_IMAGE:ci-$WB_ARCH"
+          docker push -q "$ZIEL_IMAGE:ci-$WB_ARCH"
+          mkdir -p digest
+          docker inspect -f '{{index .RepoDigests 0}}' "$ZIEL_IMAGE:ci-$WB_ARCH" > "digest/$WB_ARCH.txt"
+          cat "digest/$WB_ARCH.txt"
+
+      - name: Digest weitergeben
+        if: env.VEROEFFENTLICHEN == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ matrix.arch }}
+          path: digest/
+
+  veroeffentlichen:
+    name: Veröffentlichen
+    needs: [entscheiden, bauen]
+    if: needs.entscheiden.outputs.veroeffentlichen == 'true' && needs.bauen.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      issues: write
+    env:
+      HC_TAG: ${{ needs.entscheiden.outputs.hc_tag }}
+      FASSUNG: ${{ needs.entscheiden.outputs.fassung }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: digest-*
+          merge-multiple: true
+          path: digest
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tags für beide Plattformen setzen
+        run: |
+          docker buildx imagetools create \
+            -t "$ZIEL_IMAGE:$FASSUNG" -t "$ZIEL_IMAGE:${HC_TAG#v}" -t "$ZIEL_IMAGE:latest" \
+            "$(cat digest/amd64.txt)" "$(cat digest/arm64.txt)"
+          docker buildx imagetools inspect "$ZIEL_IMAGE:$FASSUNG"
+          {
+            echo "### Veröffentlicht: \`$FASSUNG\`"
+            echo
+            echo '```'
+            echo "docker pull $ZIEL_IMAGE:$FASSUNG"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Offenes Issue der Version schließen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          LAUF_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: tools/ci/meldung.sh gruen
+
+  meldung:
+    name: Meldung bei Rot
+    needs: [entscheiden, bauen, veroeffentlichen]
+    if: >-
+      always() && github.event_name != 'pull_request' &&
+      (needs.entscheiden.result == 'failure' || needs.bauen.result == 'failure' || needs.veroeffentlichen.result == 'failure')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    env:
+      HC_TAG: ${{ needs.entscheiden.outputs.hc_tag }}
+      FASSUNG: ${{ needs.entscheiden.outputs.fassung }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: fehler-*
+          merge-multiple: true
+          path: fehler
+      - name: Issue anlegen oder ergänzen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          EREIGNIS: ${{ github.event_name }}
+          LAUF_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: tools/ci/meldung.sh rot

@@ -17,6 +17,7 @@ FRIST="${WB_PROBE_FRIST:-180}"
 REG="localhost:${REGISTRY_PORT}"
 ARBEIT="$(mktemp -d)"
 
+# shellcheck disable=SC2317 # läuft über trap EXIT
 aufraeumen() {
 	local d
 	for d in "$ARBEIT"/hc*; do
@@ -67,22 +68,23 @@ DB_NAME=/data/hc.sqlite
 REGISTRATION_OPEN=False
 EOF
 	docker compose --project-directory "$1" up -d --wait --wait-timeout "$FRIST" >/dev/null
-	docker compose --project-directory "$1" exec -T "$2" ./manage.py shell < "$WURZEL/tests/update/markierung.py" >/dev/null
+	# shell -c: Über die Standardeingabe liest Django das Skript nur, wenn es beim Start schon bereitliegt.
+	docker compose --project-directory "$1" exec -T "$2" ./manage.py shell -c "$(cat "$WURZEL/tests/update/markierung.py")" >/dev/null
 }
 
 einstellungen() { # Datei, Zeilen
-	local datei="$1"
+	local datei="$1" entwurf
 	shift
-	printf '%s\n' "$@" | sudo tee "$datei" >/dev/null
-	sudo chown root:root "$datei"
-	sudo chmod 600 "$datei"
+	entwurf="$(mktemp)"
+	printf '%s\n' "$@" > "$entwurf"
+	sudo install -o root -g root -m 600 "$entwurf" "$datei"
+	rm -f "$entwurf"
 }
 
-update() { # Einstellungsdatei, weitere Optionen; Ausgabe nach $ARBEIT/ausgabe.txt
+update() { # Einstellungsdatei, weitere Optionen; Ausgabe auch nach $ARBEIT/ausgabe.txt
 	local datei="$1" rc=0
 	shift
-	sudo bash "$SKRIPT" --einstellungen "$datei" "$@" >"$ARBEIT/ausgabe.txt" 2>&1 || rc=$?
-	cat "$ARBEIT/ausgabe.txt"
+	sudo bash "$SKRIPT" --einstellungen "$datei" "$@" 2>&1 | tee "$ARBEIT/ausgabe.txt" || rc=$?
 	return "$rc"
 }
 

@@ -1,0 +1,12 @@
+.git
+.github
+.upstream
+.venv
+node_modules
+artefakte
+fehler
+docs
+tests
+tools
+deploy
+**/__pycache__

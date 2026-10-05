@@ -65,7 +65,8 @@ lies_einstellungen() {
 		local besitzer rechte
 		besitzer="$(stat -c %u "$EINSTELLUNGEN")"
 		rechte="$(stat -c %a "$EINSTELLUNGEN")"
-		if [ "$besitzer" != 0 ] || [ $((8#$rechte & 8#022)) -ne 0 ]; then
+		# Die letzten beiden Ziffern gelten Gruppe und anderen; 2, 3, 6 und 7 erlauben Schreiben.
+		if [ "$besitzer" != 0 ] || [[ "${rechte: -2}" == *[2367]* ]]; then
 			echo "$EINSTELLUNGEN gehört nicht root oder ist für andere schreibbar (Besitzer $besitzer, Rechte $rechte). Mit chown root:root und chmod 600 korrigieren. Es wurde nichts geändert." >&2
 			exit 2
 		fi
