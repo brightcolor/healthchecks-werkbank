@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("django")
+# Ein Untermodul prüft auf das echte Django: Ohne Django gilt werkbank/django im Suchpfad als Paket "django".
+pytest.importorskip("django.core")
 from django.core.exceptions import ImproperlyConfigured  # noqa: E402
 
 WURZEL = Path(__file__).resolve().parent.parent
