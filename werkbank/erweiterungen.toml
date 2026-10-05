@@ -1,6 +1,6 @@
 # Erweiterungen, die der Bau in jeder Sprache einsetzt (sprache.py bauen).
 # en ist der Anker in Healthchecks, de der Ersatz. Greift ein Eintrag nicht, bricht der
-# Bau ab: Die Vorlagen der Werkbank nutzen den Filter zustand und das Tag werkbank_mail.
+# Bau ab: Die Vorlagen der Werkbank nutzen die Filter zustand, art und rolle sowie das Tag werkbank_mail.
 
 [[quelltext]]
 datei = "hc/front/templatetags/hc_extras.py"
@@ -16,6 +16,18 @@ register = template.Library()
 def zustand(status: str) -> str:
     """Zustand eines Checks in Worten der Werkbank (WERKBANK_ZUSTAENDE), sonst unverändert."""
     return getattr(settings, "WERKBANK_ZUSTAENDE", {}).get(status, status)
+
+
+@register.filter
+def art(kanal) -> str:
+    """Art einer Integration in Worten der Werkbank (WERKBANK_ARTEN), sonst der Name aus Healthchecks."""
+    return getattr(settings, "WERKBANK_ARTEN", {}).get(kanal.kind, kanal.get_kind_display())
+
+
+@register.filter
+def rolle(mitglied) -> str:
+    """Rolle eines Mitglieds in Worten der Werkbank (WERKBANK_ROLLEN), sonst der Name aus Healthchecks."""
+    return getattr(settings, "WERKBANK_ROLLEN", {}).get(mitglied.role, mitglied.get_role_display())
 
 
 @register.simple_tag

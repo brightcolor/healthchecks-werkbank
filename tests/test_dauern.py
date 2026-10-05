@@ -63,3 +63,12 @@ def test_kurzformen(date):
 ])
 def test_dauer_im_satz(date, dauer, text):
     assert date.format_duration_for_sentence(dauer) == text
+
+
+@pytest.mark.parametrize("wert, text", [(0.8458, "84,58"), (1.0, "100,0"), (0.0, "0,0"), (0.99999, "99,99")])
+def test_verfuegbarkeit_mit_dezimalkomma(wert, text):
+    (eintrag,) = [e for e in sprache.lade_eintraege(WURZEL / "werkbank/deutsch/code.toml")
+                  if e.datei == "hc/front/templatetags/hc_extras.py" and "10000" in e.en]
+    namen: dict = {}
+    exec(f"def pct(v):\n    {eintrag.de}\n", namen)
+    assert namen["pct"](wert) == text

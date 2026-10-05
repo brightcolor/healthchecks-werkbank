@@ -15,6 +15,10 @@ Ein Katalog besteht aus TOML-Dateien mit zwei Arten von Einträgen:
   [[quelltext]]  datei, en, de   genaues Stück Quelle, optional anzahl
 Ein Eintrag mit gleichem en und de markiert ein geprüftes Wort, das bleibt.
 
+Die Datei <WB_KATALOG_KONFIG> nennt dazu Stand und Geltungsbereich, die Wörtertabellen
+(WORTTABELLEN, für die Filter zustand, art und rolle) und [[django]]-Einträge, die Djangos
+eigene Übersetzungen korrigieren; der Bau schreibt sie als MO-Datei nach WB_LOCALE.
+
 Einstellungen über Umgebungsvariablen; die Vorgaben stehen in VORGABEN.
 """
 
@@ -26,6 +30,7 @@ import json
 import os
 import re
 import shutil
+import struct
 import sys
 import tomllib
 from collections import Counter, defaultdict
@@ -44,9 +49,21 @@ VORGABEN = {
     "WB_EINSTELLUNGSMODUL": "hc/werkbank_einstellungen.py",
     "WB_FORMATMODUL": "hc/werkbank_formate",
     "WB_LOCAL_SETTINGS": "hc/local_settings.py",
+    # Ordner für Korrekturen an Djangos eigenen Übersetzungen ([[django]] im Katalog).
+    "WB_LOCALE": "hc/werkbank_locale",
 }
 SPRACHEN = ("de", "en")
-PFAD_EINSTELLUNGEN = ("WB_EINSTELLUNGSMODUL", "WB_FORMATMODUL", "WB_LOCAL_SETTINGS")
+PFAD_EINSTELLUNGEN = ("WB_EINSTELLUNGSMODUL", "WB_FORMATMODUL", "WB_LOCAL_SETTINGS", "WB_LOCALE")
+# Pluralformen des Deutschen, wie gettext sie für [[django]]-Einträge mit plural braucht.
+PLURALFORMEN = 2
+PLURALREGEL = "nplurals=2; plural=(n != 1);"
+# Wörtertabellen im Katalog: Abschnitt -> (wem die Tabelle ein Wort gibt, Beispiel). Der Bau legt
+# jede als WERKBANK_<ABSCHNITT> ab (Platzhalter @@WB_<ABSCHNITT>@@ in werkbank_einstellungen.py).
+WORTTABELLEN = {
+    "zustaende": ("jedem Zustand", 'down = "ausgefallen"'),
+    "arten": ("jeder Integrationsart", 'shell = "Shell-Befehl"'),
+    "rollen": ("jeder Rolle im Projekt", 'r = "Nur lesen"'),
+}
 # Attribute, deren Wert ein Mensch sieht oder hört (HTML); value ist nur an Knöpfen Beschriftung.
 SICHTBARE_ATTRIBUTE = ("title", "placeholder", "aria-label", "alt")
 KNOPF_TYPEN = ("submit", "button", "reset")
@@ -61,7 +78,8 @@ TOKEN = re.compile(
     r"|<!--.*?-->"
     r"|<![A-Za-z][^>]*>"
     r"|<(?P<opak>script|style|pre|code|textarea)\b.*?</(?P=opak)\s*>"
-    r"|</?[A-Za-z][^<>]*>",
+    # HTML-Tags; Django-Ausdrücke darin zählen als Einheit, auch mit < oder > in Bedingungen.
+    r"|</?[A-Za-z](?:\{\{.*?\}\}|\{%.*?%\}|\{#.*?#\}|[^<>{]|\{)*>",
     re.S | re.I,
 )
 ATTRIBUT = re.compile(r"""(?P<name>[A-Za-z_:][-A-Za-z0-9_:.]*)\s*=\s*(?P<q>["'])(?P<wert>.*?)(?P=q)""", re.S)
@@ -91,12 +109,21 @@ class Eintrag:
 
 
 @dataclass
+class DjangoText:
+    kontext: str | None
+    en: str
+    plural: str | None
+    de: tuple[str, ...]
+
+
+@dataclass
 class Katalog:
     stand: str
     vorlagen: list[str]
     ausnahmen: list[str]
-    zustaende: dict[str, str]
+    woerter: dict[str, dict[str, str]]
     eintraege: list[Eintrag]
+    django: list[DjangoText]
 
 
 def einstellung(name: str) -> str:
@@ -273,21 +300,30 @@ def lade_katalog(ordner: Path) -> Katalog:
         raise SprachFehler(f"Den Katalog-Ordner {ordner} gibt es nicht. WB_KATALOG auf einen Ordner in werkbank/ setzen, Vorgabe {VORGABEN['WB_KATALOG']}.")
     konfig_pfad = ordner / einstellung("WB_KATALOG_KONFIG")
     if not konfig_pfad.is_file():
-        raise SprachFehler(f"{konfig_pfad} fehlt. Die Datei nennt Stand, Geltungsbereich und Zustandswörter des Katalogs.")
+        raise SprachFehler(f"{konfig_pfad} fehlt. Die Datei nennt Stand und Geltungsbereich des Katalogs und seine Wörtertabellen.")
     konfig = toml_laden(konfig_pfad)
     try:
         stand = konfig["katalog"]["stand"]
         vorlagen = konfig["bereich"]["vorlagen"]
         ausnahmen = konfig["bereich"].get("ausnahmen", [])
-        zustaende = konfig.get("zustaende", {})
     except (KeyError, TypeError, AttributeError) as err:
         raise SprachFehler(
-            f"{konfig_pfad.name}: {err} fehlt. Erwartet sind [katalog] stand, [bereich] vorlagen und ausnahmen sowie [zustaende]."
+            f"{konfig_pfad.name}: {err} fehlt. Erwartet sind [katalog] stand und [bereich] vorlagen, dazu wahlweise ausnahmen."
         ) from err
     if not isinstance(stand, str) or not all(isinstance(m, str) for m in [*vorlagen, *ausnahmen]):
         raise SprachFehler(f"{konfig_pfad.name}: stand, vorlagen und ausnahmen sind Texte bzw. Listen von Texten.")
-    if not all(isinstance(k, str) and isinstance(v, str) and v.strip() for k, v in zustaende.items()):
-        raise SprachFehler(f"{konfig_pfad.name}: [zustaende] ordnet jedem Zustand ein Wort zu, etwa down = \"ausgefallen\".")
+    fremd = sorted(set(konfig) - {"katalog", "bereich", "django", *WORTTABELLEN})
+    if fremd:
+        raise SprachFehler(
+            f"{konfig_pfad.name}: unbekannte Abschnitte {', '.join(f'[{n}]' for n in fremd)}. "
+            f"Erlaubt sind [katalog], [bereich], [[django]] und die Wörtertabellen {', '.join(f'[{n}]' for n in WORTTABELLEN)}."
+        )
+    woerter: dict[str, dict[str, str]] = {}
+    for name, (wem, beispiel) in WORTTABELLEN.items():
+        tabelle = konfig.get(name, {})
+        if not _woerter(tabelle):
+            raise SprachFehler(f"{konfig_pfad.name}: [{name}] ordnet {wem} ein Wort zu, etwa {beispiel}.")
+        woerter[name] = dict(tabelle)
     eintraege: list[Eintrag] = []
     for pfad in sorted(ordner.glob("*.toml")):
         if pfad.name != konfig_pfad.name:
@@ -298,7 +334,67 @@ def lade_katalog(ordner: Path) -> Katalog:
         if schluessel in gesehen:
             raise SprachFehler(f"{e.herkunft}: doppelt, dieselbe Stelle steht schon in {gesehen[schluessel]}. Einen der beiden Einträge entfernen.")
         gesehen[schluessel] = e.herkunft
-    return Katalog(stand, list(vorlagen), list(ausnahmen), dict(zustaende), eintraege)
+    return Katalog(stand, list(vorlagen), list(ausnahmen), woerter, eintraege, lade_django_texte(konfig, konfig_pfad.name))
+
+
+def lade_django_texte(konfig: dict, quelle: str) -> list[DjangoText]:
+    """Korrekturen an Djangos Übersetzungen: [[django]] mit en, de und wahlweise kontext und plural."""
+    roh_liste = konfig.get("django", [])
+    if not isinstance(roh_liste, list):
+        raise SprachFehler(f"{quelle}: django muss als [[django]] stehen.")
+    texte: list[DjangoText] = []
+    gesehen: dict[tuple[str | None, str], int] = {}
+    for nr, roh in enumerate(roh_liste, 1):
+        herkunft = f"{quelle}, [[django]] Nr. {nr}"
+        fremd = sorted(set(roh) - {"kontext", "en", "plural", "de"})
+        if fremd:
+            raise SprachFehler(f"{herkunft}: unbekannte Schlüssel {', '.join(fremd)}. Erlaubt sind kontext, en, plural und de.")
+        en, plural, kontext, de = roh.get("en"), roh.get("plural"), roh.get("kontext"), roh.get("de")
+        if not all(isinstance(w, str) and w for w in (en, *(x for x in (plural, kontext) if x is not None))):
+            raise SprachFehler(f"{herkunft}: en, plural und kontext sind Texte; en ist Djangos englischer Text.")
+        if de is None:
+            raise SprachFehler(f"{herkunft}: de fehlt. Den deutschen Text ergänzen.")
+        if plural is None:
+            if not (isinstance(de, str) and de.strip()):
+                raise SprachFehler(f"{herkunft}: de ist ein Text, weil der Eintrag kein plural hat.")
+            formen = (de,)
+        else:
+            if not (isinstance(de, list) and len(de) == PLURALFORMEN and all(isinstance(f, str) and f.strip() for f in de)):
+                raise SprachFehler(
+                    f"{herkunft}: de ist eine Liste mit {PLURALFORMEN} Formen (Einzahl, Mehrzahl), weil der Eintrag plural hat."
+                )
+            formen = tuple(de)
+        if (kontext, en) in gesehen:
+            raise SprachFehler(f"{herkunft}: doppelt, derselbe Text steht schon in [[django]] Nr. {gesehen[(kontext, en)]}.")
+        gesehen[(kontext, en)] = nr
+        texte.append(DjangoText(kontext, en, plural, formen))
+    return texte
+
+
+def mo_daten(texte: list[DjangoText]) -> bytes:
+    """Die Texte als GNU-MO-Katalog, wie gettext und Django ihn lesen."""
+    paare = {"": f"Content-Type: text/plain; charset=UTF-8\nPlural-Forms: {PLURALREGEL}\n"}
+    for t in texte:
+        schluessel = (f"{t.kontext}\x04" if t.kontext else "") + t.en + (f"\x00{t.plural}" if t.plural else "")
+        paare[schluessel] = "\x00".join(t.de)
+    eintraege = sorted((k.encode("utf-8"), v.encode("utf-8")) for k, v in paare.items())
+    anzahl = len(eintraege)
+    tabelle_en, tabelle_de = 28, 28 + 8 * anzahl
+    daten = b""
+    lagen_en, lagen_de = [], []
+    beginn = 28 + 16 * anzahl
+    for k, _ in eintraege:
+        lagen_en.append(struct.pack("<2I", len(k), beginn + len(daten)))
+        daten += k + b"\0"
+    for _, v in eintraege:
+        lagen_de.append(struct.pack("<2I", len(v), beginn + len(daten)))
+        daten += v + b"\0"
+    kopf = struct.pack("<7I", 0x950412DE, 0, anzahl, tabelle_en, tabelle_de, 0, 0)
+    return kopf + b"".join(lagen_en) + b"".join(lagen_de) + daten
+
+
+def _woerter(tabelle) -> bool:
+    return isinstance(tabelle, dict) and all(isinstance(k, str) and isinstance(v, str) and v.strip() for k, v in tabelle.items())
 
 
 def bereich_dateien(wurzel: Path, katalog: Katalog) -> list[str]:
@@ -391,20 +487,26 @@ def erweitern(wurzel: Path, werkbank: Path) -> None:
         schreibe(ziel, neu, crlf)
 
 
-def einstellungen_schreiben(wurzel: Path, werkbank: Path, sprache: str, zustaende: dict[str, str]) -> None:
-    modul_rel, format_rel, local_rel = (pfad_einstellung(n) for n in PFAD_EINSTELLUNGEN)
+def einstellungen_schreiben(
+    wurzel: Path, werkbank: Path, sprache: str, woerter: dict[str, dict[str, str]], django: list[DjangoText]
+) -> None:
+    modul_rel, format_rel, local_rel, locale_rel = (pfad_einstellung(n) for n in PFAD_EINSTELLUNGEN)
     vorlage = werkbank / "django" / "werkbank_einstellungen.py"
     formate = werkbank / "django" / "werkbank_formate"
     for noetig in (vorlage, formate):
         if not noetig.exists():
             raise SprachFehler(f"{noetig} fehlt. Die Werkbank braucht die Dateien unter werkbank/django/.")
+    ziel = wurzel / modul_rel
+    locale_von_modul = os.path.relpath(wurzel / locale_rel, ziel.parent).replace(os.sep, "/")
     text = (
         lies(vorlage)[0]
         .replace("@@WB_SPRACHE@@", sprache)
-        .replace("@@WB_ZUSTAENDE@@", json.dumps(zustaende, ensure_ascii=False, sort_keys=True))
         .replace("@@WB_FORMATMODUL@@", modulname(format_rel))
+        .replace("@@WB_LOCALE@@", locale_von_modul)
     )
-    ziel = wurzel / modul_rel
+    for name in WORTTABELLEN:
+        tabelle = json.dumps(woerter.get(name, {}), ensure_ascii=False, sort_keys=True)
+        text = text.replace(f"@@WB_{name.upper()}@@", tabelle)
     ziel.parent.mkdir(parents=True, exist_ok=True)
     schreibe(ziel, text)
     formate_ziel = wurzel / format_rel
@@ -414,6 +516,10 @@ def einstellungen_schreiben(wurzel: Path, werkbank: Path, sprache: str, zustaend
     local = wurzel / local_rel
     local.parent.mkdir(parents=True, exist_ok=True)
     schreibe(local, f"from {modulname(modul_rel)} import *  # noqa: F401,F403  Werkbank: Sprache und Mail-Einstellungen\n")
+    if sprache == "de":
+        mo = wurzel / locale_rel / "de" / "LC_MESSAGES" / "django.mo"
+        mo.parent.mkdir(parents=True, exist_ok=True)
+        mo.write_bytes(mo_daten(django))
 
 
 def bericht_schreiben(pfad: Path, abschnitt: str, inhalt: dict) -> None:
@@ -437,7 +543,8 @@ def bauen(wurzel: Path, werkbank: Path, bericht: Path | None = None) -> dict:
         pfad_einstellung(name)
     katalog = lade_katalog(werkbank / einstellung("WB_KATALOG"))
     erweitern(wurzel, werkbank)
-    einstellungen_schreiben(wurzel, werkbank, sprache, katalog.zustaende if sprache == "de" else {})
+    deutsch = sprache == "de"
+    einstellungen_schreiben(wurzel, werkbank, sprache, katalog.woerter if deutsch else {}, katalog.django if deutsch else [])
     ergebnis: dict = {"sprache": sprache, "stand": katalog.stand}
     if sprache == "de":
         ergebnis.update(uebersetzen(wurzel, katalog))

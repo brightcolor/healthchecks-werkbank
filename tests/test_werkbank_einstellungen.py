@@ -16,10 +16,10 @@ FORMATE = WURZEL / "werkbank" / "django" / "werkbank_formate" / "de" / "formats.
 MAIL = ("WB_MAIL_ANSCHRIFT", "WB_MAIL_IMPRESSUM_URL", "WB_MAIL_DATENSCHUTZ_URL")
 
 
-def laden(sprache_="de", zustaende='{"down": "ausgefallen"}'):
+def laden(sprache_="de", zustaende='{"down": "ausgefallen"}', arten='{"shell": "Shell-Befehl"}', rollen='{"r": "Nur lesen"}'):
     text = (VORLAGE.read_text(encoding="utf-8").replace("@@WB_SPRACHE@@", sprache_)
-            .replace("@@WB_ZUSTAENDE@@", zustaende).replace("@@WB_FORMATMODUL@@", "hc.werkbank_formate"))
-    namen: dict = {}
+            .replace("@@WB_ZUSTAENDE@@", zustaende).replace("@@WB_ARTEN@@", arten).replace("@@WB_ROLLEN@@", rollen).replace("@@WB_LOCALE@@", "werkbank_locale").replace("@@WB_FORMATMODUL@@", "hc.werkbank_formate"))
+    namen: dict = {"__file__": str(VORLAGE)}
     exec(compile(text, str(VORLAGE), "exec"), namen)
     return namen
 
@@ -35,16 +35,21 @@ def test_deutsch_schaltet_django_um():
     assert namen["USE_I18N"] is True
     assert namen["LANGUAGE_CODE"] == "de"
     assert namen["FORMAT_MODULE_PATH"] == ["hc.werkbank_formate"]
+    assert namen["LOCALE_PATHS"] == [str(VORLAGE.parent / "werkbank_locale")]
     assert namen["WERKBANK_ZUSTAENDE"] == {"down": "ausgefallen"}
+    assert namen["WERKBANK_ARTEN"] == {"shell": "Shell-Befehl"}
+    assert namen["WERKBANK_ROLLEN"] == {"r": "Nur lesen"}
     assert set(namen["__all__"]) >= {"USE_I18N", "LANGUAGE_CODE", "FORMAT_MODULE_PATH", "WB_MAIL_ANSCHRIFT"}
     assert "os" not in namen["__all__"]
 
 
 def test_englisch_laesst_django_englisch():
-    namen = laden("en", "{}")
+    namen = laden("en", "{}", "{}", "{}")
     assert "USE_I18N" not in namen
     assert "USE_I18N" not in namen["__all__"]
     assert namen["WERKBANK_ZUSTAENDE"] == {}
+    assert namen["WERKBANK_ARTEN"] == {}
+    assert namen["WERKBANK_ROLLEN"] == {}
 
 
 def test_mail_einstellungen_sind_als_vorgabe_leer():
@@ -74,7 +79,7 @@ def test_ungueltige_mail_einstellungen(monkeypatch, name, wert, meldung):
 
 
 def test_formatmodul_haelt_den_dezimalpunkt():
-    namen: dict = {}
+    namen: dict = {"__file__": str(VORLAGE)}
     exec(compile(FORMATE.read_text(encoding="utf-8"), str(FORMATE), "exec"), namen)
     assert (namen["DECIMAL_SEPARATOR"], namen["THOUSAND_SEPARATOR"], namen["NUMBER_GROUPING"]) == (".", "", 0)
     assert "DATE_FORMAT" not in namen

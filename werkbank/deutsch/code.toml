@@ -1,6 +1,6 @@
 # Texte im Code von Healthchecks: Dauern, Seitentitel, Datumsformate im Browser, Sätze in
 # Skripten, Meldungen und Formularfehler in Python, Fehlertexte der Integrationen.
-# Antworten der API (hc/api/) und Protokollzeilen bleiben englisch, Skripte werten sie aus.
+# Antworten der API (hc/api/views.py) und Protokollzeilen bleiben englisch, Skripte werten sie aus.
 
 # --- Dauern (hc/lib/date.py) ----------------------------------------------------------------
 
@@ -107,6 +107,13 @@ datei = "hc/front/templatetags/hc_extras.py"
 anzahl = 1
 en = 's = "DOWN – " + s'
 de = 's = "AUSGEFALLEN – " + s'
+
+[[quelltext]]
+datei = "hc/front/templatetags/hc_extras.py"
+anzahl = 1
+# Verfügbarkeit in Prozent mit Dezimalkomma; der Wert dient nur der Anzeige (details_downtimes.html).
+en = 'return str(int(v * 10000) / 100)'
+de = 'return str(int(v * 10000) / 100).replace(".", ",")'
 
 # --- Datum und Uhrzeit im Browser (static/js/dates.js) ------------------------------------------
 
@@ -255,6 +262,44 @@ datei = "static/js/snippet-copy.js"
 anzahl = 1
 en = 'title: "Copied"'
 de = 'title: "Kopiert"'
+
+[[quelltext]]
+datei = "static/js/checks.js"
+anzahl = 1
+# Vergleicht mit dem Wort, das die Vorlage last_ping_cell.html zeigt (GLOBAL "Never" in oberflaeche.toml).
+en = 'this.innerText == "Never"'
+de = 'this.innerText == "Nie"'
+
+[[quelltext]]
+datei = "static/js/details.js"
+anzahl = 1
+en = 'button.textContent = "Success!";'
+de = 'button.textContent = "Ping gesendet";'
+
+[[quelltext]]
+datei = "static/js/details.js"
+anzahl = 1
+# Derselbe Text wie der Knopf in details.html.
+en = 'e.target.textContent = "Ping Now!";'
+de = 'e.target.textContent = "Jetzt pingen";'
+
+[[quelltext]]
+datei = "static/js/log.js"
+anzahl = 1
+en = 'var toFormatted = "now, live updates";'
+de = 'var toFormatted = "jetzt, laufend aktualisiert";'
+
+[[quelltext]]
+datei = "static/js/slug-suggestions.js"
+anzahl = 1
+en = '`Suggested value: <code>${suggested}</code>`'
+de = '`Vorschlag: <code>${suggested}</code>`'
+
+[[quelltext]]
+datei = "static/js/update-timeout-modal.js"
+anzahl = 2
+en = '.text("Updating...")'
+de = '.text("Wird aktualisiert …")'
 
 # --- Konto (hc/accounts/) -----------------------------------------------------------------------
 
@@ -814,3 +859,134 @@ datei = "hc/integrations/zulip/transport.py"
 anzahl = 1
 en = '"Zulip notifications are not enabled."'
 de = '"Benachrichtigungen über Zulip sind auf dieser Instanz abgeschaltet."'
+
+# --- Anzeigetexte der Modelle (hc/api/models.py) ------------------------------------------------
+# Namen unbenannter Integrationen, Prioritäten in der Integrationsliste und die Art des letzten
+# Pings in Benachrichtigungen. Die Namen der Integrationsarten stehen in Migrationen; sie kommen
+# über [arten] in katalog.toml.
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = '''
+    -3: "disabled",
+    -2: "lowest",
+    -1: "low",
+    0: "normal",
+    1: "high",
+    2: "emergency",
+'''
+de = '''
+    -3: "aus",
+    -2: "niedrigste",
+    -1: "niedrig",
+    0: "normal",
+    1: "hoch",
+    2: "Notfall",
+'''
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = '''
+    5: "max priority",
+    4: "high priority",
+    3: "default priority",
+    2: "low priority",
+    1: "min priority",
+    0: "disabled",
+'''
+de = '''
+    5: "höchste Priorität",
+    4: "hohe Priorität",
+    3: "Standardpriorität",
+    2: "niedrige Priorität",
+    1: "niedrigste Priorität",
+    0: "aus",
+'''
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = '''
+    0: "disabled",
+    2: "low priority",
+    5: "normal priority",
+    9: "high priority",
+'''
+de = '''
+    0: "aus",
+    2: "niedrige Priorität",
+    5: "normale Priorität",
+    9: "hohe Priorität",
+'''
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 2
+en = 'parts.append(f"down: {s}")'
+de = 'parts.append(f"bei Ausfall: {s}")'
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 2
+en = 'parts.append(f"up: {s}")'
+de = 'parts.append(f"wieder in Ordnung: {s}")'
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = 'return f"Email to {self.email.value}"'
+de = 'return f"Mail an {self.email.value}"'
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = 'return f"SMS to {self.phone.value}"'
+de = 'return f"SMS an {self.phone.value}"'
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = 'return f"Zulip stream {self.zulip.to}"'
+de = 'return f"Zulip-Stream {self.zulip.to}"'
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = 'return f"Zulip user {self.zulip.to}"'
+de = 'return f"Zulip-Nutzer {self.zulip.to}"'
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = '''
+        return self.get_kind_display()
+'''
+de = '''
+        return getattr(settings, "WERKBANK_ARTEN", {}).get(self.kind, self.get_kind_display())
+'''
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = 'return "Ignored"'
+de = 'return "Ignoriert"'
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = 'return f"Exit status {self.exitstatus}"'
+de = 'return f"Exit-Status {self.exitstatus}"'
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = 'return "Failure"'
+de = 'return "Fehlschlag"'
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = 'return "Success"'
+de = 'return "Erfolg"'

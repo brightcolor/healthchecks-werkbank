@@ -1,0 +1,4207 @@
+# Oberfläche von Healthchecks: Vorlagen unter templates/ ohne Doku und Mails.
+# Erzeugt aus einer Arbeitsliste; Änderungen direkt hier eintragen.
+# Begriffe: Check, Ping, Badge, Tag, Slug bleiben; Period = Intervall; Grace Time = Kulanz;
+# up/grace/down = in Ordnung/verspätet/ausgefallen. Du-Form, echte Umlaute.
+
+[[quelltext]]
+datei = "templates/base.html"
+anzahl = 1
+en = '''
+        Warning: Your account is scheduled for deletion on {{ request.profile.deletion_scheduled_date.date }}.
+        <a href="mailto:{% support_email %}">Contact support</a> to resolve.
+'''
+de = '''
+        Achtung: Dein Konto ist zur Löschung am {{ request.profile.deletion_scheduled_date.date }} vorgemerkt.
+        <a href="mailto:{% support_email %}">Schreib dem Support</a>, um das zu klären.
+'''
+
+[[quelltext]]
+datei = "templates/front/checks.html"
+anzahl = 1
+en = '''
+            The account <strong>{{ project.owner.email }}</strong> is currently
+            over its check limit. Please ask <strong>{{ project.owner.email }}</strong>
+            to upgrade their account.
+'''
+de = '''
+            Das Konto <strong>{{ project.owner.email }}</strong> liegt über seiner
+            Grenze für Checks. Bitte <strong>{{ project.owner.email }}</strong>,
+            in einen größeren Tarif zu wechseln.
+'''
+
+[[quelltext]]
+datei = "templates/front/checks.html"
+anzahl = 1
+en = '''
+The project <strong>{{ project }}</strong> does not have any checks yet.'''
+de = '''
+Im Projekt <strong>{{ project }}</strong> gibt es noch keine Checks.'''
+
+[[quelltext]]
+datei = "templates/front/checks.html"
+anzahl = 1
+en = '''
+            <strong>There are more things to monitor.</strong>
+            To add more checks, please
+            {% if request.user == project.owner %}
+            <a href="{% url 'hc-billing' %}">upgrade your account</a>.
+            {% else %}
+            ask <strong>{{ project.owner.email }}</strong> to upgrade their account.
+'''
+de = '''
+            <strong>Es gibt noch mehr zu überwachen.</strong>
+            Für weitere Checks
+            {% if request.user == project.owner %}
+            <a href="{% url 'hc-billing' %}">wechsle in einen größeren Tarif</a>.
+            {% else %}
+            bitte <strong>{{ project.owner.email }}</strong>, in einen größeren Tarif zu wechseln.
+'''
+
+[[quelltext]]
+datei = "templates/front/checks_table.html"
+anzahl = 1
+en = '''
+yesno:"Key/Slug,UUID"'''
+de = '''
+yesno:"Schlüssel/Slug,UUID"'''
+
+[[quelltext]]
+datei = "templates/front/details.html"
+anzahl = 1
+en = '''
+            This is a brand new check, with details copied over from your existing check.
+            You might now want to
+            <a data-target="edit-name" href="#">update its name and tags</a>.
+'''
+de = '''
+            Das ist ein neuer Check mit den Angaben deines bestehenden Checks.
+            Am besten passt du jetzt
+            <a data-target="edit-name" href="#">Name und Tags an</a>.
+'''
+
+[[quelltext]]
+datei = "templates/front/details.html"
+anzahl = 1
+en = '''
+                    Keep this check up by making HTTP
+                    {% if check.methods == "POST" %}POST{% endif %}
+                    requests to this URL:
+'''
+de = '''
+                    Halte diesen Check in Ordnung mit
+                    HTTP-{% if check.methods == "POST" %}POST-{% endif %}Anfragen
+                    an diese Adresse:
+'''
+
+[[quelltext]]
+datei = "templates/front/details.html"
+anzahl = 2
+en = '''
+<code>(unavailable, set slug first)</code>'''
+de = '''
+<code>(nicht verfügbar, zuerst einen Slug festlegen)</code>'''
+
+[[quelltext]]
+datei = "templates/front/details.html"
+anzahl = 1
+en = '''
+                    The ping key is currently not set. Go to
+                    <a href="{% url 'hc-project-settings' project.code %}">project settings</a>
+                    to generate it.
+'''
+de = '''
+                    Der Ping-Schlüssel fehlt noch. Leg ihn in den
+                    <a href="{% url 'hc-project-settings' project.code %}">Einstellungen des Projekts</a>
+                    an.
+'''
+
+[[quelltext]]
+datei = "templates/front/details.html"
+anzahl = 1
+en = '''
+                <p>You can also explicitly
+                    <a href="{% url 'hc-serve-doc' 'signaling_failures' %}">
+                        signal a failure</a>
+                    and
+                    <a href="{% url 'hc-serve-doc' 'measuring_script_run_time' %}">
+                        measure job execution time</a>.
+'''
+de = '''
+                <p>Du kannst auch ausdrücklich
+                    <a href="{% url 'hc-serve-doc' 'signaling_failures' %}">
+                        einen Fehlschlag melden</a>
+                    und
+                    <a href="{% url 'hc-serve-doc' 'measuring_script_run_time' %}">
+                        die Laufzeit eines Jobs messen</a>.
+'''
+
+[[quelltext]]
+datei = "templates/front/details.html"
+anzahl = 1
+en = '''
+                Set up your preferred methods of notification in the
+                <a href="{% url 'hc-channels' project.code %}">Integrations</a>
+                page.
+'''
+de = '''
+                Richte deine Benachrichtigungswege auf der Seite
+                <a href="{% url 'hc-channels' project.code %}">Integrationen</a>
+                ein.
+'''
+
+[[quelltext]]
+datei = "templates/front/details.html"
+anzahl = 1
+en = '''
+Transfer<span class="hidden-sm hidden-xs"> to Another Project</span>&hellip;'''
+de = '''
+Verschieben<span class="hidden-sm hidden-xs"> in ein anderes Projekt</span>&hellip;'''
+
+[[quelltext]]
+datei = "templates/front/details.html"
+anzahl = 1
+en = '''
+                <p>This project does not yet have a ping key.<br />
+                   To ping this check, please generate the
+                   ping key first.
+'''
+de = '''
+                <p>Dieses Projekt hat noch keinen Ping-Schlüssel.<br />
+                   Leg ihn zuerst an, dann kannst du diesen Check pingen.
+'''
+
+[[quelltext]]
+datei = "templates/front/log_row.html"
+anzahl = 1
+en = '''
+Status: <strong>{{ event.old_status }} ➔ {{ event.new_status }}</strong>.'''
+de = '''
+Zustand: <strong>{{ event.old_status|zustand }} ➔ {{ event.new_status|zustand }}</strong>.'''
+
+[[quelltext]]
+datei = "templates/front/event_summary.html"
+anzahl = 1
+en = '''
+    Added a Trello card in
+    board "{{ event.channel.trello.board_name }}"
+'''
+de = '''
+    Trello-Karte im Board „{{ event.channel.trello.board_name }}“ angelegt
+'''
+
+[[quelltext]]
+datei = "templates/front/event_summary.html"
+anzahl = 1
+en = '''
+to group "{{ event.channel.name }}"'''
+de = '''
+an die Gruppe „{{ event.channel.name }}“'''
+
+[[quelltext]]
+datei = "templates/front/details_downtimes.html"
+anzahl = 1
+en = '''
+{{ d.count }} downtime{{ d.count|pluralize }}, {{ d.duration|hc_approx_duration }} total'''
+de = '''
+{{ d.count }} {{ d.count|pluralize:"Ausfall,Ausfälle" }}, insgesamt {{ d.duration|hc_approx_duration }}'''
+
+[[quelltext]]
+datei = "templates/front/details_downtimes.html"
+anzahl = 1
+en = '''
+{{ d.monthly_uptime|pct }}% uptime'''
+de = '''
+{{ d.monthly_uptime|pct }} % verfügbar'''
+
+[[quelltext]]
+datei = "templates/front/update_timeout_modal.html"
+anzahl = 1
+en = '''
+– When a check is late, <strong>or</strong> has
+                            received a "start" signal, how long to wait to send an alert.'''
+de = '''
+– Wie lange gewartet wird, bevor eine Benachrichtigung rausgeht, wenn ein Check verspätet ist <strong>oder</strong> ein „start“-Signal bekommen hat.'''
+
+[[quelltext]]
+datei = "templates/front/copy_modal.html"
+anzahl = 1
+en = '''
+You are about to <strong>create a new check based on this
+                    check's configuration</strong>. The following items will
+                get copied:'''
+de = '''
+Du legst gleich <strong>einen neuen Check mit den Einstellungen dieses Checks</strong> an. Diese Angaben werden übernommen:'''
+
+[[quelltext]]
+datei = "templates/front/copy_modal.html"
+anzahl = 1
+en = '''
+The following items <em>will not</em> be copied:'''
+de = '''
+Diese Angaben werden <em>nicht</em> übernommen:'''
+
+[[quelltext]]
+datei = "templates/front/cron_preview.html"
+anzahl = 1
+en = '''
+Please check the <a href="{% url 'hc-docs-cron' %}">supported cron syntax features</a>.'''
+de = '''
+Welche Schreibweisen gehen, zeigt die <a href="{% url 'hc-docs-cron' %}">Übersicht der Cron-Syntax</a>.'''
+
+[[quelltext]]
+datei = "templates/front/cron_preview.html"
+anzahl = 1
+en = '''
+{{ d|date:"M j, H:i" }}'''
+de = '''
+{{ d|date:"j. M, H:i" }}'''
+
+[[quelltext]]
+datei = "templates/front/projects.html"
+anzahl = 1
+en = '''
+{{ project.n_checks }} check{{ project.n_checks|pluralize }},'''
+de = '''
+{{ project.n_checks }} {{ project.n_checks|pluralize:"Check,Checks" }},'''
+
+[[quelltext]]
+datei = "templates/front/projects.html"
+anzahl = 1
+en = '''
+{{ project.n_channels }} integration{{ project.n_channels|pluralize }}'''
+de = '''
+{{ project.n_channels }} {{ project.n_channels|pluralize:"Integration,Integrationen" }}'''
+
+[[quelltext]]
+datei = "templates/front/show_usage_modal.html"
+anzahl = 1
+en = '''
+Signal success or failure by sending an
+                            email message to <a href="mailto:{{ check.email }}">{{ check.email }}</a>.'''
+de = '''
+Melde Erfolg oder Fehlschlag mit einer Mail an <a href="mailto:{{ check.email }}">{{ check.email }}</a>.'''
+
+[[quelltext]]
+datei = "templates/front/show_usage_modal.html"
+anzahl = 1
+en = '''
+<a href="{% url 'hc-serve-doc' 'email' %}">Read more</a>
+                            about pinging via email.'''
+de = '''
+Mehr zu Pings per Mail steht in der <a href="{% url 'hc-serve-doc' 'email' %}">Doku</a>.'''
+
+[[quelltext]]
+datei = "templates/front/signal_captcha.html"
+anzahl = 1
+en = '''
+First, solve a CAPTCHA
+            <a href="https://signalcaptchas.org/challenge/generate.html" target="_blank">here</a>,
+            then paste it below:'''
+de = '''
+Löse zuerst <a href="https://signalcaptchas.org/challenge/generate.html" target="_blank">hier</a> ein CAPTCHA und füge das Ergebnis unten ein:'''
+
+[[quelltext]]
+datei = "templates/front/signup_modal.html"
+anzahl = 1
+en = '''
+Enter your <strong>email address</strong>.'''
+de = '''
+Gib deine <strong>Mail-Adresse</strong> ein.'''
+
+[[quelltext]]
+datei = "templates/front/unsubscribe_success.html"
+anzahl = 1
+en = '''
+Your email address has been unsubscribed from
+    {{ site_name }} notifications.'''
+de = '''
+Deine Mail-Adresse bekommt keine Benachrichtigungen von {{ site_name }} mehr.'''
+
+[[quelltext]]
+datei = "templates/front/verify_email_success.html"
+anzahl = 1
+en = '''
+Success! You have verified this email
+                    address, and it will now receive
+                    {{ site_name }} notifications.'''
+de = '''
+Geschafft: Die Mail-Adresse ist bestätigt und bekommt ab jetzt Benachrichtigungen von {{ site_name }}.'''
+
+[[quelltext]]
+datei = "templates/front/channel_checks.html"
+anzahl = 1
+en = '''
+This dialog would normally show a list of checks in the project, and let
+        you assign checks to this integration. But there are currently no checks
+        in <strong>{{ channel.project }}</strong>. Please check back
+        after adding a check!'''
+de = '''
+Hier ordnest du die Checks des Projekts dieser Integration zu. In <strong>{{ channel.project }}</strong> gibt es noch keine Checks. Leg zuerst einen Check an und komm dann hierher zurück.'''
+
+[[quelltext]]
+datei = "templates/front/channel_description.html"
+anzahl = 1
+en = '''
+Pushover ({{ ch.po_priority }} priority)'''
+de = '''
+Pushover (Priorität {{ ch.po_priority }})'''
+
+[[quelltext]]
+datei = "templates/front/channel_description.html"
+anzahl = 1
+en = '''
+{{ num_members }} member{{ num_members|pluralize}}'''
+de = '''
+{{ num_members }} {{ num_members|pluralize:"Mitglied,Mitglieder" }}'''
+
+[[quelltext]]
+datei = "templates/front/channel_description.html"
+anzahl = 1
+en = '''
+{{ ch.get_kind_display }}'''
+de = '''
+{% load hc_extras %}{{ ch|art }}'''
+
+[[quelltext]]
+datei = "templates/front/event_summary.html"
+anzahl = 1
+en = '''
+{{ event.channel.get_kind_display }}'''
+de = '''
+{% load hc_extras %}{{ event.channel|art }}'''
+
+[[quelltext]]
+datei = "templates/front/channels.html"
+anzahl = 2
+en = '''
+{{ ch.get_kind_display }}'''
+de = '''
+{{ ch|art }}'''
+
+[[quelltext]]
+datei = "templates/front/channels.html"
+anzahl = 1
+en = '''
+Used {{ profile.sms_sent_this_month }} of {{ profile.sms_limit }} sends this month.'''
+de = '''
+Diesen Monat {{ profile.sms_sent_this_month }} von {{ profile.sms_limit }} Nachrichten verschickt.'''
+
+[[quelltext]]
+datei = "templates/front/channels.html"
+anzahl = 1
+en = '''
+Used {{ profile.calls_sent_this_month }} of {{ profile.call_limit }} phone calls this month.'''
+de = '''
+Diesen Monat {{ profile.calls_sent_this_month }} von {{ profile.call_limit }} Anrufen genutzt.'''
+
+[[quelltext]]
+datei = "templates/front/channels.html"
+anzahl = 1
+en = '''
+The project "{{ project }}" does not have any integrations
+                set up yet.'''
+de = '''
+Im Projekt „{{ project }}“ ist noch keine Integration eingerichtet.'''
+
+[[quelltext]]
+datei = "templates/front/channels.html"
+anzahl = 1
+en = '''
+With no configured integrations, {{ site_name }}
+                <strong>will not send any notifications</strong>
+                when checks change state.'''
+de = '''
+Ohne Integration verschickt {{ site_name }} <strong>keine Benachrichtigungen</strong>, wenn sich der Zustand eines Checks ändert.'''
+
+[[quelltext]]
+datei = "templates/front/channels.html"
+anzahl = 1
+en = '''
+Receive instant push notifications using Apprise; see <a href="https://github.com/caronc/apprise#popular-notification-services" >all of the supported services here</a>.'''
+de = '''
+Sofortige Push-Benachrichtigungen über Apprise. <a href="https://github.com/caronc/apprise#popular-notification-services" >Hier stehen alle unterstützten Dienste</a>.'''
+
+[[quelltext]]
+datei = "templates/front/channels.html"
+anzahl = 1
+en = '''
+Your favorite service or notification method not listed? <br />
+                Please <a href="https://github.com/healthchecks/healthchecks/issues">file an issue on GitHub</a>!'''
+de = '''
+Dein Dienst fehlt in der Liste? <br />
+                Schreib ein <a href="https://github.com/healthchecks/healthchecks/issues">Issue auf GitHub</a> (auf Englisch).'''
+
+[[quelltext]]
+datei = "templates/front/channels.html"
+anzahl = 1
+en = '''
+Remove this
+                        <span class="remove-channel-kind">---</span>
+                        Integration?'''
+de = '''
+Integration <span class="remove-channel-kind">---</span> entfernen?'''
+
+[[quelltext]]
+datei = "templates/front/channels.html"
+anzahl = 1
+en = '''
+You are about to remove this
+                        <span class="remove-channel-kind">---</span>
+                    integration.'''
+de = '''
+Du entfernst gleich die Integration <span class="remove-channel-kind">---</span>.'''
+
+[[quelltext]]
+datei = "templates/base.html"
+anzahl = 1
+en = '''
+lang="en"'''
+de = '''
+lang="de"'''
+
+[[quelltext]]
+datei = "templates/base_bare.html"
+anzahl = 1
+en = '''
+lang="en"'''
+de = '''
+lang="de"'''
+
+[[quelltext]]
+datei = "templates/front/dashboard.html"
+anzahl = 1
+en = '''
+lang="en"'''
+de = '''
+lang="de"'''
+
+[[quelltext]]
+datei = "templates/accounts/check_token_submit.html"
+anzahl = 1
+en = '''
+lang="en"'''
+de = '''
+lang="de"'''
+
+[[quelltext]]
+datei = "templates/accounts/login.html"
+anzahl = 1
+en = '''
+<h1>Log In to {{ site_name }}</h1>'''
+de = '''
+<h1>Bei {{ site_name }} anmelden</h1>'''
+
+[[quelltext]]
+datei = "templates/accounts/login.html"
+anzahl = 1
+en = '''
+Enter your <strong>email address</strong>.'''
+de = '''
+Gib deine <strong>Mail-Adresse</strong> ein.'''
+
+[[quelltext]]
+datei = "templates/accounts/login.html"
+anzahl = 1
+en = '''
+Enter your <strong>email address</strong> and <strong>password</strong>.'''
+de = '''
+Gib deine <strong>Mail-Adresse</strong> und dein <strong>Passwort</strong> ein.'''
+
+[[quelltext]]
+datei = "templates/accounts/login.html"
+anzahl = 1
+en = '''
+<li>Log in using the <strong>Email Me a Link</strong> method.</li>'''
+de = '''
+<li>Melde dich über <strong>Link per Mail schicken</strong> an.</li>'''
+
+[[quelltext]]
+datei = "templates/accounts/login.html"
+anzahl = 1
+en = '''
+Once in your account, go to
+                        <strong>Account Settings › Set Password</strong>
+                        to set a new password.'''
+de = '''
+Geh dann zu <strong>Konto › Passwort festlegen</strong> und leg ein neues Passwort fest.'''
+
+[[quelltext]]
+datei = "templates/accounts/login.html"
+anzahl = 1
+en = '''
+Please contact us at
+                    <a href="mailto:{{ support_email }}">{{ support_email }}</a>
+                    in case you need assistance!'''
+de = '''
+Brauchst du Hilfe, schreib an <a href="mailto:{{ support_email }}">{{ support_email }}</a>.'''
+
+[[quelltext]]
+datei = "templates/accounts/login_link_sent.html"
+anzahl = 1
+en = '''
+If a {% site_name %} account exists for this email address,
+                you will receive a login link in your email shortly.'''
+de = '''
+Gibt es zu dieser Mail-Adresse ein Konto bei {% site_name %}, kommt gleich ein Anmeldelink per Mail.'''
+
+[[quelltext]]
+datei = "templates/accounts/check_token_submit.html"
+anzahl = 2
+en = '''
+Continue to {{ site_name }}'''
+de = '''
+Weiter zu {{ site_name }}'''
+
+[[quelltext]]
+datei = "templates/accounts/check_token_submit.html"
+anzahl = 1
+en = '''
+<p>You are about to log into {{ site_name }}.</p>'''
+de = '''
+<p>Du meldest dich gleich bei {{ site_name }} an.</p>'''
+
+[[quelltext]]
+datei = "templates/accounts/set_password.html"
+anzahl = 1
+en = '''
+Please pick a password for your {{ site_name }} account.'''
+de = '''
+Leg ein Passwort für dein Konto bei {{ site_name }} fest.'''
+
+[[quelltext]]
+datei = "templates/accounts/unsubscribed.html"
+anzahl = 1
+en = '''
+Your email address has been unsubscribed from
+    {{ site_name }} reports.'''
+de = '''
+Deine Mail-Adresse bekommt keine Berichte von {{ site_name }} mehr.'''
+
+[[quelltext]]
+datei = "templates/accounts/add_credential.html"
+anzahl = 1
+en = '''
+Follow your browser's instructions to register your security key
+            with {% site_name %}.'''
+de = '''
+Folge den Schritten deines Browsers, um den Sicherheitsschlüssel bei {% site_name %} zu registrieren.'''
+
+[[quelltext]]
+datei = "templates/accounts/change_email.html"
+anzahl = 1
+en = '''
+Otherwise, you may get locked out of
+                    your {{ site_name }} account.'''
+de = '''
+Sonst sperrst du dich womöglich aus deinem Konto bei {{ site_name }} aus.'''
+
+[[quelltext]]
+datei = "templates/accounts/change_email_instructions.html"
+anzahl = 1
+en = '''
+We've sent a log in link to <strong>{{ email }}</strong>.
+                To finalize the email address change, please log
+                in using that link.'''
+de = '''
+Ein Anmeldelink ist an <strong>{{ email }}</strong> unterwegs. Melde dich mit diesem Link an, damit die neue Mail-Adresse gilt.'''
+
+[[quelltext]]
+datei = "templates/accounts/close_account.html"
+anzahl = 1
+en = '''
+You are about to close your {% site_name %} account. This
+                operation will permanently remove:'''
+de = '''
+Du schließt gleich dein Konto bei {% site_name %}. Dabei wird endgültig gelöscht:'''
+
+[[quelltext]]
+datei = "templates/accounts/close_account.html"
+anzahl = 1
+en = '''
+{{ request.user.project_set.count }} project{{ request.user.project_set.count|pluralize }}'''
+de = '''
+{{ request.user.project_set.count }} {{ request.user.project_set.count|pluralize:"Projekt,Projekte" }}'''
+
+[[quelltext]]
+datei = "templates/accounts/close_account.html"
+anzahl = 1
+en = '''
+{{ request.profile.num_checks_used }} check{{ request.profile.num_checks_used|pluralize }}'''
+de = '''
+{{ request.profile.num_checks_used }} {{ request.profile.num_checks_used|pluralize:"Check,Checks" }}'''
+
+[[quelltext]]
+datei = "templates/accounts/close_account.html"
+anzahl = 1
+en = '''
+To confirm, please type your account's email address
+                (<code>{{ request.user.email }}</code>) below:'''
+de = '''
+Zur Bestätigung gib unten die Mail-Adresse deines Kontos ein (<code>{{ request.user.email }}</code>):'''
+
+[[quelltext]]
+datei = "templates/accounts/remove_credential.html"
+anzahl = 1
+en = '''
+You are about to remove
+            the security key <strong>{{ credential.name|default:'unnamed' }}</strong>
+            from your two-factor authentication methods.'''
+de = '''
+Du entfernst gleich den Sicherheitsschlüssel <strong>{{ credential.name|default:'unbenannt' }}</strong> aus deiner Zwei-Faktor-Anmeldung.'''
+
+[[quelltext]]
+datei = "templates/accounts/remove_credential.html"
+anzahl = 1
+en = '''
+After removing this key,
+                <strong>two-factor authentication will no longer be active</strong>
+                for your {% site_name%} account.'''
+de = '''
+Ohne diesen Schlüssel ist die <strong>Zwei-Faktor-Anmeldung für dein Konto bei {% site_name %} abgeschaltet</strong>.'''
+
+[[quelltext]]
+datei = "templates/accounts/remove_totp.html"
+anzahl = 1
+en = '''
+You are about to remove the authenticator app from your
+               {% site_name %} account.'''
+de = '''
+Du entfernst gleich die Authenticator-App aus deinem Konto bei {% site_name %}.'''
+
+[[quelltext]]
+datei = "templates/accounts/remove_totp.html"
+anzahl = 1
+en = '''
+After removing the authenticator app,
+                <strong>two-factor authentication will no longer be active.</strong>'''
+de = '''
+Ohne die Authenticator-App ist die <strong>Zwei-Faktor-Anmeldung abgeschaltet.</strong>'''
+
+[[quelltext]]
+datei = "templates/accounts/notifications.html"
+anzahl = 1
+en = '''
+Next {{ profile.reports }} report date is
+                                {{ profile.next_report_date|date:"F j, Y" }}.'''
+de = '''
+Der nächste Bericht kommt am {{ profile.next_report_date|date:"j. F Y" }}.'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+Attach a password to your {{ site_name }} account.'''
+de = '''
+Leg ein Passwort für dein Konto bei {{ site_name }} fest.'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+{{ credential.name|default:"unnamed" }}'''
+de = '''
+{{ credential.name|default:"unbenannt" }}'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+– registered on {{ credential.created|date:"M j, Y" }}'''
+de = '''
+– registriert am {{ credential.created|date:"j. M Y" }}'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+– configured on {{ profile.totp_created|date:"M j, Y" }}'''
+de = '''
+– eingerichtet am {{ profile.totp_created|date:"j. M Y" }}'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+<strong>The key "{% for c in credentials%}{{ c.name }}{% endfor %}" is currently your only second factor.</strong>
+                        If you lose this key, or it stops working, you will lose
+                        access to your {% site_name %} account.'''
+de = '''
+<strong>Der Schlüssel „{% for c in credentials%}{{ c.name }}{% endfor %}“ ist gerade dein einziger zweiter Faktor.</strong>
+                        Geht er verloren oder kaputt, kommst du nicht mehr in dein Konto bei {% site_name %}.'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+<strong>The Authenticator app is currently your only second factor.</strong>
+                        If you lose access to it, you will lose access to your
+                        {% site_name %} account.'''
+de = '''
+<strong>Die Authenticator-App ist gerade dein einziger zweiter Faktor.</strong>
+                        Verlierst du den Zugriff darauf, kommst du nicht mehr in dein Konto bei {% site_name %}.'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+Make sure you have a backup of the Authenticator app's TOTP
+                        seed{% if use_webauthn %}, or register a Security Key to be used as a backup second factor{% endif %}.'''
+de = '''
+Sichere den TOTP-Schlüssel der Authenticator-App{% if use_webauthn %} oder registriere einen Sicherheitsschlüssel als Reserve{% endif %}.'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+Two-factor authentication is currently <strong>inactive</strong>.
+                    Your account does not have any configured two-factor authentication
+                    methods.'''
+de = '''
+Die Zwei-Faktor-Anmeldung ist gerade <strong>aus</strong>. Für dein Konto ist noch kein zweiter Faktor eingerichtet.'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+Added security key <strong>{{ added_credential_name }}</strong>.'''
+de = '''
+Sicherheitsschlüssel <strong>{{ added_credential_name }}</strong> hinzugefügt.'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+Removed security key <strong>{{ removed_credential_name }}</strong>.'''
+de = '''
+Sicherheitsschlüssel <strong>{{ removed_credential_name }}</strong> entfernt.'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+{{ m.get_role_display }}'''
+de = '''
+{{ m|rolle }}'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+Left project <strong>{{ left_project }}</strong>.'''
+de = '''
+Projekt <strong>{{ left_project }}</strong> verlassen.'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+Tip: your browser's time zone is <b>FIXME</b>.
+                        <a href="#">Use it instead?</a>'''
+de = '''
+Tipp: Dein Browser nutzt die Zeitzone <b>FIXME</b>.
+                        <a href="#">Diese übernehmen?</a>'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+Deliver <a href="{% url 'hc-profile' %}">email reports</a>
+                            (if enabled) between 9:00 and 11:00 local time.'''
+de = '''
+Den Versand der <a href="{% url 'hc-profile' %}">Mail-Berichte</a> (falls eingeschaltet) zwischen 9 und 11 Uhr Ortszeit.'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+<p>This will permanently remove your {{ site_name }} account.</p>'''
+de = '''
+<p>Damit löschst du dein Konto bei {{ site_name }} endgültig.</p>'''
+
+[[quelltext]]
+datei = "templates/accounts/profile.html"
+anzahl = 1
+en = '''
+You are about to leave the project <strong id="leave-project-name"></strong>.
+                        You will lose access to its checks and integrations.'''
+de = '''
+Du verlässt gleich das Projekt <strong id="leave-project-name"></strong> und verlierst den Zugriff auf seine Checks und Integrationen.'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+This project has
+                    <strong>{{ num_checks }} check{{ num_checks|pluralize}}</strong>,
+                    but your account only has space for
+                    <strong>{{ num_available }} additional check{{ num_available|pluralize }}</strong>.
+                    To accept the transfer, please
+                    <a href="{% url 'hc-billing' %}">upgrade your account first!</a>'''
+de = '''
+Das Projekt hat <strong>{{ num_checks }} {{ num_checks|pluralize:"Check,Checks" }}</strong>, in deinem Konto ist aber nur noch Platz für <strong>{{ num_available }} {{ num_available|pluralize:"weiteren Check,weitere Checks" }}</strong>. Um die Übertragung anzunehmen, <a href="{% url 'hc-billing' %}">wechsle zuerst in einen größeren Tarif</a>.'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+data-name="API key"'''
+de = '''
+data-name="API-Schlüssel"'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+data-name="read-only API key"'''
+de = '''
+data-name="API-Schlüssel (nur lesen)"'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+data-name="Ping key"'''
+de = '''
+data-name="Ping-Schlüssel"'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+{{ m.get_role_display }}'''
+de = '''
+{{ m|rolle }}'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+Transfer initiated, awaiting confirmation from
+                <strong>{{ transfer_request.user.email }}</strong>.'''
+de = '''
+Übertragung gestartet, sie wartet auf die Bestätigung von <strong>{{ transfer_request.user.email }}</strong>.'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+This will permanently remove project {{ project }}.'''
+de = '''
+Damit löschst du das Projekt „{{ project }}“ endgültig.'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+<h4>Revoke <span class="name"></span>?</h4>'''
+de = '''
+<h4><span class="name"></span> widerrufen?</h4>'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+You are about to revoke your current
+                        <span class="name"></span>.'''
+de = '''
+Du widerrufst gleich deinen aktuellen <span class="name"></span>.'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+Afterwards, you can generate a new key, but there will
+                        be <strong>no way of getting the key's current value back</strong>.'''
+de = '''
+Danach kannst du einen neuen Schlüssel erzeugen, <strong>der bisherige Wert lässt sich aber nicht wiederherstellen</strong>.'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+Revoke <span class="name"></span>
+'''
+de = '''
+<span class="name"></span> widerrufen
+'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+<p>You are about to remove <strong id="rtm-email"></strong> from the project.</p>'''
+de = '''
+<p>Du entfernst gleich <strong id="rtm-email"></strong> aus dem Projekt.</p>'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+<h4>Remove "{{ project }}"?</h4>'''
+de = '''
+<h4>„{{ project }}“ entfernen?</h4>'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+<p>Danger zone! You are about to permanently remove
+                    project <strong>{{ project }}</strong> and all
+                    of its associated checks and integrations. Are you sure?'''
+de = '''
+<p>Achtung: Du löschst gleich das Projekt <strong>{{ project }}</strong> mit allen Checks und Integrationen endgültig. Sicher?'''
+
+[[quelltext]]
+datei = "templates/accounts/project.html"
+anzahl = 1
+en = '''
+<strong>Tip:</strong> unlike API keys, you will be able to
+                look up the ping key later too. When {% site_name %} displays the ping
+                key in a masked form, you can <strong>click on it to reveal it</strong>.'''
+de = '''
+<strong>Tipp:</strong> Den Ping-Schlüssel kannst du später jederzeit wieder nachsehen. Wo {% site_name %} ihn verdeckt zeigt, <strong>klickst du darauf, um ihn anzuzeigen</strong>.'''
+
+[[text]]
+datei = "*"
+en = "Account"
+de = "Konto"
+
+[[text]]
+datei = "*"
+en = "Account Settings"
+de = "Konto"
+
+[[text]]
+datei = "*"
+en = "Add Check"
+de = "Check anlegen"
+
+[[text]]
+datei = "*"
+en = "Add Integration"
+de = "Integration hinzufügen"
+
+[[text]]
+datei = "*"
+en = "All good!"
+de = "Alles in Ordnung."
+
+[[text]]
+datei = "*"
+en = "Appearance"
+de = "Darstellung"
+
+[[text]]
+datei = "*"
+en = "Are you sure?"
+de = "Sicher?"
+
+[[text]]
+datei = "*"
+en = "Billing"
+de = "Abrechnung"
+
+[[text]]
+datei = "*"
+en = "Cancel"
+de = "Abbrechen"
+
+[[text]]
+datei = "*"
+en = "Checks"
+de = "Checks"
+
+[[text]]
+datei = "*"
+en = "Continue"
+de = "Weiter"
+
+[[text]]
+datei = "*"
+en = "Cron Expression"
+de = "Cron-Ausdruck"
+
+[[text]]
+datei = "*"
+en = "Description"
+de = "Beschreibung"
+
+[[text]]
+datei = "*"
+en = "Docs"
+de = "Doku"
+
+[[text]]
+datei = "*"
+en = "Email"
+de = "E-Mail"
+
+[[text]]
+datei = "*"
+en = "Email Reports"
+de = "Mail-Berichte"
+
+[[text]]
+datei = "*"
+en = "Got It!"
+de = "Verstanden"
+
+[[text]]
+datei = "*"
+en = "Grace"
+de = "Kulanz"
+
+[[text]]
+datei = "*"
+en = "Grace Time"
+de = "Kulanz"
+
+[[text]]
+datei = "*"
+en = "Healthchecks"
+de = "Healthchecks"
+
+[[text]]
+datei = "*"
+en = "Integration Settings"
+de = "Einstellungen der Integration"
+
+[[text]]
+datei = "*"
+en = "Integrations"
+de = "Integrationen"
+
+[[text]]
+datei = "*"
+en = "Label"
+de = "Bezeichnung"
+
+[[text]]
+datei = "*"
+en = "Last Ping"
+de = "Letzter Ping"
+
+[[text]]
+datei = "*"
+en = "Last Ping:"
+de = "Letzter Ping:"
+
+[[text]]
+datei = "*"
+en = "Loading"
+de = "Lädt …"
+
+[[text]]
+datei = "*"
+en = "Log In"
+de = "Anmelden"
+
+[[text]]
+datei = "*"
+en = "Log Out"
+de = "Abmelden"
+
+[[text]]
+datei = "*"
+en = "Name"
+de = "Name"
+
+[[text]]
+datei = "*"
+en = "Never"
+de = "Nie"
+
+[[text]]
+datei = "*"
+en = "Period"
+de = "Intervall"
+
+[[text]]
+datei = "*"
+en = "Period:"
+de = "Intervall:"
+
+[[text]]
+datei = "*"
+en = "Phone Number"
+de = "Telefonnummer"
+
+[[text]]
+datei = "*"
+en = "Ping URL"
+de = "Ping-Adresse"
+
+[[text]]
+datei = "*"
+en = "Project"
+de = "Projekt"
+
+[[text]]
+datei = "*"
+en = "Project:"
+de = "Projekt:"
+
+[[text]]
+datei = "*"
+en = "Remove"
+de = "Entfernen"
+
+[[text]]
+datei = "*"
+en = "Save"
+de = "Speichern"
+
+[[text]]
+datei = "*"
+en = "Save Changes"
+de = "Speichern"
+
+[[text]]
+datei = "*"
+en = "Save Integration"
+de = "Integration speichern"
+
+[[text]]
+datei = "*"
+en = "Schedule"
+de = "Zeitplan"
+
+[[text]]
+datei = "*"
+en = "Schedule:"
+de = "Zeitplan:"
+
+[[text]]
+datei = "*"
+en = "Settings"
+de = "Einstellungen"
+
+[[text]]
+datei = "*"
+en = "Sign Up"
+de = "Registrieren"
+
+[[text]]
+datei = "*"
+en = "Site Administration"
+de = "Verwaltung"
+
+[[text]]
+datei = "*"
+en = "Status"
+de = "Status"
+
+[[text]]
+datei = "*"
+en = "Tags"
+de = "Tags"
+
+[[text]]
+datei = "*"
+en = "Tags:"
+de = "Tags:"
+
+[[text]]
+datei = "*"
+en = "Team"
+de = "Team"
+
+[[text]]
+datei = "*"
+en = "Time Zone"
+de = "Zeitzone"
+
+[[text]]
+datei = "*"
+en = "Time Zone:"
+de = "Zeitzone:"
+
+[[text]]
+datei = "*"
+en = "Two-factor Authentication"
+de = "Zwei-Faktor-Anmeldung"
+
+[[text]]
+datei = "*"
+en = "URL"
+de = "URL"
+
+[[text]]
+datei = "*"
+en = "Webhook URL"
+de = "Webhook-Adresse"
+
+[[text]]
+datei = "*"
+en = "github"
+de = "github"
+
+[[text]]
+datei = "*"
+en = "healthchecks.io"
+de = "healthchecks.io"
+
+[[text]]
+datei = "*"
+en = "https://"
+de = "https://"
+
+[[text]]
+datei = "*"
+en = "slug"
+de = "slug"
+
+[[text]]
+datei = "*"
+en = "uuid"
+de = "uuid"
+
+[[text]]
+datei = "*"
+en = "you@example.org"
+de = "you@example.org"
+
+[[text]]
+datei = "*"
+en = "minutes"
+de = "Minuten"
+
+[[text]]
+datei = "*"
+en = "hours"
+de = "Stunden"
+
+[[text]]
+datei = "*"
+en = "days"
+de = "Tage"
+
+[[text]]
+datei = "*"
+en = "Simple"
+de = "Einfach"
+
+[[text]]
+datei = "*"
+en = "Cron"
+de = "Cron"
+
+[[text]]
+datei = "*"
+en = "OnCalendar"
+de = "OnCalendar"
+
+[[text]]
+datei = "*"
+en = "OnCalendar Expression(s)"
+de = "OnCalendar-Ausdrücke"
+
+[[text]]
+datei = "*"
+en = "Slug"
+de = "Slug"
+
+[[text]]
+datei = "*"
+en = "Use Suggested"
+de = "Vorschlag übernehmen"
+
+[[text]]
+datei = "*"
+en = "(Docs)"
+de = "(Doku)"
+
+[[text]]
+datei = "*"
+en = "Invalid timezone."
+de = "Diese Zeitzone ist unbekannt. Wähl eine aus der Liste."
+
+[[text]]
+datei = "*"
+en = "Expected Ping Dates"
+de = "Erwartete Pings"
+
+[[text]]
+datei = "*"
+en = "Check"
+de = "Check"
+
+[[text]]
+datei = "*"
+en = "Set Password"
+de = "Passwort festlegen"
+
+[[text]]
+datei = "*"
+en = "Close Account"
+de = "Konto schließen"
+
+[[text]]
+datei = "*"
+en = "Waiting for security key"
+de = "Warte auf den Sicherheitsschlüssel"
+
+[[text]]
+datei = "*"
+en = "Try Again"
+de = "Noch einmal versuchen"
+
+[[text]]
+datei = "*"
+en = "Success!"
+de = "Geschafft:"
+
+[[text]]
+datei = "*"
+en = "Credential acquired."
+de = "Schlüssel erkannt."
+
+[[text]]
+datei = "*"
+en = "Account Settings -"
+de = "Konto -"
+
+[[text]]
+datei = "*"
+en = "Your settings have been updated!"
+de = "Deine Einstellungen sind gespeichert."
+
+[[text]]
+datei = "templates/base.html"
+en = "- Monitor Cron Jobs. Get Notified When Your Cron Jobs Fail"
+de = "- Überwachung für Cron-Jobs und wiederkehrende Abläufe"
+
+[[text]]
+datei = "templates/base.html"
+en = "Toggle navigation"
+de = "Navigation ein- und ausblenden"
+
+[[text]]
+datei = "templates/base.html"
+en = "All Projects"
+de = "Alle Projekte"
+
+[[text]]
+datei = "templates/base.html"
+en = "New Project&hellip;"
+de = "Neues Projekt&hellip;"
+
+[[text]]
+datei = "templates/base.html"
+en = "Badges"
+de = "Badges"
+
+[[text]]
+datei = "templates/base.html"
+en = "Pricing"
+de = "Preise"
+
+[[text]]
+datei = "templates/bad_link.html"
+en = "Incorrect Link"
+de = "Ungültiger Link"
+
+[[text]]
+datei = "templates/bad_link.html"
+en = "The link you just used is incorrect. If you copy-pasted the link, please make sure you did not miss any characters."
+de = "Dieser Link stimmt nicht. Hast du ihn kopiert, prüf bitte, ob alle Zeichen dabei sind."
+
+[[text]]
+datei = "templates/try_later.html"
+en = "Too Many Requests"
+de = "Zu viele Anfragen"
+
+[[text]]
+datei = "templates/try_later.html"
+en = "Please try again later."
+de = "Versuch es bitte später noch einmal."
+
+[[text]]
+datei = "templates/admin/base_site.html"
+en = "Administration"
+de = "Verwaltung"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Your account is currently over its check limit. Please upgrade, or reduce the number of checks in your account."
+de = "Dein Konto liegt über seiner Grenze für Checks. Wechsle in einen größeren Tarif oder entferne Checks aus deinem Konto."
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Accounts that remain over the limit for more than 30 days are scheduled for deletion."
+de = "Konten, die länger als 30 Tage über der Grenze liegen, werden zur Löschung vorgemerkt."
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Project's Owner:"
+de = "Eigentümer des Projekts:"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Current Plan:"
+de = "Aktueller Tarif:"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Hobbyist (free)"
+de = "Hobbyist (kostenlos)"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Checks Used:"
+de = "Genutzte Checks:"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "of"
+de = "von"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Billing Details and Plan Upgrades"
+de = "Abrechnung und Tarife"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Filter by status"
+de = "Nach Zustand filtern"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "New"
+de = "Neu"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Paused"
+de = "Pausiert"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Started"
+de = "Gestartet"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Up"
+de = "In Ordnung"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Late"
+de = "Verspätet"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Down"
+de = "Ausgefallen"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "New ×"
+de = "Neu ×"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Paused ×"
+de = "Pausiert ×"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Started ×"
+de = "Gestartet ×"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Up ×"
+de = "In Ordnung ×"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Late ×"
+de = "Verspätet ×"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Down ×"
+de = "Ausgefallen ×"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "{{ checks|length }} in use, {{ num_available }} available"
+de = "{{ checks|length }} genutzt, {{ num_available }} frei"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "no matching checks found"
+de = "keine passenden Checks"
+
+[[text]]
+datei = "templates/front/checks.html"
+en = "Show Earlier Events"
+de = "Frühere Ereignisse zeigen"
+
+[[text]]
+datei = "templates/front/checks_table.html"
+en = "Last Duration"
+de = "Letzte Dauer"
+
+[[text]]
+datei = "templates/front/checks_table.html"
+en = "unavailable, slug not set"
+de = "nicht verfügbar, kein Slug gesetzt"
+
+[[text]]
+datei = "templates/front/checks_table.html"
+en = "(not unique)"
+de = "(nicht eindeutig)"
+
+[[text]]
+datei = "templates/front/checks_table.html"
+en = "of"
+de = "von"
+
+[[text]]
+datei = "templates/front/checks_table.html"
+en = "Show Details"
+de = "Details anzeigen"
+
+[[text]]
+datei = "templates/front/last_ping_cell.html"
+en = "confirmation link"
+de = "Bestätigungslink"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Copy created!"
+de = "Kopie angelegt."
+
+[[text]]
+datei = "templates/front/details.html"
+en = "(edit&hellip;)"
+de = "(bearbeiten&hellip;)"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Edit Description&hellip;"
+de = "Beschreibung bearbeiten&hellip;"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Add description&hellip;"
+de = "Beschreibung hinzufügen&hellip;"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "How To Ping"
+de = "So pingst du"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Or by sending email to:"
+de = "Oder mit einer Mail an:"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Filtering Rules&hellip;"
+de = "Filterregeln&hellip;"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Usage Examples"
+de = "Beispiele"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Current Status"
+de = "Aktueller Zustand"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Pause"
+de = "Pausieren"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Ping Now!"
+de = "Jetzt pingen"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "(The expected time between pings)"
+de = "(erwarteter Abstand zwischen zwei Pings)"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "OnCalendar Expr."
+de = "OnCalendar-Ausdruck"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "(When a check is late, how long to wait to send an alert)"
+de = "(wie lange nach einem verspäteten Ping gewartet wird, bis ein Alarm kommt)"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Change Schedule&hellip;"
+de = "Zeitplan ändern&hellip;"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Notification Groups"
+de = "Benachrichtigungsgruppen"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "ON"
+de = "AN"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "OFF"
+de = "AUS"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Notification Methods"
+de = "Benachrichtigungswege"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "No notification methods set up yet."
+de = "Noch kein Benachrichtigungsweg eingerichtet."
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Danger Zone"
+de = "Gefahrenbereich"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Copy, transfer, or permanently remove this check."
+de = "Check kopieren, in ein anderes Projekt verschieben oder endgültig entfernen."
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Create a Copy&hellip;"
+de = "Kopie anlegen&hellip;"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Clear Events"
+de = "Ereignisse löschen"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Events"
+de = "Ereignisse"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Click on individual items for details"
+de = "Für Details einen Eintrag anklicken"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Ping Key Required"
+de = "Ping-Schlüssel nötig"
+
+[[text]]
+datei = "templates/front/details.html"
+en = "Open Project Settings"
+de = "Einstellungen des Projekts öffnen"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Event Log -"
+de = "Ereignisse -"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Events"
+de = "Ereignisse"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Showing"
+de = "Angezeigt:"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "matching events."
+de = "passende Ereignisse."
+
+[[text]]
+datei = "templates/front/log.html"
+en = "The oldest stored ping is ping #"
+de = "Der älteste gespeicherte Ping ist Ping #"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "from"
+de = "vom"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Show events older than:"
+de = "Ereignisse zeigen, die älter sind als:"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "now"
+de = "jetzt"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Event types"
+de = "Arten"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Success"
+de = "Erfolg"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Failure"
+de = "Fehlschlag"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Started"
+de = "Gestartet"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Log"
+de = "Log"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Ignored ping"
+de = "Ignorierter Ping"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Status change"
+de = "Zustandswechsel"
+
+[[text]]
+datei = "templates/front/log.html"
+en = "Downtime alert"
+de = "Alarm bei Ausfall"
+
+[[text]]
+datei = "templates/front/log_row.html"
+en = "Ignored"
+de = "Ignoriert"
+
+[[text]]
+datei = "templates/front/log_row.html"
+en = "Failure"
+de = "Fehlschlag"
+
+[[text]]
+datei = "templates/front/log_row.html"
+en = "Started"
+de = "Gestartet"
+
+[[text]]
+datei = "templates/front/log_row.html"
+en = "Log"
+de = "Log"
+
+[[text]]
+datei = "templates/front/log_row.html"
+en = "OK"
+de = "OK"
+
+[[text]]
+datei = "templates/front/log_row.html"
+en = "from"
+de = "von"
+
+[[text]]
+datei = "templates/front/log_status_text.html"
+en = "This check is down. Last ping was"
+de = "Dieser Check ist ausgefallen. Letzter Ping"
+
+[[text]]
+datei = "templates/front/log_status_text.html"
+en = "This check is up. Last ping was"
+de = "Dieser Check ist in Ordnung. Letzter Ping"
+
+[[text]]
+datei = "templates/front/log_status_text.html"
+en = "This check is late. Last ping was"
+de = "Dieser Check ist verspätet. Letzter Ping"
+
+[[text]]
+datei = "templates/front/log_status_text.html"
+en = "This check is paused, and will ignore pings until resumed."
+de = "Dieser Check ist pausiert und übergeht Pings, bis du ihn fortsetzt."
+
+[[text]]
+datei = "templates/front/log_status_text.html"
+en = "(Resume&nbsp;Now)"
+de = "(Jetzt&nbsp;fortsetzen)"
+
+[[text]]
+datei = "templates/front/log_status_text.html"
+en = "This check is ready for pings."
+de = "Dieser Check wartet auf Pings."
+
+[[text]]
+datei = "templates/front/log_status_text.html"
+en = "This check is paused."
+de = "Dieser Check ist pausiert."
+
+[[text]]
+datei = "templates/front/log_status_text.html"
+en = "This check has never received a ping."
+de = "Dieser Check hat noch keinen Ping bekommen."
+
+[[text]]
+datei = "templates/front/log_status_text.html"
+en = "Currently running, started"
+de = "Läuft gerade, gestartet vor"
+
+[[text]]
+datei = "templates/front/log_status_text.html"
+en = "ago."
+de = "."
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Sent an email to"
+de = "Mail an"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Sent a Slack alert"
+de = "Slack-Alarm"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "to"
+de = "an"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Sent a Pushover notification"
+de = "Pushover-Benachrichtigung"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Called a webhook"
+de = "Webhook aufgerufen:"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Sent an SMS to"
+de = "SMS an"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Sent a WhatsApp message to"
+de = "WhatsApp-Nachricht an"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Executed a shell command"
+de = "Shell-Befehl ausgeführt"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Made a phone call to"
+de = "Anruf bei"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Sent a Signal message to"
+de = "Signal-Nachricht an"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Sent a Gotify notification"
+de = "Gotify-Benachrichtigung"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Sent a group notification"
+de = "Gruppenbenachrichtigung"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Created a GitHub issue in"
+de = "GitHub-Issue angelegt in"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Sent an alert to"
+de = "Alarm an"
+
+[[text]]
+datei = "templates/front/event_summary.html"
+en = "Error:"
+de = "Fehler:"
+
+[[text]]
+datei = "templates/front/details_events.html"
+en = "Show More&hellip;"
+de = "Mehr zeigen&hellip;"
+
+[[text]]
+datei = "templates/front/details_events.html"
+en = "You will see a"
+de = "Hier erscheint ein"
+
+[[text]]
+datei = "templates/front/details_events.html"
+en = "live-updating"
+de = "laufend aktualisiertes"
+
+[[text]]
+datei = "templates/front/details_events.html"
+en = "log of received pings here."
+de = "Log der empfangenen Pings."
+
+[[text]]
+datei = "templates/front/details_events.html"
+en = "This check has not received any pings yet."
+de = "Dieser Check hat noch keinen Ping bekommen."
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "Ping #"
+de = "Ping #"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "(ignored)"
+de = "(ignoriert)"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "(failure, exit status"
+de = "(Fehlschlag, Exit-Status"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "(exit status 0)"
+de = "(Exit-Status 0)"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "(received via the"
+de = "(empfangen über den Endpunkt"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "endpoint)"
+de = ")"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "Time Received"
+de = "Empfangen"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "Source"
+de = "Quelle"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "from"
+de = "von"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "Duration"
+de = "Dauer"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "Run ID"
+de = "Lauf-ID"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "User Agent"
+de = "User-Agent"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "Subject"
+de = "Betreff"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "Request Body"
+de = "Inhalt der Anfrage"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "The request body data is not yet available, please check back later."
+de = "Der Inhalt der Anfrage liegt noch nicht vor. Sieh später noch einmal nach."
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "Raw Message"
+de = "Rohfassung"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "Text"
+de = "Text"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "HTML"
+de = "HTML"
+
+[[text]]
+datei = "templates/front/ping_details.html"
+en = "Download Original"
+de = "Original herunterladen"
+
+[[text]]
+datei = "templates/front/ping_details_not_found.html"
+en = "Not Found"
+de = "Nicht gefunden"
+
+[[text]]
+datei = "templates/front/ping_details_not_found.html"
+en = "No additional information is available for this event."
+de = "Zu diesem Ereignis gibt es keine weiteren Angaben."
+
+[[text]]
+datei = "templates/front/add_check_modal.html"
+en = "Give this check a human-friendly name."
+de = "Gib dem Check einen gut lesbaren Namen."
+
+[[text]]
+datei = "templates/front/add_check_modal.html"
+en = "Separate multiple tags with spaces."
+de = "Mehrere Tags trennst du mit Leerzeichen."
+
+[[text]]
+datei = "templates/front/add_check_modal.html"
+en = "The expected time between pings."
+de = "Die erwartete Zeit zwischen zwei Pings."
+
+[[text]]
+datei = "templates/front/add_check_modal.html"
+en = "When a check is late, or has received a \"start\" signal, how long to wait to send an alert."
+de = "Wie lange gewartet wird, bevor eine Benachrichtigung rausgeht, wenn ein Check verspätet ist oder ein „start“-Signal bekommen hat."
+
+[[text]]
+datei = "templates/front/update_timeout_modal.html"
+en = "– The expected time between pings."
+de = "– Die erwartete Zeit zwischen zwei Pings."
+
+[[text]]
+datei = "templates/front/update_timeout_modal.html"
+en = "m h dom mon dow"
+de = "m h dom mon dow"
+
+[[text]]
+datei = "templates/front/update_timeout_modal.html"
+en = "(cheatsheet)"
+de = "(Spickzettel)"
+
+[[text]]
+datei = "templates/front/update_timeout_modal.html"
+en = "Server's Time Zone"
+de = "Zeitzone des Servers"
+
+[[text]]
+datei = "templates/front/update_timeout_modal.html"
+en = "syntax reference"
+de = "Syntaxbeschreibung"
+
+[[text]]
+datei = "templates/front/update_name_modal.html"
+en = "Name and Tags"
+de = "Name und Tags"
+
+[[text]]
+datei = "templates/front/update_name_modal.html"
+en = "unnamed"
+de = "unbenannt"
+
+[[text]]
+datei = "templates/front/update_name_modal.html"
+en = "Give this check a human-friendly name, so you can easily recognize it later."
+de = "Gib dem Check einen gut lesbaren Namen, damit du ihn später schnell wiedererkennst."
+
+[[text]]
+datei = "templates/front/update_name_modal.html"
+en = "Use tags for easy filtering and for status badges. Separate multiple tags with spaces."
+de = "Mit Tags filterst du die Liste und baust Status-Badges. Mehrere Tags trennst du mit Leerzeichen."
+
+[[text]]
+datei = "templates/front/update_name_modal.html"
+en = "Additional notes for your own reference. Will appear in email alerts and Slack notifications."
+de = "Notizen für dich. Sie erscheinen auch in Benachrichtigungen per Mail und Slack."
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Allowed HTTP Request Methods"
+de = "Erlaubte HTTP-Methoden"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Accept and process HTTP ping requests if the request method is"
+de = "HTTP-Pings annehmen und verarbeiten, wenn die Anfrage diese Methode nutzt:"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "HEAD, GET, POST, PUT"
+de = "HEAD, GET, POST, PUT"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Only POST"
+de = "Nur POST"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "May help if bots (email content scanners, link preview loaders) make GET requests to the ping URL."
+de = "Hilft, wenn Bots (Mail-Scanner, Linkvorschauen) GET-Anfragen an die Ping-Adresse schicken."
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Content Filtering"
+de = "Inhaltsfilter"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Classify pings as start, success, or failure signals by matching keywords (case-sensitive) in"
+de = "Pings anhand von Stichwörtern als Start, Erfolg oder Fehlschlag einordnen. Groß- und Kleinschreibung zählt. Gesucht wird in:"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Request body of HTTP requests"
+de = "Inhalt von HTTP-Anfragen"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Subject line of email messages"
+de = "Betreff von Mails"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Message body of email messages"
+de = "Text von Mails"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Start keywords"
+de = "Stichwörter für Start"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Success keywords"
+de = "Stichwörter für Erfolg"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Failure keywords"
+de = "Stichwörter für Fehlschlag"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Comma-separated list of keywords. If any keyword is found, classify the ping as a start / success / failure signal."
+de = "Stichwörter durch Kommas getrennt. Kommt eines davon vor, zählt der Ping als Start, Erfolg oder Fehlschlag."
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "If no keywords match"
+de = "Wenn kein Stichwort passt"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Ignore the ping"
+de = "Ping ignorieren"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Classify the ping as failure"
+de = "Ping als Fehlschlag werten"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Pinging a Paused Check"
+de = "Pings an pausierte Checks"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "When a paused check receives a ping:"
+de = "Wenn ein pausierter Check einen Ping bekommt:"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Leave the paused state (default)"
+de = "Pause beenden (Vorgabe)"
+
+[[text]]
+datei = "templates/front/filtering_rules_modal.html"
+en = "Ignore the ping, stay in the paused state"
+de = "Ping ignorieren, pausiert bleiben"
+
+[[text]]
+datei = "templates/front/clear_events_modal.html"
+en = "Clear Events for"
+de = "Ereignisse löschen für"
+
+[[text]]
+datei = "templates/front/clear_events_modal.html"
+en = "You are about to clear all logged pings and notifications for the check"
+de = "Du löschst gleich alle gespeicherten Pings und Benachrichtigungen des Checks"
+
+[[text]]
+datei = "templates/front/clear_events_modal.html"
+en = "Clear Events"
+de = "Ereignisse löschen"
+
+[[text]]
+datei = "templates/front/copy_modal.html"
+en = "Create a Copy of This Check"
+de = "Check kopieren"
+
+[[text]]
+datei = "templates/front/copy_modal.html"
+en = "Name, tags and description"
+de = "Name, Tags und Beschreibung"
+
+[[text]]
+datei = "templates/front/copy_modal.html"
+en = "Assigned notification methods"
+de = "Zugeordnete Integrationen"
+
+[[text]]
+datei = "templates/front/copy_modal.html"
+en = "Its URL (a new URL will be generated)"
+de = "Die Ping-Adresse (der neue Check bekommt eine eigene)"
+
+[[text]]
+datei = "templates/front/copy_modal.html"
+en = "The log of already received pings"
+de = "Das Protokoll der bisher empfangenen Pings"
+
+[[text]]
+datei = "templates/front/copy_modal.html"
+en = "Create a Copy"
+de = "Kopie anlegen"
+
+[[text]]
+datei = "templates/front/cron_preview.html"
+en = "Invalid cron expression."
+de = "Dieser Cron-Ausdruck ist ungültig."
+
+[[text]]
+datei = "templates/front/oncalendar_preview.html"
+en = "Invalid OnCalendar expression."
+de = "Dieser OnCalendar-Ausdruck ist ungültig. Prüf ihn mit der Syntaxbeschreibung."
+
+[[text]]
+datei = "templates/front/oncalendar_preview.html"
+en = "Next elapse:"
+de = "Nächster Termin:"
+
+[[text]]
+datei = "templates/front/oncalendar_preview.html"
+en = "(in UTC):"
+de = "(in UTC):"
+
+[[text]]
+datei = "templates/front/projects.html"
+en = "My Projects"
+de = "Meine Projekte"
+
+[[text]]
+datei = "templates/front/projects.html"
+en = "New Project&hellip;"
+de = "Neues Projekt&hellip;"
+
+[[text]]
+datei = "templates/front/remove_check_modal.html"
+en = "Remove Check"
+de = "Check entfernen"
+
+[[text]]
+datei = "templates/front/remove_check_modal.html"
+en = "You are about to remove check"
+de = "Du entfernst gleich den Check"
+
+[[text]]
+datei = "templates/front/remove_check_modal.html"
+en = "Once it's gone there is no \"undo\" and you cannot get the old ping URL back."
+de = "Das lässt sich nicht rückgängig machen, und die alte Ping-Adresse ist danach verloren."
+
+[[text]]
+datei = "templates/front/show_usage_modal.html"
+en = "Usage Examples"
+de = "Anwendungsbeispiele"
+
+[[text]]
+datei = "templates/front/show_usage_modal.html"
+en = "Crontab"
+de = "Crontab"
+
+[[text]]
+datei = "templates/front/show_usage_modal.html"
+en = "Bash"
+de = "Bash"
+
+[[text]]
+datei = "templates/front/show_usage_modal.html"
+en = "Python"
+de = "Python"
+
+[[text]]
+datei = "templates/front/show_usage_modal.html"
+en = "Ruby"
+de = "Ruby"
+
+[[text]]
+datei = "templates/front/show_usage_modal.html"
+en = "Node.js"
+de = "Node.js"
+
+[[text]]
+datei = "templates/front/show_usage_modal.html"
+en = "Go"
+de = "Go"
+
+[[text]]
+datei = "templates/front/show_usage_modal.html"
+en = "PHP"
+de = "PHP"
+
+[[text]]
+datei = "templates/front/show_usage_modal.html"
+en = "Browser"
+de = "Browser"
+
+[[text]]
+datei = "templates/front/show_usage_modal.html"
+en = "PowerShell"
+de = "PowerShell"
+
+[[text]]
+datei = "templates/front/signal_captcha.html"
+en = "Signal CAPTCHA"
+de = "Signal-CAPTCHA"
+
+[[text]]
+datei = "templates/front/signal_captcha.html"
+en = "Result:"
+de = "Ergebnis:"
+
+[[text]]
+datei = "templates/front/signal_captcha.html"
+en = "Challenge"
+de = "Challenge"
+
+[[text]]
+datei = "templates/front/signal_captcha.html"
+en = "CAPTCHA"
+de = "CAPTCHA"
+
+[[text]]
+datei = "templates/front/signal_captcha.html"
+en = "Submit"
+de = "Absenden"
+
+[[text]]
+datei = "templates/front/signup_modal.html"
+en = "Create Your Account"
+de = "Konto anlegen"
+
+[[text]]
+datei = "templates/front/signup_modal.html"
+en = "We will email you a magic log in link."
+de = "Du bekommst einen Anmeldelink per Mail."
+
+[[text]]
+datei = "templates/front/signup_modal.html"
+en = "Email Me a Link"
+de = "Link per Mail schicken"
+
+[[text]]
+datei = "templates/front/transfer_modal.html"
+en = "Transfer to Another Project"
+de = "In ein anderes Projekt verschieben"
+
+[[text]]
+datei = "templates/front/transfer_modal.html"
+en = "Target Project"
+de = "Zielprojekt"
+
+[[text]]
+datei = "templates/front/transfer_modal.html"
+en = "Select..."
+de = "Auswählen …"
+
+[[text]]
+datei = "templates/front/transfer_modal.html"
+en = "(current project)"
+de = "(aktuelles Projekt)"
+
+[[text]]
+datei = "templates/front/transfer_modal.html"
+en = "(at check limit)"
+de = "(Grenze für Checks erreicht)"
+
+[[text]]
+datei = "templates/front/transfer_modal.html"
+en = "Integrations will get reset."
+de = "Die Integrationen werden zurückgesetzt."
+
+[[text]]
+datei = "templates/front/transfer_modal.html"
+en = "The check will lose its current notification channels, and will be assigned all notification channels of the target project."
+de = "Der Check verliert seine bisherigen Integrationen und bekommt alle Integrationen des Zielprojekts."
+
+[[text]]
+datei = "templates/front/transfer_modal.html"
+en = "Transfer"
+de = "Verschieben"
+
+[[text]]
+datei = "templates/front/unsubscribe_success.html"
+en = "Unsubscribed"
+de = "Abbestellt"
+
+[[text]]
+datei = "templates/front/verify_email_success.html"
+en = "Email Address Verified!"
+de = "Mail-Adresse bestätigt"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "Status Badges -"
+de = "Status-Badges -"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "Status Badges"
+de = "Status-Badges"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "provides status badges for each of the tags you have used. The badges have public, but hard-to-guess URLs. You can use them in your READMEs, dashboards or status pages."
+de = "stellt für jeden Tag, den du nutzt, ein Status-Badge bereit. Die Adressen der Badges sind öffentlich, aber schwer zu erraten. Du kannst sie in READMEs, Dashboards oder Statusseiten einbinden."
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "Each badge can be in one of the following states:"
+de = "Ein Badge zeigt einen dieser Zustände:"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "up"
+de = "up"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "– all matching checks are up."
+de = "– alle passenden Checks sind in Ordnung."
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "down"
+de = "down"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "– at least one check is currently down."
+de = "– mindestens ein Check ist gerade ausgefallen."
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "As an option, the badges can report a third state:"
+de = "Auf Wunsch zeigen die Badges einen dritten Zustand:"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "late"
+de = "late"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "(when at least one check is running late but has not exceeded its grace time yet)."
+de = "(mindestens ein Check ist verspätet, seine Kulanz läuft aber noch)."
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "Badge Generator"
+de = "Badge erstellen"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "Generate a badge for"
+de = "Badge erstellen für"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "All checks in the project"
+de = "Alle Checks im Projekt"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "The checks tagged with this tag:"
+de = "Die Checks mit diesem Tag:"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "A specific check:"
+de = "Einen bestimmten Check:"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "Badge format"
+de = "Format"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "SVG"
+de = "SVG"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "JSON"
+de = "JSON"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "Shields.io"
+de = "Shields.io"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "Badge states"
+de = "Zustände"
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "Two states ("
+de = "Zwei Zustände ("
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "Three states ("
+de = "Drei Zustände ("
+
+[[text]]
+datei = "templates/front/badges.html"
+en = "or"
+de = "oder"
+
+[[text]]
+datei = "templates/front/badges_preview.html"
+en = "Preview"
+de = "Vorschau"
+
+[[text]]
+datei = "templates/front/badges_preview.html"
+en = "JSON endpoint URL"
+de = "Adresse des JSON-Endpunkts"
+
+[[text]]
+datei = "templates/front/badges_preview.html"
+en = "Badge URL"
+de = "Adresse des Badges"
+
+[[text]]
+datei = "templates/front/badges_preview.html"
+en = "HTML code"
+de = "HTML-Code"
+
+[[text]]
+datei = "templates/front/badges_preview.html"
+en = "Markdown code"
+de = "Markdown-Code"
+
+[[text]]
+datei = "templates/front/channel_checks.html"
+en = "Assign Checks to Integration"
+de = "Checks der Integration zuordnen"
+
+[[text]]
+datei = "templates/front/channel_checks.html"
+en = "of"
+de = "von"
+
+[[text]]
+datei = "templates/front/channel_checks.html"
+en = "unnamed"
+de = "unbenannt"
+
+[[text]]
+datei = "templates/front/channel_checks.html"
+en = "Select All"
+de = "Alle auswählen"
+
+[[text]]
+datei = "templates/front/channel_checks.html"
+en = "Unselect All"
+de = "Auswahl aufheben"
+
+[[text]]
+datei = "templates/front/channel_checks.html"
+en = "Got It"
+de = "Verstanden"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "Email to"
+de = "Mail an"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "(down only)"
+de = "(nur bei Ausfall)"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "(up only)"
+de = "(nur wenn wieder in Ordnung)"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "PagerDuty account"
+de = "PagerDuty-Konto"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "Slack"
+de = "Slack"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "team"
+de = "Team"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = ", channel"
+de = ", Kanal"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "Telegram"
+de = "Telegram"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "group"
+de = "Gruppe"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "user"
+de = "Nutzer"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "channel"
+de = "Kanal"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "SMS to"
+de = "SMS an"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "Phone call to"
+de = "Anruf bei"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "Trello board"
+de = "Trello-Board"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = ", list"
+de = ", Liste"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "Matrix"
+de = "Matrix"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "WhatsApp to"
+de = "WhatsApp an"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "Zulip"
+de = "Zulip"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "stream"
+de = "Stream"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "Signal to"
+de = "Signal an"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "ntfy topic"
+de = "ntfy-Thema"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "Group,"
+de = "Gruppe,"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "GitHub repo"
+de = "GitHub-Repository"
+
+[[text]]
+datei = "templates/front/channel_description.html"
+en = "Gotify,"
+de = "Gotify,"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Integrations -"
+de = "Integrationen -"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Name, Details"
+de = "Name, Details"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Assigned Checks"
+de = "Zugeordnete Checks"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Last Notification"
+de = "Letzte Benachrichtigung"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "unnamed"
+de = "unbenannt"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Click to change assigned checks"
+de = "Klicken, um die zugeordneten Checks zu ändern"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "of"
+de = "von"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Disabled"
+de = "Abgeschaltet"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Unconfirmed"
+de = "Unbestätigt"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Ready to deliver"
+de = "Bereit"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Failed"
+de = "Fehlgeschlagen"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Delivered,"
+de = "Zugestellt,"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Fix&hellip;"
+de = "Beheben&hellip;"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Edit"
+de = "Bearbeiten"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Send a test notification using this integration"
+de = "Testbenachrichtigung über diese Integration schicken"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Test!"
+de = "Testen"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Add More"
+de = "Weitere hinzufügen"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Webhook"
+de = "Webhook"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Apprise"
+de = "Apprise"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Discord"
+de = "Discord"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Google Chat"
+de = "Google Chat"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Gotify"
+de = "Gotify"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Matrix"
+de = "Matrix"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Mattermost"
+de = "Mattermost"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Microsoft Teams"
+de = "Microsoft Teams"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "ntfy"
+de = "ntfy"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Opsgenie"
+de = "Opsgenie"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "PagerDuty"
+de = "PagerDuty"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "PagerTree"
+de = "PagerTree"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Prometheus"
+de = "Prometheus"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Pushbullet"
+de = "Pushbullet"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Pushover"
+de = "Pushover"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Rocket.Chat"
+de = "Rocket.Chat"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Signal"
+de = "Signal"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Slack"
+de = "Slack"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "SMS"
+de = "SMS"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Spike.sh"
+de = "Spike.sh"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Telegram"
+de = "Telegram"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Trello"
+de = "Trello"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "WhatsApp"
+de = "WhatsApp"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Zulip"
+de = "Zulip"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Splunk On-Call (VictorOps)"
+de = "Splunk On-Call (VictorOps)"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Email icon"
+de = "E-Mail-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Webhook icon"
+de = "Webhook-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Apprise icon"
+de = "Apprise-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Discord icon"
+de = "Discord-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "GitHub icon"
+de = "GitHub-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Google Chat icon"
+de = "Google-Chat-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Gotify icon"
+de = "Gotify-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Group icon"
+de = "Gruppen-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Matrix icon"
+de = "Matrix-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Mattermost icon"
+de = "Mattermost-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Opsgenie icon"
+de = "Opsgenie-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "PagerDuty icon"
+de = "PagerDuty-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "PagerTree icon"
+de = "PagerTree-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Phone icon"
+de = "Telefon-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Prometheus icon"
+de = "Prometheus-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Pushbullet icon"
+de = "Pushbullet-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Pushover icon"
+de = "Pushover-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Rocket.Chat icon"
+de = "Rocket.Chat-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Shell icon"
+de = "Shell-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Signal icon"
+de = "Signal-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Slack icon"
+de = "Slack-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "SMS icon"
+de = "SMS-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Spike.sh icon"
+de = "Spike.sh-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Telegram icon"
+de = "Telegram-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Trello icon"
+de = "Trello-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Splunk On-Call icon"
+de = "Splunk-On-Call-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "WhatsApp icon"
+de = "WhatsApp-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Zulip icon"
+de = "Zulip-Symbol"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Get an email message when a check goes up or down."
+de = "Du bekommst eine Mail, wenn ein Check ausfällt oder wieder in Ordnung ist."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Receive an HTTP callback when a check goes down."
+de = "Ein HTTP-Aufruf an deine Adresse, wenn ein Check ausfällt."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Cross-platform voice and text chat app designed for gamers."
+de = "Sprach- und Textchat für alle Plattformen, gemacht für Gamer."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "GitHub Issues"
+de = "GitHub-Issues"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Create a GitHub issue when a check goes down."
+de = "Legt ein GitHub-Issue an, wenn ein Check ausfällt."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Google's communication tool for teams, successor of Hangouts."
+de = "Das Team-Werkzeug von Google, Nachfolger von Hangouts."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Self-hosted push notification service."
+de = "Selbst betriebener Dienst für Push-Benachrichtigungen."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Group"
+de = "Gruppe"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Deliver to multiple integrations at once."
+de = "Benachrichtigt mehrere Integrationen auf einmal."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Post notifications to a Matrix room."
+de = "Schreibt Benachrichtigungen in einen Matrix-Raum."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "High Trust Messaging for the Enterprise."
+de = "Vertrauenswürdiger Messenger für Unternehmen."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Chat and collaboration platform for Microsoft Office 365 customers."
+de = "Chat- und Teamplattform für Kunden von Microsoft Office 365."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Send push notifications to your phone or desktop via PUT/POST."
+de = "Push-Benachrichtigungen per PUT/POST auf Handy oder Desktop."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Alerting &amp; Incident Management Solution for Dev &amp; Ops."
+de = "Alarmierung und Incident-Management für Dev und Ops."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "On-call scheduling, alerting, and incident tracking."
+de = "Bereitschaftspläne, Alarmierung und Verfolgung von Störungen."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "DevOps Incident Management - On-Call Schedules, Alerts, &amp; Notifications."
+de = "Incident-Management für DevOps: Bereitschaftspläne, Alarme und Benachrichtigungen."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Phone Call"
+de = "Anruf"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Get a phone call when a check goes down."
+de = "Du bekommst einen Anruf, wenn ein Check ausfällt."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Export check and tag status values to Prometheus."
+de = "Gibt die Zustände von Checks und Tags an Prometheus weiter."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Pushbullet connects your devices, making them feel like one."
+de = "Pushbullet verbindet deine Geräte, als wären sie eines."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Receive instant push notifications on your phone or tablet."
+de = "Sofortige Push-Benachrichtigungen auf Handy oder Tablet."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Open-source communications platform for organizations with high data protection standards."
+de = "Open-Source-Plattform für Kommunikation, gebaut für hohe Datenschutzansprüche."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Shell Command"
+de = "Shell-Befehl"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Execute a local shell command when a check goes up or down."
+de = "Führt einen Shell-Befehl auf dem Server aus, wenn ein Check ausfällt oder wieder in Ordnung ist."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Get a Signal message when a check goes up or down."
+de = "Du bekommst eine Signal-Nachricht, wenn ein Check ausfällt oder wieder in Ordnung ist."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "A messaging app for teams."
+de = "Messenger für Teams."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Get a text message to your phone when a check goes down."
+de = "Du bekommst eine SMS, wenn ein Check ausfällt."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Incident management with unlimited alerts and on-call schedules."
+de = "Incident-Management mit unbegrenzten Alarmen und Bereitschaftsplänen."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "A messaging app with a focus on speed and security."
+de = "Messenger mit Fokus auf Tempo und Sicherheit."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Create a Trello card when a check goes down."
+de = "Legt eine Trello-Karte an, wenn ein Check ausfällt."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Get a WhatsApp message when a check goes up or down."
+de = "Du bekommst eine WhatsApp-Nachricht, wenn ein Check ausfällt oder wieder in Ordnung ist."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Open-source group chat."
+de = "Open-Source-Gruppenchat."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Suggest New Integration"
+de = "Neue Integration vorschlagen"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Once it's gone it's gone. But, if you change your mind later, you can create a similar channel again. Do you want to continue?"
+de = "Entfernt ist entfernt. Brauchst du sie später doch wieder, legst du einfach eine neue an. Weitermachen?"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Integration Details"
+de = "Details der Integration"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Give this integration a human-friendly name, so you can easily recognize it later."
+de = "Gib der Integration einen gut lesbaren Namen, damit du sie später schnell wiedererkennst."
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Execute on \"down\" events:"
+de = "Ausführen bei Ausfall:"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Execute on \"up\" events:"
+de = "Ausführen, wenn wieder in Ordnung:"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Request Body"
+de = "Inhalt der Anfrage"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Request Headers"
+de = "Header der Anfrage"
+
+[[text]]
+datei = "templates/front/channels.html"
+en = "Edit Webhook Parameters&hellip;"
+de = "Webhook bearbeiten&hellip;"
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "Log In -"
+de = "Anmelden -"
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "Account closed."
+de = "Konto geschlossen."
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "Your account has been closed and its associated data has been deleted."
+de = "Dein Konto ist geschlossen, die zugehörigen Daten sind gelöscht."
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "The login link you just used is either incorrect or expired."
+de = "Der Anmeldelink ist ungültig oder abgelaufen."
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "Please use the form below to request a fresh login link."
+de = "Fordere unten einen neuen Anmeldelink an."
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "We will email you a magic log in link."
+de = "Du bekommst einen Anmeldelink per Mail."
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "Email Me a Link"
+de = "Link per Mail schicken"
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "or"
+de = "oder"
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "Incorrect email or password."
+de = "Mail-Adresse oder Passwort stimmen nicht. Prüf beides und versuch es noch einmal."
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "your password"
+de = "dein Passwort"
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "Lost your password?"
+de = "Passwort vergessen?"
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "Lost Password?"
+de = "Passwort vergessen?"
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "If you need to reset your password, please do the following:"
+de = "So setzt du dein Passwort zurück:"
+
+[[text]]
+datei = "templates/accounts/login.html"
+en = "Got it"
+de = "Verstanden"
+
+[[text]]
+datei = "templates/accounts/login_link_sent.html"
+en = "Check Your Email!"
+de = "Sieh in dein Postfach"
+
+[[text]]
+datei = "templates/accounts/login_totp.html"
+en = "Please enter the six-digit code from your authenticator app."
+de = "Gib den sechsstelligen Code aus deiner Authenticator-App ein."
+
+[[text]]
+datei = "templates/accounts/login_totp.html"
+en = "6-digit code"
+de = "6-stelliger Code"
+
+[[text]]
+datei = "templates/accounts/login_webauthn.html"
+en = "Please select how you want to authenticate."
+de = "Wie möchtest du dich bestätigen?"
+
+[[text]]
+datei = "templates/accounts/login_webauthn.html"
+en = "Use security key"
+de = "Sicherheitsschlüssel nutzen"
+
+[[text]]
+datei = "templates/accounts/login_webauthn.html"
+en = "Use authenticator app"
+de = "Authenticator-App nutzen"
+
+[[text]]
+datei = "templates/accounts/login_webauthn.html"
+en = "Follow your browser's steps to authenticate with your security key."
+de = "Folge den Schritten deines Browsers, um dich mit dem Sicherheitsschlüssel zu bestätigen."
+
+[[text]]
+datei = "templates/accounts/login_webauthn.html"
+en = "Something went wrong."
+de = "Die Bestätigung mit dem Sicherheitsschlüssel hat nicht geklappt."
+
+[[text]]
+datei = "templates/accounts/check_token_submit.html"
+en = "Please press the button below to continue:"
+de = "Klick auf den Knopf, um weiterzumachen:"
+
+[[text]]
+datei = "templates/accounts/set_password.html"
+en = "Set a Password"
+de = "Passwort festlegen"
+
+[[text]]
+datei = "templates/accounts/set_password.html"
+en = "pick a password (at least 8 characters)"
+de = "Passwort wählen (mindestens 8 Zeichen)"
+
+[[text]]
+datei = "templates/accounts/signup_result.html"
+en = "Please check your email!"
+de = "Sieh in dein Postfach: Der Anmeldelink ist unterwegs."
+
+[[text]]
+datei = "templates/accounts/sudo.html"
+en = "Enter a Confirmation Code"
+de = "Bestätigungscode eingeben"
+
+[[text]]
+datei = "templates/accounts/sudo.html"
+en = "We have sent a confirmation code to your email address. Please enter it below to continue:"
+de = "Ein Bestätigungscode ist per Mail an dich unterwegs. Gib ihn unten ein, um weiterzumachen:"
+
+[[text]]
+datei = "templates/accounts/sudo.html"
+en = "Not a valid code. Did you type it in correctly?"
+de = "Dieser Code stimmt nicht. Prüf die Eingabe und versuch es noch einmal."
+
+[[text]]
+datei = "templates/accounts/unsubscribe_submit.html"
+en = "Unsubscribe"
+de = "Abbestellen"
+
+[[text]]
+datei = "templates/accounts/unsubscribe_submit.html"
+en = "Please press the button below to unsubscribe:"
+de = "Klick auf den Knopf, um die Mails abzubestellen:"
+
+[[text]]
+datei = "templates/accounts/unsubscribed.html"
+en = "Unsubscribed"
+de = "Abbestellt"
+
+[[text]]
+datei = "templates/accounts/add_credential.html"
+en = "Add Security Key"
+de = "Sicherheitsschlüssel hinzufügen"
+
+[[text]]
+datei = "templates/accounts/add_credential.html"
+en = "Give this credential a descriptive name. Example: \"My primary Yubikey\""
+de = "Gib dem Schlüssel einen Namen, an dem du ihn erkennst, zum Beispiel „Mein Yubikey“."
+
+[[text]]
+datei = "templates/accounts/add_credential.html"
+en = "Confirm Name and Continue"
+de = "Name bestätigen und weiter"
+
+[[text]]
+datei = "templates/accounts/add_credential.html"
+en = "Something went wrong."
+de = "Die Registrierung des Sicherheitsschlüssels hat nicht geklappt."
+
+[[text]]
+datei = "templates/accounts/add_credential.html"
+en = "Save Security Key"
+de = "Sicherheitsschlüssel speichern"
+
+[[text]]
+datei = "templates/accounts/add_project_modal.html"
+en = "Create New Project"
+de = "Neues Projekt anlegen"
+
+[[text]]
+datei = "templates/accounts/add_project_modal.html"
+en = "Name your project"
+de = "Name des Projekts"
+
+[[text]]
+datei = "templates/accounts/add_project_modal.html"
+en = "Create Project"
+de = "Projekt anlegen"
+
+[[text]]
+datei = "templates/accounts/add_totp.html"
+en = "Set Up Authenticator App"
+de = "Authenticator-App einrichten"
+
+[[text]]
+datei = "templates/accounts/add_totp.html"
+en = "supports time-based one-time passwords (TOTP) as a second authentication factor. To use this method, you will need an authenticator app on your phone."
+de = "unterstützt zeitbasierte Einmalpasswörter (TOTP) als zweiten Faktor. Dafür brauchst du eine Authenticator-App auf deinem Handy."
+
+[[text]]
+datei = "templates/accounts/add_totp.html"
+en = "Step 1."
+de = "Schritt 1."
+
+[[text]]
+datei = "templates/accounts/add_totp.html"
+en = "Scan the QR code below using your authentication app, or enter the secret key manually."
+de = "Scanne den QR-Code unten mit deiner Authenticator-App oder gib den geheimen Schlüssel von Hand ein."
+
+[[text]]
+datei = "templates/accounts/add_totp.html"
+en = "Secret key:"
+de = "Geheimer Schlüssel:"
+
+[[text]]
+datei = "templates/accounts/add_totp.html"
+en = "Step 2."
+de = "Schritt 2."
+
+[[text]]
+datei = "templates/accounts/add_totp.html"
+en = "Enter the six-digit code from your authenticator app below."
+de = "Gib unten den sechsstelligen Code aus deiner Authenticator-App ein."
+
+[[text]]
+datei = "templates/accounts/add_totp.html"
+en = "six-digit code"
+de = "sechsstelliger Code"
+
+[[text]]
+datei = "templates/accounts/add_totp.html"
+en = "6-digit number"
+de = "6-stellige Zahl"
+
+[[text]]
+datei = "templates/accounts/appearance.html"
+en = "Theme"
+de = "Farbschema"
+
+[[text]]
+datei = "templates/accounts/appearance.html"
+en = "Light theme preview"
+de = "Vorschau des hellen Schemas"
+
+[[text]]
+datei = "templates/accounts/appearance.html"
+en = "Light"
+de = "Hell"
+
+[[text]]
+datei = "templates/accounts/appearance.html"
+en = "Dark theme preview"
+de = "Vorschau des dunklen Schemas"
+
+[[text]]
+datei = "templates/accounts/appearance.html"
+en = "Dark"
+de = "Dunkel"
+
+[[text]]
+datei = "templates/accounts/appearance.html"
+en = "System theme preview"
+de = "Vorschau des System-Schemas"
+
+[[text]]
+datei = "templates/accounts/appearance.html"
+en = "System"
+de = "System"
+
+[[text]]
+datei = "templates/accounts/change_email.html"
+en = "Change Account's Email Address"
+de = "Mail-Adresse des Kontos ändern"
+
+[[text]]
+datei = "templates/accounts/change_email.html"
+en = "Your account's email address is used for sending the sign-in links and monthly reports."
+de = "An diese Mail-Adresse gehen Anmeldelinks und Monatsberichte."
+
+[[text]]
+datei = "templates/accounts/change_email.html"
+en = "Make sure you can receive emails at the new address."
+de = "Prüf, dass Mails an die neue Adresse auch ankommen."
+
+[[text]]
+datei = "templates/accounts/change_email.html"
+en = "Two-factor authentication is active."
+de = "Die Zwei-Faktor-Anmeldung ist aktiv."
+
+[[text]]
+datei = "templates/accounts/change_email.html"
+en = "If you are handing this account over to somebody else, consider disabling two-factor authentication first."
+de = "Gibst du das Konto an jemand anderen weiter, schalte die Zwei-Faktor-Anmeldung am besten vorher ab."
+
+[[text]]
+datei = "templates/accounts/change_email.html"
+en = "Current Email"
+de = "Aktuelle Mail-Adresse"
+
+[[text]]
+datei = "templates/accounts/change_email.html"
+en = "New Email"
+de = "Neue Mail-Adresse"
+
+[[text]]
+datei = "templates/accounts/change_email.html"
+en = "Change Email"
+de = "Mail-Adresse ändern"
+
+[[text]]
+datei = "templates/accounts/change_email_instructions.html"
+en = "One Last Step&hellip;"
+de = "Ein letzter Schritt&hellip;"
+
+[[text]]
+datei = "templates/accounts/close_account.html"
+en = "Close Account?"
+de = "Konto schließen?"
+
+[[text]]
+datei = "templates/accounts/close_account.html"
+en = "type your email address to confirm"
+de = "Mail-Adresse zur Bestätigung eingeben"
+
+[[text]]
+datei = "templates/accounts/remove_credential.html"
+en = "Remove Security Key?"
+de = "Sicherheitsschlüssel entfernen?"
+
+[[text]]
+datei = "templates/accounts/remove_credential.html"
+en = "Remove Security Key"
+de = "Sicherheitsschlüssel entfernen"
+
+[[text]]
+datei = "templates/accounts/remove_totp.html"
+en = "Disable Authenticator App"
+de = "Authenticator-App abschalten"
+
+[[text]]
+datei = "templates/accounts/remove_totp.html"
+en = "Are you sure you want to continue?"
+de = "Weitermachen?"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "Periodic email reports:"
+de = "Regelmäßige Berichte per Mail:"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "Off"
+de = "Aus"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "Daily"
+de = "Täglich"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "between 9:00 and 11:00"
+de = "zwischen 9 und 11 Uhr"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "Weekly"
+de = "Wöchentlich"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "on Mondays"
+de = "montags"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "Monthly"
+de = "Monatlich"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "on 1st of every month"
+de = "am Ersten jedes Monats"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "Ongoing reminders if any checks are down:"
+de = "Erinnerungen, solange Checks ausgefallen sind:"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "Do not remind me"
+de = "Nicht erinnern"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "Remind me"
+de = "Erinnere mich"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "daily"
+de = "täglich"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "hourly"
+de = "stündlich"
+
+[[text]]
+datei = "templates/accounts/notifications.html"
+en = "will send reports and ongoing reminders to"
+de = "schickt Berichte und Erinnerungen an"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Email and Password"
+de = "Mail-Adresse und Passwort"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Your account's email address is"
+de = "Die Mail-Adresse deines Kontos:"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Change Email"
+de = "Mail-Adresse ändern"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Password authentication is enabled."
+de = "Die Anmeldung mit Passwort ist eingeschaltet."
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Change Password"
+de = "Passwort ändern"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Your new password has been set!"
+de = "Dein neues Passwort ist gespeichert."
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Security keys"
+de = "Sicherheitsschlüssel"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "No registered security keys"
+de = "Keine Sicherheitsschlüssel registriert"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Authenticator app"
+de = "Authenticator-App"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Enabled"
+de = "Eingeschaltet"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Not configured"
+de = "Nicht eingerichtet"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Register a second security key, to be used as a backup second factor."
+de = "Registriere einen zweiten Sicherheitsschlüssel als Reserve."
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Set Up Authenticator App"
+de = "Authenticator-App einrichten"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Add Security Key"
+de = "Sicherheitsschlüssel hinzufügen"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Successfully set up the Authenticator app."
+de = "Die Authenticator-App ist eingerichtet."
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Disabled the authenticator app."
+de = "Die Authenticator-App ist abgeschaltet."
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "My Projects"
+de = "Meine Projekte"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "My role"
+de = "Meine Rolle"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Owner"
+de = "Eigentümer"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Leave"
+de = "Verlassen"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "You do not have any projects. Create one!"
+de = "Du hast noch kein Projekt. Leg eins an."
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Create a New Project"
+de = "Neues Projekt anlegen"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Preferred Time Zone"
+de = "Bevorzugte Zeitzone"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "UTC"
+de = "UTC"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "FIXME"
+de = "FIXME"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "will use your preferred time zone to:"
+de = "nutzt deine bevorzugte Zeitzone für:"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Format dates and times here in the web interface."
+de = "Datum und Uhrzeit hier in der Oberfläche."
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Format dates and times in monitoring alerts."
+de = "Datum und Uhrzeit in Benachrichtigungen."
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Time zone updated!"
+de = "Zeitzone gespeichert."
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Leave This Project?"
+de = "Projekt verlassen?"
+
+[[text]]
+datei = "templates/accounts/profile.html"
+en = "Leave Project"
+de = "Projekt verlassen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Project Settings -"
+de = "Projekteinstellungen -"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Ownership Transfer Request"
+de = "Anfrage zur Übertragung"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "would like to transfer the ownership of this project to you."
+de = "möchte dir dieses Projekt übertragen."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Reject"
+de = "Ablehnen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Accept"
+de = "Annehmen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Project Name"
+de = "Projektname"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Change Project Name"
+de = "Projektnamen ändern"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Project name updated"
+de = "Projektname gespeichert."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "API Access"
+de = "API-Zugang"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "API key"
+de = "API-Schlüssel"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "not set"
+de = "nicht gesetzt"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Revoke"
+de = "Widerrufen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Create"
+de = "Erzeugen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "API key (read-only)"
+de = "API-Schlüssel (nur lesen)"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Ping key"
+de = "Ping-Schlüssel"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "See also:"
+de = "Siehe auch:"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "API documentation"
+de = "Doku der API"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Pinging API documentation"
+de = "Doku der Ping-API"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Key created"
+de = "Schlüssel erzeugt."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Key revoked"
+de = "Schlüssel widerrufen."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Team Access"
+de = "Teamzugang"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Role"
+de = "Rolle"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Owner"
+de = "Eigentümer"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Add Users from Other Projects"
+de = "Personen aus anderen Projekten hinzufügen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Add to Team"
+de = "Zum Team hinzufügen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Invite team members to your project."
+de = "Lade Teammitglieder in dein Projekt ein."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Share access to your checks and configured integrations without having to share login details."
+de = "Sie bekommen Zugriff auf deine Checks und Integrationen, deine Zugangsdaten bleiben bei dir."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Invite a Team Member"
+de = "Teammitglied einladen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "invited to team"
+de = "ist ins Team eingeladen."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "is already a member"
+de = "ist schon Mitglied."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "removed from team"
+de = "ist aus dem Team entfernt."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Transfer Ownership"
+de = "Projekt übertragen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Cancel Transfer"
+de = "Übertragung abbrechen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Transfer Project&hellip;"
+de = "Projekt übertragen&hellip;"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Transfer this project to a team member."
+de = "Übertrage das Projekt an ein Teammitglied."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Transfer initiated!"
+de = "Übertragung gestartet."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Transfer cancelled!"
+de = "Übertragung abgebrochen."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Remove Project"
+de = "Projekt entfernen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Remove Team Member"
+de = "Teammitglied entfernen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Remove Member from Project"
+de = "Aus dem Projekt entfernen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "friend@example.org"
+de = "name@example.org"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Access Level"
+de = "Rechte"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Team Member"
+de = "Mitglied"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Can create and manage checks and integrations. Cannot access your account's billing settings."
+de = "Legt Checks und Integrationen an und verwaltet sie. Kein Zugriff auf die Abrechnung deines Kontos."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Manager"
+de = "Manager"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Same as Team Member, plus can invite and remove other members."
+de = "Wie Mitglied, lädt außerdem weitere Mitglieder ein und entfernt sie."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Read-only"
+de = "Nur lesen"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Can view checks and integrations, but cannot modify anything. Cannot access project's API keys."
+de = "Sieht Checks und Integrationen, kann aber nichts ändern. Kein Zugriff auf die API-Schlüssel des Projekts."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Send Invite"
+de = "Einladung schicken"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Set Project Name"
+de = "Projektnamen speichern"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Choose owner"
+de = "Neuer Eigentümer"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Select..."
+de = "Auswählen …"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "This project currently has no team members. To transfer the ownership of this project, please start by inviting the new owner as a team member."
+de = "Das Projekt hat noch keine Teammitglieder. Lade zuerst den neuen Eigentümer als Teammitglied ein, dann kannst du das Projekt übertragen."
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Initiate Transfer"
+de = "Übertragung starten"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "API Key Created!"
+de = "API-Schlüssel erzeugt"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Copy the key and store it securely. The key will not be shown again:"
+de = "Kopier den Schlüssel und bewahre ihn sicher auf. Er wird nur dieses eine Mal angezeigt:"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "OK, I copied the key"
+de = "Schlüssel ist kopiert"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Ping Key Created!"
+de = "Ping-Schlüssel erzeugt"
+
+[[text]]
+datei = "templates/accounts/project.html"
+en = "Here is the new ping key."
+de = "Hier ist der neue Ping-Schlüssel."

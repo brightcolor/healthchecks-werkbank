@@ -1,4 +1,5 @@
-# Katalog für Deutsch: Stand, Geltungsbereich und Zustandswörter.
+# Katalog für Deutsch: Stand, Geltungsbereich, Wörtertabellen (Zustände, Integrationsarten, Rollen)
+# und Korrekturen an Djangos eigenen Übersetzungen ([[django]]).
 # Die Einträge stehen in den übrigen TOML-Dateien dieses Ordners.
 
 [katalog]
@@ -18,3 +19,65 @@ down = "ausgefallen"
 started = "gestartet"
 paused = "pausiert"
 new = "neu"
+
+[arten]
+# Namen der Integrationsarten, die Healthchecks auf Englisch führt (Filter art).
+# Die übrigen Arten heißen nach ihrem Dienst und behalten den Namen aus Healthchecks.
+call = "Anruf"
+email = "E-Mail"
+group = "Gruppe"
+shell = "Shell-Befehl"
+
+[rollen]
+# Rollen im Projekt, die Healthchecks auf Englisch führt (Filter rolle).
+r = "Nur lesen"
+w = "Mitglied"
+m = "Manager"
+
+# Korrekturen an Djangos deutschen Texten. Django schreibt relative Zeiten ohne Dativ
+# („1 Tage, 5 Stunden her“, „2 Tage von jetzt an“); die Werkbank zeigt „vor 1 Tag, 5 Stunden“
+# und „in 2 Tagen“. en ist Djangos englischer Text, kontext sein msgctxt, plural die Mehrzahl.
+
+[[django]]
+en = "%(delta)s ago"
+de = "vor %(delta)s"
+
+[[django]]
+en = "%(delta)s from now"
+de = "in %(delta)s"
+
+[[django]]
+kontext = "naturaltime-past"
+en = "%(num)d year"
+plural = "%(num)d years"
+de = ["%(num)d Jahr", "%(num)d Jahren"]
+
+[[django]]
+kontext = "naturaltime-past"
+en = "%(num)d month"
+plural = "%(num)d months"
+de = ["%(num)d Monat", "%(num)d Monaten"]
+
+[[django]]
+kontext = "naturaltime-past"
+en = "%(num)d day"
+plural = "%(num)d days"
+de = ["%(num)d Tag", "%(num)d Tagen"]
+
+[[django]]
+kontext = "naturaltime-future"
+en = "%(num)d year"
+plural = "%(num)d years"
+de = ["%(num)d Jahr", "%(num)d Jahren"]
+
+[[django]]
+kontext = "naturaltime-future"
+en = "%(num)d month"
+plural = "%(num)d months"
+de = ["%(num)d Monat", "%(num)d Monaten"]
+
+[[django]]
+kontext = "naturaltime-future"
+en = "%(num)d day"
+plural = "%(num)d days"
+de = ["%(num)d Tag", "%(num)d Tagen"]

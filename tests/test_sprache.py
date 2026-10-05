@@ -1,4 +1,6 @@
+import gettext
 import json
+import re
 import sys
 import tomllib
 from pathlib import Path
@@ -19,6 +21,22 @@ ausnahmen = ["templates/docs/**"]
 
 [zustaende]
 down = "ausgefallen"
+
+[arten]
+shell = "Shell-Befehl"
+
+[rollen]
+r = "Nur lesen"
+
+[[django]]
+en = "%(delta)s ago"
+de = "vor %(delta)s"
+
+[[django]]
+kontext = "naturaltime-past"
+en = "%(num)d day"
+plural = "%(num)d days"
+de = ["%(num)d Tag", "%(num)d Tagen"]
 """
 
 ERWEITERUNG = """
@@ -34,16 +52,16 @@ erweitert = True
 '''
 """
 
-EINSTELLUNGEN = 'SPRACHE = "@@WB_SPRACHE@@"\nZUSTAENDE = @@WB_ZUSTAENDE@@\nFORMATE = "@@WB_FORMATMODUL@@"\n'
+EINSTELLUNGEN = 'SPRACHE = "@@WB_SPRACHE@@"\nZUSTAENDE = @@WB_ZUSTAENDE@@\nARTEN = @@WB_ARTEN@@\nROLLEN = @@WB_ROLLEN@@\nLOCALE = "@@WB_LOCALE@@"\nFORMATE = "@@WB_FORMATMODUL@@"\n'
 
 
-def aufbau(tmp_path, katalog="", dateien=None, erweiterung=ERWEITERUNG):
+def aufbau(tmp_path, katalog="", dateien=None, erweiterung=ERWEITERUNG, konfig=KATALOG_KONFIG):
     wurzel = tmp_path / "hc-wurzel"
     werkbank = tmp_path / "werkbank"
     formate = werkbank / "django" / "werkbank_formate" / "de"
     (werkbank / "deutsch").mkdir(parents=True)
     formate.mkdir(parents=True)
-    (werkbank / "deutsch" / "katalog.toml").write_bytes(KATALOG_KONFIG.encode())
+    (werkbank / "deutsch" / "katalog.toml").write_bytes(konfig.encode())
     (werkbank / "deutsch" / "test.toml").write_bytes(katalog.encode())
     (werkbank / "erweiterungen.toml").write_bytes(erweiterung.encode())
     (werkbank / "django" / "werkbank_einstellungen.py").write_bytes(EINSTELLUNGEN.encode())
@@ -86,6 +104,17 @@ def test_sichtbare_attribute_und_knoepfe(tmp_path):
         '<input type="text" placeholder="Suchen" value="Save" class="Save">'
         '<input type="submit" value="Speichern"><button title="Schließen" aria-label="Schließen">x</button>'
         '<img alt="Logo der Instanz" src="Logo"><a href="Close">y</a>')
+
+
+def test_django_bedingungen_in_tags(tmp_path):
+    katalog = text("*", "Add Check", "Check anlegen") + text("*", "no matching checks found", "keine passenden Checks")
+    quelle = ('<button class="btn"\n  {% if num_available <= 0 %}disabled{% endif %}>\n  Add Check\n</button>'
+              '<div id="x" {% if n > 0 %}style="display: none"{% endif %}>no matching checks found</div>')
+    wurzel, werkbank = aufbau(tmp_path, katalog, {"templates/p.html": quelle})
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/p.html") == quelle.replace("Add Check", "Check anlegen").replace(
+        "no matching checks found", "keine passenden Checks")
+    assert bericht["englisch"] == []
 
 
 def test_opake_bereiche_und_kommentare_bleiben(tmp_path):
@@ -171,6 +200,8 @@ def test_englisch_laesst_die_texte_stehen(tmp_path, monkeypatch):
     assert bericht["sprache"] == "en"
     assert 'SPRACHE = "en"' in lies(wurzel, "hc/werkbank_einstellungen.py")
     assert "ZUSTAENDE = {}" in lies(wurzel, "hc/werkbank_einstellungen.py")
+    assert "ARTEN = {}" in lies(wurzel, "hc/werkbank_einstellungen.py")
+    assert "ROLLEN = {}" in lies(wurzel, "hc/werkbank_einstellungen.py")
     assert "erweitert = True" in lies(wurzel, "hc/extras.py")
 
 
@@ -180,10 +211,80 @@ def test_einstellungsmodul_formatmodul_und_local_settings(tmp_path):
     modul = lies(wurzel, "hc/werkbank_einstellungen.py")
     assert 'SPRACHE = "de"' in modul
     assert 'ZUSTAENDE = {"down": "ausgefallen"}' in modul
+    assert 'ARTEN = {"shell": "Shell-Befehl"}' in modul
+    assert 'ROLLEN = {"r": "Nur lesen"}' in modul
     assert 'FORMATE = "hc.werkbank_formate"' in modul
     assert lies(wurzel, "hc/werkbank_formate/de/formats.py") == 'DECIMAL_SEPARATOR = "."\n'
     assert lies(wurzel, "hc/local_settings.py").startswith("from hc.werkbank_einstellungen import *")
 
+
+
+@pytest.mark.parametrize("abschnitt, meldung", [
+    ('[zustaende]\ndown = ""\n', "[zustaende] ordnet jedem Zustand ein Wort zu"),
+    ('[arten]\nshell = " "\n', "[arten] ordnet jeder Integrationsart ein Wort zu"),
+    ('[arten]\nshell = 1\n', "[arten] ordnet jeder Integrationsart ein Wort zu"),
+    ('[rollen]\nm = ""\n', "[rollen] ordnet jeder Rolle im Projekt ein Wort zu"),
+    ('[rolen]\nm = "Manager"\n', "unbekannte Abschnitte [rolen]"),
+])
+def test_woerter_im_katalog_werden_geprueft(tmp_path, abschnitt, meldung):
+    konfig = '[katalog]\nstand = "v9.9"\n\n[bereich]\nvorlagen = ["templates/**/*.html"]\n\n' + abschnitt
+    wurzel, werkbank = aufbau(tmp_path, konfig=konfig)
+    with pytest.raises(sprache.SprachFehler, match=re.escape(meldung)):
+        sprache.bauen(wurzel, werkbank)
+
+
+def test_andere_woerter_fuer_arten(tmp_path):
+    konfig = KATALOG_KONFIG.replace('shell = "Shell-Befehl"', 'call = "Telefonanruf"')
+    wurzel, werkbank = aufbau(tmp_path, konfig=konfig)
+    sprache.bauen(wurzel, werkbank)
+    assert 'ARTEN = {"call": "Telefonanruf"}' in lies(wurzel, "hc/werkbank_einstellungen.py")
+
+
+def mo_laden(pfad):
+    with open(pfad, "rb") as datei:
+        return gettext.GNUTranslations(datei)
+
+
+def test_django_texte_landen_in_einer_mo_datei(tmp_path):
+    wurzel, werkbank = aufbau(tmp_path)
+    sprache.bauen(wurzel, werkbank)
+    texte = mo_laden(wurzel / "hc/werkbank_locale/de/LC_MESSAGES/django.mo")
+    assert texte.gettext("%(delta)s ago") == "vor %(delta)s"
+    assert texte.npgettext("naturaltime-past", "%(num)d day", "%(num)d days", 1) == "%(num)d Tag"
+    assert texte.npgettext("naturaltime-past", "%(num)d day", "%(num)d days", 3) == "%(num)d Tagen"
+    assert texte.gettext("unbekannt") == "unbekannt"
+    assert 'LOCALE = "werkbank_locale"' in lies(wurzel, "hc/werkbank_einstellungen.py")
+
+
+def test_mo_datei_mit_umlauten_und_anderem_ort(tmp_path, monkeypatch):
+    monkeypatch.setenv("WB_LOCALE", "hc/sprachen/korrektur")
+    konfig = KATALOG_KONFIG + '\n[[django]]\nkontext = "monat"\nen = "March"\nde = "März"\n'
+    wurzel, werkbank = aufbau(tmp_path, konfig=konfig)
+    sprache.bauen(wurzel, werkbank)
+    texte = mo_laden(wurzel / "hc/sprachen/korrektur/de/LC_MESSAGES/django.mo")
+    assert texte.pgettext("monat", "March") == "März"
+    assert 'LOCALE = "sprachen/korrektur"' in lies(wurzel, "hc/werkbank_einstellungen.py")
+
+
+def test_englisch_schreibt_keine_mo_datei(tmp_path, monkeypatch):
+    monkeypatch.setenv("WB_SPRACHE", "en")
+    wurzel, werkbank = aufbau(tmp_path)
+    sprache.bauen(wurzel, werkbank)
+    assert not (wurzel / "hc/werkbank_locale").exists()
+
+
+@pytest.mark.parametrize("eintrag, meldung", [
+    ('[[django]]\nen = "A"\n', "de fehlt"),
+    ('[[django]]\nen = "A"\nde = ["B", "C"]\n', "de ist ein Text"),
+    ('[[django]]\nen = "A"\nplural = "As"\nde = "B"\n', "de ist eine Liste mit 2 Formen"),
+    ('[[django]]\nen = "A"\nplural = "As"\nde = ["B"]\n', "de ist eine Liste mit 2 Formen"),
+    ('[[django]]\nen = "A"\nde = "B"\nfarbe = "rot"\n', "unbekannte Schlüssel farbe"),
+    ('[[django]]\nen = "%(delta)s ago"\nde = "B"\n', "doppelt"),
+])
+def test_django_eintraege_werden_geprueft(tmp_path, eintrag, meldung):
+    wurzel, werkbank = aufbau(tmp_path, konfig=KATALOG_KONFIG + "\n" + eintrag)
+    with pytest.raises(sprache.SprachFehler, match=re.escape(meldung)):
+        sprache.bauen(wurzel, werkbank)
 
 def test_andere_ziele_fuer_module(tmp_path, monkeypatch):
     monkeypatch.setenv("WB_EINSTELLUNGSMODUL", "hc/eigene_einstellungen.py")

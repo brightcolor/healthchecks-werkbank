@@ -13,14 +13,18 @@ from django.core.exceptions import ImproperlyConfigured
 __all__ = [
     "WERKBANK_SPRACHE",
     "WERKBANK_ZUSTAENDE",
+    "WERKBANK_ARTEN",
+    "WERKBANK_ROLLEN",
     "WB_MAIL_ANSCHRIFT",
     "WB_MAIL_IMPRESSUM_URL",
     "WB_MAIL_DATENSCHUTZ_URL",
 ]
 
-# Vom Bau gesetzt: WB_SPRACHE und [zustaende] aus dem Katalog.
+# Vom Bau gesetzt: WB_SPRACHE und die Wörtertabellen [zustaende], [arten] und [rollen] des Katalogs.
 WERKBANK_SPRACHE = "@@WB_SPRACHE@@"
 WERKBANK_ZUSTAENDE = @@WB_ZUSTAENDE@@
+WERKBANK_ARTEN = @@WB_ARTEN@@
+WERKBANK_ROLLEN = @@WB_ROLLEN@@
 
 if WERKBANK_SPRACHE == "de":
     USE_I18N = True
@@ -28,7 +32,9 @@ if WERKBANK_SPRACHE == "de":
     # Skripte von Healthchecks lesen Zahlen aus den Seiten, etwa den Zeitstempel im Log
     # für Live-Updates. Das Formatmodul hält deshalb den Dezimalpunkt.
     FORMAT_MODULE_PATH = ["@@WB_FORMATMODUL@@"]
-    __all__ += ["USE_I18N", "LANGUAGE_CODE", "FORMAT_MODULE_PATH"]
+    # Korrekturen an Djangos eigenen Übersetzungen, etwa „vor 1 Tag“ ([[django]] im Katalog).
+    LOCALE_PATHS = [os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "@@WB_LOCALE@@"))]
+    __all__ += ["USE_I18N", "LANGUAGE_CODE", "FORMAT_MODULE_PATH", "LOCALE_PATHS"]
 
 # Mail-Fuß: Anschrift, Impressum und Datenschutz erscheinen, sobald sie gesetzt sind.
 MAIL_VORGABEN = {
