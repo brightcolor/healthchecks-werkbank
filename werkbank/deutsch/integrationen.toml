@@ -1,0 +1,3678 @@
+# Integrationen von Healthchecks: Einrichtungsseiten und die Nachrichten, die sie verschicken
+# (hc/integrations/*/templates/). Erzeugt aus artefakte/kq_integrationen.py.
+# Zustände in Nachrichten: AUSGEFALLEN / IN ORDNUNG, über den Filter zustand, wo die Vorlage den
+# Zustand als Wert bekommt. SMS behalten gerade Anführungszeichen (GSM-Zeichensatz).
+
+[[quelltext]]
+datei = "hc/integrations/apprise/templates/apprise_title.html"
+anzahl = 1
+en = '''
+is {{ status|upper }}'''
+de = '''
+{% load hc_extras %}ist {{ status|zustand|upper }}'''
+
+[[quelltext]]
+datei = "hc/integrations/github/templates/github_title.html"
+anzahl = 1
+en = '''
+is {{ status|upper }}'''
+de = '''
+{% load hc_extras %}ist {{ status|zustand|upper }}'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_title.html"
+anzahl = 1
+en = '''
+is {{ status|upper }}'''
+de = '''
+{% load hc_extras %}ist {{ status|zustand|upper }}'''
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/templates/ntfy_title.html"
+anzahl = 1
+en = '''
+is {{ status|upper }}'''
+de = '''
+{% load hc_extras %}ist {{ status|zustand|upper }}'''
+
+[[quelltext]]
+datei = "hc/integrations/pagertree/templates/pagertree_description.html"
+anzahl = 1
+en = '''
+is {{ status|upper }}'''
+de = '''
+{% load hc_extras %}ist {{ status|zustand|upper }}'''
+
+[[quelltext]]
+datei = "hc/integrations/pagertree/templates/pagertree_title.html"
+anzahl = 1
+en = '''
+is {{ status|upper }}'''
+de = '''
+{% load hc_extras %}ist {{ status|zustand|upper }}'''
+
+[[quelltext]]
+datei = "hc/integrations/spike/templates/spike_description.html"
+anzahl = 1
+en = '''
+is {{ status|upper }}'''
+de = '''
+{% load hc_extras %}ist {{ status|zustand|upper }}'''
+
+[[quelltext]]
+datei = "hc/integrations/spike/templates/spike_title.html"
+anzahl = 1
+en = '''
+is {{ status|upper }}'''
+de = '''
+{% load hc_extras %}ist {{ status|zustand|upper }}'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/zulip_topic.html"
+anzahl = 1
+en = '''
+is {{ status|upper }}'''
+de = '''
+{% load hc_extras %}ist {{ status|zustand|upper }}'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/zulip_content.html"
+anzahl = 1
+en = '''
+is **{{ status|upper }}**'''
+de = '''
+ist **{{ status|zustand|upper }}**'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/rocketchat_message.html"
+anzahl = 1
+en = '''
+is {{ flip.new_status|upper }}'''
+de = '''
+ist {{ flip.new_status|zustand|upper }}'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/matrix_description_formatted.html"
+anzahl = 1
+en = '''
+The check <a href="{{ check.cloaked_url }}">{{ check.name_then_code }}</a> is <b>DOWN</b>'''
+de = '''
+Der Check <a href="{{ check.cloaked_url }}">{{ check.name_then_code }}</a> ist <b>AUSGEFALLEN</b>'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/telegram_message.html"
+anzahl = 1
+en = '''
+The check <a href="{{ check.cloaked_url }}">{{ check.name_then_code }}</a> is <b>DOWN</b>'''
+de = '''
+Der Check <a href="{{ check.cloaked_url }}">{{ check.name_then_code }}</a> ist <b>AUSGEFALLEN</b>'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/telegram_message.html"
+anzahl = 1
+en = '''
+The check <a href="{{ check.cloaked_url }}">{{ check.name_then_code }}</a> is now <b>UP</b>'''
+de = '''
+Der Check <a href="{{ check.cloaked_url }}">{{ check.name_then_code }}</a> ist wieder <b>IN ORDNUNG</b>'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/matrix_description_formatted.html"
+anzahl = 1
+en = '''
+The check <a href="{{ check.cloaked_url }}">{{ check.name_then_code }}</a> is <b>UP</b>'''
+de = '''
+Der Check <a href="{{ check.cloaked_url }}">{{ check.name_then_code }}</a> ist wieder <b>IN ORDNUNG</b>'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/googlechat_message.html"
+anzahl = 1
+en = '''
+The check <b>{{ check.name_then_code }}</b> is <b>DOWN</b>'''
+de = '''
+Der Check <b>{{ check.name_then_code }}</b> ist <b>AUSGEFALLEN</b>'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_message.html"
+anzahl = 1
+en = '''
+The check <b>{{ check.name_then_code }}</b> is <b>DOWN</b>'''
+de = '''
+Der Check <b>{{ check.name_then_code }}</b> ist <b>AUSGEFALLEN</b>'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/googlechat_message.html"
+anzahl = 1
+en = '''
+The check <b>{{ check.name_then_code }}</b> is now <b>UP</b>'''
+de = '''
+Der Check <b>{{ check.name_then_code }}</b> ist wieder <b>IN ORDNUNG</b>'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_message.html"
+anzahl = 1
+en = '''
+The check <b>{{ check.name_then_code }}</b> is now <b>UP</b>'''
+de = '''
+Der Check <b>{{ check.name_then_code }}</b> ist wieder <b>IN ORDNUNG</b>'''
+
+[[quelltext]]
+datei = "hc/integrations/github/templates/github_body.html"
+anzahl = 1
+en = '''
+The check [{{ check.name_then_code }}]({{ check.cloaked_url }}) is **DOWN**'''
+de = '''
+Der Check [{{ check.name_then_code }}]({{ check.cloaked_url }}) ist **AUSGEFALLEN**'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_message.html"
+anzahl = 1
+en = '''
+The check [{{ check.name_then_code }}]({{ check.cloaked_url }}) is **DOWN**'''
+de = '''
+Der Check [{{ check.name_then_code }}]({{ check.cloaked_url }}) ist **AUSGEFALLEN**'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_message.html"
+anzahl = 1
+en = '''
+The check [{{ check.name_then_code }}]({{ check.cloaked_url }}) is now **UP**'''
+de = '''
+Der Check [{{ check.name_then_code }}]({{ check.cloaked_url }}) ist wieder **IN ORDNUNG**'''
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/templates/opsgenie_message.html"
+anzahl = 1
+en = '''
+The check "{{ check.name_then_code }}" is DOWN'''
+de = '''
+Der Check „{{ check.name_then_code }}“ ist AUSGEFALLEN'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/pd_description.html"
+anzahl = 1
+en = '''
+{{ check.name_then_code|safe }} is DOWN{% if flip.reason %}'''
+de = '''
+{{ check.name_then_code|safe }} ist AUSGEFALLEN{% if flip.reason %}'''
+
+[[quelltext]]
+datei = "hc/integrations/victorops/templates/victorops_description.html"
+anzahl = 1
+en = '''
+{{ check.name_then_code|safe }} is DOWN{% if flip.reason %}'''
+de = '''
+{{ check.name_then_code|safe }} ist AUSGEFALLEN{% if flip.reason %}'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/matrix_description.html"
+anzahl = 1
+en = '''
+{{ check.name_then_code }} is DOWN{% if flip.reason %}'''
+de = '''
+{{ check.name_then_code }} ist AUSGEFALLEN{% if flip.reason %}'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/pd_description.html"
+anzahl = 1
+en = '''
+{{ check.name_then_code|safe }} received a ping and is now UP'''
+de = '''
+{{ check.name_then_code|safe }} hat einen Ping bekommen und ist wieder IN ORDNUNG'''
+
+[[quelltext]]
+datei = "hc/integrations/victorops/templates/victorops_description.html"
+anzahl = 1
+en = '''
+{{ check.name_then_code|safe }} is UP.'''
+de = '''
+{{ check.name_then_code|safe }} ist wieder IN ORDNUNG.'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/pushover_title.html"
+anzahl = 1
+en = '''
+🔴 {{ check.name_then_code|safe }} is DOWN'''
+de = '''
+🔴 {{ check.name_then_code|safe }} ist AUSGEFALLEN'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/pushover_title.html"
+anzahl = 1
+en = '''
+🟢 {{ check.name_then_code|safe }} is UP'''
+de = '''
+🟢 {{ check.name_then_code|safe }} ist wieder IN ORDNUNG'''
+
+[[quelltext]]
+datei = "hc/integrations/trello/templates/trello_name.html"
+anzahl = 1
+en = '''
+Down: {{ check.name_then_code|safe }}'''
+de = '''
+Ausgefallen: {{ check.name_then_code|safe }}'''
+
+[[quelltext]]
+datei = "hc/integrations/trello/templates/trello_name.html"
+anzahl = 1
+en = '''
+Up: {{ check.name_then_code|safe }}'''
+de = '''
+In Ordnung: {{ check.name_then_code|safe }}'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/matrix_description.html"
+anzahl = 1
+en = '''
+{{ check.name_then_code }} is now UP.'''
+de = '''
+{{ check.name_then_code }} ist wieder IN ORDNUNG.'''
+
+[[quelltext]]
+datei = "hc/integrations/sms/templates/sms_message.html"
+anzahl = 1
+en = '''
+{{ site_name }}: The check "{{ check.name_then_code|safe }}" is DOWN'''
+de = '''
+{{ site_name }}: Der Check "{{ check.name_then_code|safe }}" ist AUSGEFALLEN'''
+
+[[quelltext]]
+datei = "hc/integrations/sms/templates/sms_message.html"
+anzahl = 1
+en = '''
+{{ site_name }}: The check "{{ check.name_then_code|safe }}" is UP.'''
+de = '''
+{{ site_name }}: Der Check "{{ check.name_then_code|safe }}" ist wieder IN ORDNUNG.'''
+
+[[quelltext]]
+datei = "hc/integrations/call/templates/call_message.html"
+anzahl = 1
+en = '''
+Hello! A message from {{ site_name }}: The check "{{ check.name_then_code|safe }}" is down.'''
+de = '''
+Hallo! Eine Nachricht von {{ site_name }}: Der Check "{{ check.name_then_code|safe }}" ist ausgefallen.'''
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/templates/msteamsw_message.html"
+anzahl = 1
+en = '''
+🔴 “{{ check.name_then_code }}” is DOWN'''
+de = '''
+🔴 „{{ check.name_then_code }}“ ist AUSGEFALLEN'''
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/templates/msteamsw_message.html"
+anzahl = 1
+en = '''
+🟢 “{{ check.name_then_code }}” is UP.'''
+de = '''
+🟢 „{{ check.name_then_code }}“ ist wieder IN ORDNUNG.'''
+
+[[quelltext]]
+datei = "hc/integrations/pushbullet/templates/pushbullet_message.html"
+anzahl = 1
+en = '''
+The check "{{ check.name_then_code|safe }}" is DOWN'''
+de = '''
+Der Check „{{ check.name_then_code|safe }}“ ist AUSGEFALLEN'''
+
+[[quelltext]]
+datei = "hc/integrations/pushbullet/templates/pushbullet_message.html"
+anzahl = 1
+en = '''
+The check "{{ check.name_then_code|safe }}" is UP.'''
+de = '''
+Der Check „{{ check.name_then_code|safe }}“ ist wieder IN ORDNUNG.'''
+
+[[quelltext]]
+datei = "hc/integrations/apprise/templates/apprise_description.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/googlechat_message.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_message.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/matrix_description.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/matrix_description_formatted.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/templates/ntfy_message.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/pushover_message.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/pushbullet/templates/pushbullet_message.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/rocketchat_message.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_message.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/sms/templates/sms_message.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/telegram_message.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/zulip_content.html"
+anzahl = 1
+en = '''
+The downtime lasted {{ flip.down_duration|hc_duration_for_sentence }}.'''
+de = '''
+Der Ausfall dauerte {{ flip.down_duration|hc_duration_for_sentence }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/apprise/templates/apprise_description.html"
+anzahl = 1
+en = '''
+Reason: {{ flip.reason_long }}.'''
+de = '''
+Grund: {{ flip.reason_long }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/googlechat_message.html"
+anzahl = 1
+en = '''
+Reason: {{ flip.reason_long }}.'''
+de = '''
+Grund: {{ flip.reason_long }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/templates/ntfy_message.html"
+anzahl = 1
+en = '''
+Reason: {{ flip.reason_long }}.'''
+de = '''
+Grund: {{ flip.reason_long }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/pushover_message.html"
+anzahl = 1
+en = '''
+Reason: {{ flip.reason_long }}.'''
+de = '''
+Grund: {{ flip.reason_long }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/pagertree/templates/pagertree_description.html"
+anzahl = 1
+en = '''
+Last ping was {{ ping.created|naturaltime }}.'''
+de = '''
+Der letzte Ping kam {{ ping.created|naturaltime }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/spike/templates/spike_description.html"
+anzahl = 1
+en = '''
+Last ping was {{ ping.created|naturaltime }}.'''
+de = '''
+Der letzte Ping kam {{ ping.created|naturaltime }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_message.html"
+anzahl = 1
+en = '''
+{{ down_checks|length }} other checks are {% if status == "down" %}also{% else %}still{% endif %} down.'''
+de = '''
+{{ down_checks|length }} weitere Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen.'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/matrix_description_formatted.html"
+anzahl = 1
+en = '''
+{{ down_checks|length }} other checks are {% if status == "down" %}also{% else %}still{% endif %} down.'''
+de = '''
+{{ down_checks|length }} weitere Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen.'''
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/templates/ntfy_message.html"
+anzahl = 1
+en = '''
+{{ down_checks|length }} other checks are {% if status == "down" %}also{% else %}still{% endif %} down.'''
+de = '''
+{{ down_checks|length }} weitere Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen.'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/pushover_message.html"
+anzahl = 1
+en = '''
+{{ down_checks|length }} other checks are {% if status == "down" %}also{% else %}still{% endif %} down.'''
+de = '''
+{{ down_checks|length }} weitere Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen.'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_message.html"
+anzahl = 1
+en = '''
+{{ down_checks|length }} other checks are {% if status == "down" %}also{% else %}still{% endif %} down.'''
+de = '''
+{{ down_checks|length }} weitere Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/telegram_message.html"
+anzahl = 1
+en = '''
+{{ down_checks|length }} other checks are {% if status == "down" %}also{% else %}still{% endif %} down.'''
+de = '''
+{{ down_checks|length }} weitere Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen.'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_message.html"
+anzahl = 1
+en = '''
+The following checks are {% if status == "down" %}also{% else %}still{% endif %} down:'''
+de = '''
+Diese Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen:'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/matrix_description_formatted.html"
+anzahl = 1
+en = '''
+The following checks are {% if status == "down" %}also{% else %}still{% endif %} down:'''
+de = '''
+Diese Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen:'''
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/templates/ntfy_message.html"
+anzahl = 1
+en = '''
+The following checks are {% if status == "down" %}also{% else %}still{% endif %} down:'''
+de = '''
+Diese Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen:'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/pushover_message.html"
+anzahl = 1
+en = '''
+The following checks are {% if status == "down" %}also{% else %}still{% endif %} down:'''
+de = '''
+Diese Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen:'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_message.html"
+anzahl = 1
+en = '''
+The following checks are {% if status == "down" %}also{% else %}still{% endif %} down:'''
+de = '''
+Diese Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen:'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/telegram_message.html"
+anzahl = 1
+en = '''
+The following checks are {% if status == "down" %}also{% else %}still{% endif %} down:'''
+de = '''
+Diese Checks sind {% if status == "down" %}ebenfalls{% else %}noch{% endif %} ausgefallen:'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_message.html"
+anzahl = 1
+en = '''
+(last ping: {{ c.last_ping|naturaltime|default:"never" }})'''
+de = '''
+(letzter Ping: {{ c.last_ping|naturaltime|default:"nie" }})'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/matrix_description_formatted.html"
+anzahl = 1
+en = '''
+(last ping: {{ c.last_ping|naturaltime|default:"never" }})'''
+de = '''
+(letzter Ping: {{ c.last_ping|naturaltime|default:"nie" }})'''
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/templates/ntfy_message.html"
+anzahl = 1
+en = '''
+(last ping: {{ c.last_ping|naturaltime|default:"never" }})'''
+de = '''
+(letzter Ping: {{ c.last_ping|naturaltime|default:"nie" }})'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/pushover_message.html"
+anzahl = 1
+en = '''
+(last ping: {{ c.last_ping|naturaltime|default:"never" }})'''
+de = '''
+(letzter Ping: {{ c.last_ping|naturaltime|default:"nie" }})'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_message.html"
+anzahl = 1
+en = '''
+(last ping: {{ c.last_ping|naturaltime|default:"never" }})'''
+de = '''
+(letzter Ping: {{ c.last_ping|naturaltime|default:"nie" }})'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/telegram_message.html"
+anzahl = 1
+en = '''
+(last ping: {{ c.last_ping|naturaltime|default:"never" }})'''
+de = '''
+(letzter Ping: {{ c.last_ping|naturaltime|default:"nie" }})'''
+
+[[quelltext]]
+datei = "hc/integrations/trello/templates/trello_desc.html"
+anzahl = 1
+en = '''
+[Full Details @ {% site_name %}]({{ check.cloaked_url }})'''
+de = '''
+[Alle Details in {% site_name %}]({{ check.cloaked_url }})'''
+
+[[quelltext]]
+datei = "hc/integrations/email/templates/email_form.html"
+anzahl = 1
+en = '''
+A check goes <strong>down</strong>'''
+de = '''
+Ein Check <strong>fällt aus</strong>'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+anzahl = 1
+en = '''
+A check goes <strong>down</strong>'''
+de = '''
+Ein Check <strong>fällt aus</strong>'''
+
+[[quelltext]]
+datei = "hc/integrations/sms/templates/sms_form.html"
+anzahl = 1
+en = '''
+A check goes <strong>down</strong>'''
+de = '''
+Ein Check <strong>fällt aus</strong>'''
+
+[[quelltext]]
+datei = "hc/integrations/whatsapp/templates/whatsapp_form.html"
+anzahl = 1
+en = '''
+A check goes <strong>down</strong>'''
+de = '''
+Ein Check <strong>fällt aus</strong>'''
+
+[[quelltext]]
+datei = "hc/integrations/email/templates/email_form.html"
+anzahl = 1
+en = '''
+A check goes <strong>up</strong>'''
+de = '''
+Ein Check ist <strong>wieder in Ordnung</strong>'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+anzahl = 1
+en = '''
+A check goes <strong>up</strong>'''
+de = '''
+Ein Check ist <strong>wieder in Ordnung</strong>'''
+
+[[quelltext]]
+datei = "hc/integrations/sms/templates/sms_form.html"
+anzahl = 1
+en = '''
+A check goes <strong>up</strong>'''
+de = '''
+Ein Check ist <strong>wieder in Ordnung</strong>'''
+
+[[quelltext]]
+datei = "hc/integrations/whatsapp/templates/whatsapp_form.html"
+anzahl = 1
+en = '''
+A check goes <strong>up</strong>'''
+de = '''
+Ein Check ist <strong>wieder in Ordnung</strong>'''
+
+[[quelltext]]
+datei = "hc/integrations/call/templates/add_call.html"
+anzahl = 1
+en = '''
+Optional. If you add multiple phone numbers,
+                    the labels will help you tell them apart.'''
+de = '''
+Optional. Bei mehreren Telefonnummern hilft die Bezeichnung, sie auseinanderzuhalten.'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+anzahl = 1
+en = '''
+Optional. If you add multiple phone numbers,
+                    the labels will help you tell them apart.'''
+de = '''
+Optional. Bei mehreren Telefonnummern hilft die Bezeichnung, sie auseinanderzuhalten.'''
+
+[[quelltext]]
+datei = "hc/integrations/sms/templates/sms_form.html"
+anzahl = 1
+en = '''
+Optional. If you add multiple phone numbers,
+                    the labels will help you tell them apart.'''
+de = '''
+Optional. Bei mehreren Telefonnummern hilft die Bezeichnung, sie auseinanderzuhalten.'''
+
+[[quelltext]]
+datei = "hc/integrations/whatsapp/templates/whatsapp_form.html"
+anzahl = 1
+en = '''
+Optional. If you add multiple phone numbers,
+                    the labels will help you tell them apart.'''
+de = '''
+Optional. Bei mehreren Telefonnummern hilft die Bezeichnung, sie auseinanderzuhalten.'''
+
+[[quelltext]]
+datei = "hc/integrations/call/templates/add_call.html"
+anzahl = 1
+en = '''
+Make sure the phone number starts with "+" and  has the
+                    country code.'''
+de = '''
+Die Nummer beginnt mit „+“ und der Ländervorwahl.'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+anzahl = 1
+en = '''
+Make sure the phone number starts with "+" and  has the
+                    country code.'''
+de = '''
+Die Nummer beginnt mit „+“ und der Ländervorwahl.'''
+
+[[quelltext]]
+datei = "hc/integrations/sms/templates/sms_form.html"
+anzahl = 1
+en = '''
+Make sure the phone number starts with "+" and  has the
+                    country code.'''
+de = '''
+Die Nummer beginnt mit „+“ und der Ländervorwahl.'''
+
+[[quelltext]]
+datei = "hc/integrations/whatsapp/templates/whatsapp_form.html"
+anzahl = 1
+en = '''
+Make sure the phone number starts with "+" and  has the
+                    country code.'''
+de = '''
+Die Nummer beginnt mit „+“ und der Ländervorwahl.'''
+
+[[quelltext]]
+datei = "hc/integrations/call/templates/add_call.html"
+anzahl = 1
+en = '''
+uses a third-party service, Twilio, to make phone calls.
+        {{ site_name }} will call you from a single, fixed phone number:
+        <strong>{{ twilio_from }}</strong>
+        <a href="{% url 'hc-contact-vcf' %}">(add to address book).</a>'''
+de = '''
+ruft über den Dienst Twilio an, immer von derselben Nummer: <strong>{{ twilio_from }}</strong> <a href="{% url 'hc-contact-vcf' %}">(ins Adressbuch übernehmen).</a>'''
+
+[[quelltext]]
+datei = "hc/integrations/sms/templates/sms_form.html"
+anzahl = 1
+en = '''
+uses a third-party service, Twilio, to send SMS messages.
+        Messages will be delivered from a single, fixed phone number:
+        <strong>{{ twilio_from }}</strong>
+        <a href="{% url 'hc-contact-vcf' %}">(add to address book).</a>'''
+de = '''
+verschickt die SMS über den Dienst Twilio, immer von derselben Nummer: <strong>{{ twilio_from }}</strong> <a href="{% url 'hc-contact-vcf' %}">(ins Adressbuch übernehmen).</a>'''
+
+[[quelltext]]
+datei = "hc/integrations/email/templates/email_form.html"
+anzahl = 1
+en = '''
+After entering an email address, {{ site_name }} will send out a confirmation link.
+        Only confirmed addresses receive notifications.'''
+de = '''
+Nach dem Speichern schickt {{ site_name }} einen Bestätigungslink an die Adresse. Benachrichtigungen gehen nur an bestätigte Adressen.'''
+
+[[quelltext]]
+datei = "hc/integrations/sms/templates/sms_form.html"
+anzahl = 1
+en = '''
+SMS messaging is not available on the free plan–sending the messages
+        cost too much! Please upgrade to a
+        <a href="{% url 'hc-billing' %}">paid plan</a> to enable SMS messaging.'''
+de = '''
+SMS gibt es im kostenlosen Tarif nicht, sie sind zu teuer. Wechsle in einen <a href="{% url 'hc-billing' %}">bezahlten Tarif</a>, um SMS einzuschalten.'''
+
+[[quelltext]]
+datei = "hc/integrations/whatsapp/templates/whatsapp_form.html"
+anzahl = 1
+en = '''
+Get a WhatsApp message when a check goes up or down.
+    </p>
+    <p>
+        {{ site_name }} uses a third-party service, Twilio, to send SMS messages.'''
+de = '''
+Du bekommst eine WhatsApp-Nachricht, wenn ein Check ausfällt oder wieder in Ordnung ist. {{ site_name }} verschickt sie über den Dienst Twilio.'''
+
+[[quelltext]]
+datei = "hc/integrations/whatsapp/templates/whatsapp_form.html"
+anzahl = 1
+en = '''
+WhatsApp messaging is not available on the free plan–sending the messages
+        cost too much! Please upgrade to a
+        <a href="{% url 'hc-billing' %}">paid plan</a> to enable WhatsApp messaging.'''
+de = '''
+WhatsApp-Nachrichten gibt es im kostenlosen Tarif nicht, sie sind zu teuer. Wechsle in einen <a href="{% url 'hc-billing' %}">bezahlten Tarif</a>, um WhatsApp-Nachrichten einzuschalten.'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_result.html"
+anzahl = 1
+en = '''
+Let's try the other way around: from the Signal application, please send a
+        short message to our Signal account.
+        Then click the "Send Test Message!" button again.'''
+de = '''
+Andersherum klappt es: Schick aus der Signal-App eine kurze Nachricht an unser Signal-Konto. Klick danach noch einmal auf „Testnachricht schicken“.'''
+
+[[quelltext]]
+datei = "hc/integrations/signal/templates/signal_result.html"
+anzahl = 1
+en = '''
+{% elif result == "Recipient not found" %}'''
+de = '''
+{% elif result == "Empfänger nicht gefunden" %}'''
+
+[[quelltext]]
+datei = "hc/integrations/call/templates/add_call.html"
+anzahl = 1
+en = '''
+Get a phone call when a check goes down. When you pick up the call,
+        a text-to-speech engine will read out a message and then hang up.'''
+de = '''
+Du bekommst einen Anruf, wenn ein Check ausfällt. Nimmst du ab, liest eine Computerstimme eine Nachricht vor und legt dann auf.'''
+
+[[quelltext]]
+datei = "hc/integrations/call/templates/add_call.html"
+anzahl = 1
+en = '''
+Phone call notifications are not available on the free plan–they
+        cost too much! Please upgrade to a
+        <a href="{% url 'hc-billing' %}">paid plan</a>
+        to enable phone call notifications.'''
+de = '''
+Anrufe gibt es im kostenlosen Tarif nicht, sie sind zu teuer. Wechsle in einen <a href="{% url 'hc-billing' %}">bezahlten Tarif</a>, um Anrufe einzuschalten.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/telegram_invite.html"
+anzahl = 1
+en = '''
+Please open this link to complete the {% site_name %} integration:'''
+de = '''
+Öffne diesen Link, um die Integration mit {% site_name %} abzuschließen:'''
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+anzahl = 1
+en = '''
+If your team uses <a href="https://products.office.com/en-us/microsoft-teams/group-chat-software">Microsoft Teams</a>,
+        you can set up {{ site_name }} to post status updates directly to your chosen
+        Microsoft Teams channel.'''
+de = '''
+Nutzt dein Team <a href="https://products.office.com/en-us/microsoft-teams/group-chat-software">Microsoft Teams</a>, schickt {{ site_name }} Statusmeldungen direkt in einen Teams-Kanal deiner Wahl.'''
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+anzahl = 1
+en = '''
+Log into your Microsoft Teams account. In the channel list,
+                    click on the three dot menu next to a channel,
+                    and select <strong>Workflows</strong>.'''
+de = '''
+Melde dich bei Microsoft Teams an. Klick in der Kanalliste auf das Drei-Punkte-Menü neben einem Kanal und wähl <strong>Workflows</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+anzahl = 1
+en = '''
+Search workflow templates for "webhook". Select the template named
+                    <strong>"Post to a channel when a webhook request is received"</strong>.'''
+de = '''
+Such in den Workflow-Vorlagen nach „webhook“ und wähl die Vorlage <strong>"Post to a channel when a webhook request is received"</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+anzahl = 1
+en = '''
+Copy the displayed webhook URL and paste it
+                    in the form below. Save the integration, and you are done!'''
+de = '''
+Kopier die angezeigte Webhook-Adresse und füge sie unten ein. Integration speichern, fertig.'''
+
+[[quelltext]]
+datei = "hc/integrations/victorops/templates/add_victorops.html"
+anzahl = 1
+en = '''
+is a collaboration and incident management platform for on-call DevOps teams.
+    You can integrate it with your {{ site_name }} account in a few
+    simple steps.'''
+de = '''
+ist eine Plattform für Zusammenarbeit und Incident-Management von DevOps-Teams in Bereitschaft. Mit wenigen Schritten verbindest du sie mit deinem Konto bei {{ site_name }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/victorops/templates/add_victorops.html"
+anzahl = 1
+en = '''
+Log into your Splunk On-Call account,
+                go to <strong>Integrations</strong>,
+                and look up the REST integration.'''
+de = '''
+Melde dich bei Splunk On-Call an, öffne <strong>Integrations</strong> und such die REST-Integration.'''
+
+[[quelltext]]
+datei = "hc/integrations/victorops/templates/add_victorops.html"
+anzahl = 1
+en = '''
+Enable the integration, and copy
+                the displayed <strong>Service API Endpoint</strong>.
+                Paste it in the form below. Be sure to replace
+                the <strong>$routing_key</strong> section with the
+                actual routing key you intend to use.
+            </p>
+            <p>
+                Save the integration, and it's done!'''
+de = '''
+Schalte die Integration ein und kopier den angezeigten <strong>Service API Endpoint</strong>. Füge ihn unten ein und ersetze dabei den Teil <strong>$routing_key</strong> durch den Routing-Key, den du nutzen willst. Integration speichern, fertig.'''
+
+[[quelltext]]
+datei = "hc/integrations/discord/templates/add_discord.html"
+anzahl = 1
+en = '''
+With this integration, {{ site_name }} will send
+            a notification to a <a href="https://discord.com/">Discord</a>
+            channel when a check
+            goes <strong>up</strong> or <strong>down</strong>.'''
+de = '''
+Mit dieser Integration schickt {{ site_name }} eine Benachrichtigung in einen <a href="https://discord.com/">Discord</a>-Kanal, wenn ein Check <strong>ausfällt</strong> oder <strong>wieder in Ordnung</strong> ist.'''
+
+[[quelltext]]
+datei = "hc/integrations/pushbullet/templates/add_pushbullet.html"
+anzahl = 1
+en = '''
+With this integration, {{ site_name }} will send
+            a <a href="https://pushbullet.com/">Pushbullet</a>
+            notification when a check
+            goes <strong>up</strong> or <strong>down</strong>.'''
+de = '''
+Mit dieser Integration schickt {{ site_name }} eine <a href="https://pushbullet.com/">Pushbullet</a>-Benachrichtigung, wenn ein Check <strong>ausfällt</strong> oder <strong>wieder in Ordnung</strong> ist.'''
+
+[[quelltext]]
+datei = "hc/integrations/group/templates/group_form.html"
+anzahl = 1
+en = '''
+{{ ch.get_kind_display }}'''
+de = '''
+{{ ch|art }}'''
+
+[[quelltext]]
+datei = "hc/integrations/apprise/templates/add_apprise.html"
+anzahl = 1
+en = '''
+Identify as many Apprise URLs as you wish. You can use a comma (,) to identify
+		more than on URL if you wish to.
+
+		For a detailed list of all supported Apprise Notification URLs simply
+		<a href="https://github.com/caronc/apprise#popular-notification-services" >click here</a>.'''
+de = '''
+Gib beliebig viele Apprise-Adressen an, mehrere trennst du mit Komma (,). Alle unterstützten Adressen findest du <a href="https://github.com/caronc/apprise#popular-notification-services" >in dieser Liste</a>.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+anzahl = 1
+en = '''
+When a check goes <strong>up</strong> or <strong>down</strong>,
+            {{ site_name }} will send notifications to
+            {% if recipient.type == "private" %}
+                a Telegram user
+            {% elif recipient.type == "channel" %}
+                a Telegram channel
+            {% else %}
+                a Telegram group
+            {% endif %}
+            named <strong>{{ recipient.name }}</strong>.'''
+de = '''
+Wenn ein Check <strong>ausfällt</strong> oder <strong>wieder in Ordnung</strong> ist, schickt {{ site_name }} Benachrichtigungen an {% if recipient.type == "private" %}den Telegram-Nutzer{% elif recipient.type == "channel" %}den Telegram-Kanal{% else %}die Telegram-Gruppe{% endif %} <strong>{{ recipient.name }}</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+anzahl = 1
+en = '''
+If your team uses <a href="https://telegram.org/">Telegram</a>,
+    you can set up {{ site_name }} to post status updates directly to an
+    appropriate Telegram user, group or channel.'''
+de = '''
+Nutzt dein Team <a href="https://telegram.org/">Telegram</a>, schickt {{ site_name }} Statusmeldungen direkt an einen Telegram-Nutzer, eine Gruppe oder einen Kanal.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+anzahl = 1
+en = '''
+<strong>Groups:</strong> If you want notifications sent to a group, start by inviting
+                <a href="https://t.me/{{ bot_name }}">{{ bot_name }}</a>
+                to the group. The bot will get added as a member with no access to
+                group messages.'''
+de = '''
+<strong>Gruppen:</strong> Sollen Benachrichtigungen in eine Gruppe gehen, lade zuerst <a href="https://t.me/{{ bot_name }}">{{ bot_name }}</a> in die Gruppe ein. Der Bot wird Mitglied, liest aber keine Nachrichten der Gruppe.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+anzahl = 1
+en = '''
+<strong>Direct messages:</strong> If you want notifications sent to yourself directly,
+                start a conversation with
+                <a href="https://t.me/{{ bot_name }}">{{ bot_name }}</a>.'''
+de = '''
+<strong>Direktnachrichten:</strong> Sollen Benachrichtigungen direkt an dich gehen, starte eine Unterhaltung mit <a href="https://t.me/{{ bot_name }}">{{ bot_name }}</a>.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+anzahl = 1
+en = '''
+<strong>Channels:</strong> If you want notifications sent to a Telegram channel,
+                add <a href="https://t.me/{{ bot_name }}">{{ bot_name }}</a>
+                to the channel's Administrators. Enable the "Post Messages" admin
+                right, and disable all other admin rights.'''
+de = '''
+<strong>Kanäle:</strong> Sollen Benachrichtigungen in einen Telegram-Kanal gehen, mach <a href="https://t.me/{{ bot_name }}">{{ bot_name }}</a> zum Administrator des Kanals. Schalte das Admin-Recht „Post Messages“ ein und alle anderen Admin-Rechte aus.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+anzahl = 1
+en = '''
+<p>Type <strong><code>/start</code></strong> command.
+               If there are multiple bots in the group, type
+               <strong><code>/start@{{ bot_name }}</code></strong> instead.'''
+de = '''
+<p>Schick den Befehl <strong><code>/start</code></strong>. Sind mehrere Bots in der Gruppe, schick stattdessen <strong><code>/start@{{ bot_name }}</code></strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+anzahl = 1
+en = '''
+<p>If you want {{ site_name }} to post notifications to a <strong>specific
+              group topic</strong>, send a <strong><code>/start@{{ bot_name }}</code></strong>
+              command from that topic.'''
+de = '''
+<p>Sollen die Benachrichtigungen in ein <strong>bestimmtes Thema der Gruppe</strong>, schick <strong><code>/start@{{ bot_name }}</code></strong> aus diesem Thema.'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+anzahl = 1
+en = '''
+<p>Click or tap on the confirmation link, and
+            {{ site_name }} will open in a browser window asking you to
+             confirm the new integration.</p>'''
+de = '''
+<p>Öffne den Bestätigungslink. {{ site_name }} öffnet sich im Browser und fragt nach der Bestätigung der neuen Integration.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+anzahl = 1
+en = '''
+<p>Select the project you want the Telegram integration added to,
+            click on "Connect Telegram", and it's done!</p>'''
+de = '''
+<p>Wähl das Projekt, das die Telegram-Integration bekommen soll, und klick auf „Mit Telegram verbinden“. Fertig.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+anzahl = 1
+en = '''
+delivers
+            real-time notifications on your Android, iPhone, iPad, Desktop,
+            Android Wear and Apple Watch. You can set up {{ site_name }} to
+            receive Pushover notifications in a few simple steps.'''
+de = '''
+liefert Benachrichtigungen in Echtzeit auf Android, iPhone, iPad, Desktop, Android Wear und Apple Watch. Mit wenigen Schritten schickt dir {{ site_name }} Benachrichtigungen über Pushover.'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+anzahl = 1
+en = '''
+delivers
+            real-time notifications on your Android, iPhone, iPad, Desktop,
+            Android Wear and Apple Watch. You can set up {{ site_name }} to
+            receive Pushover notifications in a few simple steps.'''
+de = '''
+liefert Benachrichtigungen in Echtzeit auf Android, iPhone, iPad, Desktop, Android Wear und Apple Watch. Mit wenigen Schritten schickt dir {{ site_name }} Benachrichtigungen über Pushover.'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+anzahl = 1
+en = '''
+Emergency Priority: Repeated every {{po_retry_delay|hc_duration }} for at most {{ po_expiration|hc_duration }} until you acknowledge them.'''
+de = '''
+Notfall-Priorität: Wiederholung alle {{po_retry_delay|hc_duration }}, höchstens {{ po_expiration|hc_duration }} lang, bis du sie bestätigst.'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+anzahl = 1
+en = '''
+Emergency priority: Repeated every {{po_retry_delay|hc_duration }} for at most {{ po_expiration|hc_duration }} until you acknowledge them.'''
+de = '''
+Notfall-Priorität: Wiederholung alle {{po_retry_delay|hc_duration }}, höchstens {{ po_expiration|hc_duration }} lang, bis du sie bestätigst.'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+anzahl = 1
+en = '''
+is a <strong>free</strong> and
+            <a href="https://github.com/healthchecks/healthchecks">open source</a>
+            service for monitoring your cron jobs, background processes and
+            scheduled tasks. Before adding Pushover integration, please log into
+            {{ site_name }}:'''
+de = '''
+ist ein <strong>kostenloser</strong> <a href="https://github.com/healthchecks/healthchecks">Open-Source</a>-Dienst zur Überwachung von Cron-Jobs, Hintergrundprozessen und geplanten Aufgaben. Melde dich bei {{ site_name }} an, bevor du die Pushover-Integration hinzufügst:'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+anzahl = 1
+en = '''
+After logging in, go
+                {% endif %}'''
+de = '''
+Öffne nach der Anmeldung{% endif %}'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+anzahl = 1
+en = '''
+to the <strong>Integrations</strong> page,
+                and click on <strong>Add Integration</strong> next to the
+                Pushover integration.'''
+de = '''
+die Seite <strong>Integrationen</strong> und klick neben Pushover auf <strong>Integration hinzufügen</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+anzahl = 1
+en = '''
+You will be redirected to
+                <a href="https://pushover.net">pushover.net</a> and
+                asked to confirm a subscription. Review the subscription
+                details and click "Subscribe Me".'''
+de = '''
+Du landest auf <a href="https://pushover.net">pushover.net</a> und bestätigst dort das Abo. Prüf die Angaben und klick auf „Subscribe Me“.'''
+
+[[quelltext]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+anzahl = 1
+en = '''
+That is all! You will now be redirected back to
+                "Integrations" page on {{ site_name }} and see
+                the new integration!'''
+de = '''
+Das war es schon. Du kommst zurück auf die Seite „Integrationen“ von {{ site_name }} und siehst dort die neue Integration.'''
+
+[[quelltext]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+anzahl = 1
+en = '''
+<p>Paste the copied <strong>URL</strong> in the form.</p>'''
+de = '''
+<p>Füge die kopierte <strong>Adresse</strong> ins Formular ein.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+<p>Paste the copied <strong>URL</strong> in the form.</p>'''
+de = '''
+<p>Füge die kopierte <strong>Adresse</strong> ins Formular ein.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+anzahl = 1
+en = '''
+<p>If your team uses <a href="https://slack.com/">Slack</a>, you can set
+        up {% site_name %} to post status updates directly to an appropriate
+        Slack channel.</p>'''
+de = '''
+<p>Nutzt dein Team <a href="https://slack.com/">Slack</a>, schickt {% site_name %} Statusmeldungen direkt in einen passenden Slack-Kanal.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+anzahl = 1
+en = '''
+is a <strong>free</strong> and
+        <a href="https://github.com/healthchecks/healthchecks">open source</a>
+        service for monitoring your cron jobs, background processes and
+        scheduled tasks. To set up a {% site_name %} integration for Slack, please
+        log into {% site_name %}:</p>'''
+de = '''
+ist ein <strong>kostenloser</strong> <a href="https://github.com/healthchecks/healthchecks">Open-Source</a>-Dienst zur Überwachung von Cron-Jobs, Hintergrundprozessen und geplanten Aufgaben. Melde dich bei {% site_name %} an, um die Integration für Slack einzurichten:</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+anzahl = 1
+en = '''
+After logging in, go
+                {% endif %}'''
+de = '''
+Öffne nach der Anmeldung{% endif %}'''
+
+[[quelltext]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+anzahl = 1
+en = '''
+to the <strong>Integrations</strong> page,
+                and click on <strong>Add Integration</strong> next to the
+                Slack icon.'''
+de = '''
+die Seite <strong>Integrationen</strong> und klick neben dem Slack-Symbol auf <strong>Integration hinzufügen</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+anzahl = 1
+en = '''
+Click on the "Add to Slack" button, and you should
+                be on a page that says "{% site_name %} would like access to
+                your Slack team". Select the team you want to add the
+                {% site_name %} integration app to.'''
+de = '''
+Klick auf „Add to Slack“. Auf der folgenden Seite steht „{% site_name %} would like access to your Slack team“. Wähl das Team, das die App von {% site_name %} bekommen soll.'''
+
+[[quelltext]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+anzahl = 1
+en = '''
+You should now be on a page that says "{% site_name %} would
+                like access to <i>TEAM NAME</i>". Select the channel you want to
+                post {% site_name %} notifications to.'''
+de = '''
+Danach steht dort „{% site_name %} would like access to <i>TEAM NAME</i>“. Wähl den Kanal, in den {% site_name %} die Benachrichtigungen schicken soll.'''
+
+[[quelltext]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+anzahl = 1
+en = '''
+That is all! You will now be redirected back to
+                "Integrations" page on {% site_name %} and see
+                the new integration!'''
+de = '''
+Das war es schon. Du kommst zurück auf die Seite „Integrationen“ von {% site_name %} und siehst dort die neue Integration.'''
+
+[[quelltext]]
+datei = "hc/integrations/slack/templates/add_slack.html"
+anzahl = 1
+en = '''
+<p>If your team uses <a href="https://slack.com/">Slack</a>, you can set
+    up {{ site_name }} to post status updates directly to an appropriate
+    Slack channel.</p>'''
+de = '''
+<p>Nutzt dein Team <a href="https://slack.com/">Slack</a>, schickt {{ site_name }} Statusmeldungen direkt in einen passenden Slack-Kanal.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/slack/templates/add_slack.html"
+anzahl = 1
+en = '''
+Follow <a href="https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/">Slack's instructions</a>
+                to create an <strong>Incoming Webhook</strong> for posting messages in
+                your chosen Slack channel.'''
+de = '''
+Leg nach der <a href="https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/">Anleitung von Slack</a> einen <strong>Incoming Webhook</strong> für den gewünschten Slack-Kanal an.'''
+
+[[quelltext]]
+datei = "hc/integrations/slack/templates/add_slack.html"
+anzahl = 1
+en = '''
+<p>Copy the generated <strong>Webhook URL</strong> and paste it in the form below.</p>'''
+de = '''
+<p>Kopier die erzeugte <strong>Webhook-Adresse</strong> und füge sie unten ein.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+anzahl = 1
+en = '''
+If your team uses <a href="https://mattermost.com/">Mattermost</a>,
+            you can set up {{ site_name }} to post alerts directly to an
+            appropriate Mattermost channel when a check goes <strong>up</strong>
+            or <strong>down</strong>.'''
+de = '''
+Nutzt dein Team <a href="https://mattermost.com/">Mattermost</a>, schickt {{ site_name }} Alarme direkt in einen passenden Mattermost-Kanal, wenn ein Check <strong>ausfällt</strong> oder <strong>wieder in Ordnung</strong> ist.'''
+
+[[quelltext]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+anzahl = 1
+en = '''
+is a free and
+            <a href="https://github.com/healthchecks/healthchecks">open source</a>
+            service for monitoring <strong>cron jobs</strong>, <strong>background processes</strong> and
+            <strong>scheduled tasks</strong>. When {% site_name %} detects a problem, it can notify
+            you by posting to a Mattermost channel. To set up the Mattermost
+            integration, please log into {{ site_name }}:'''
+de = '''
+ist ein kostenloser <a href="https://github.com/healthchecks/healthchecks">Open-Source</a>-Dienst zur Überwachung von <strong>Cron-Jobs</strong>, <strong>Hintergrundprozessen</strong> und <strong>geplanten Aufgaben</strong>. Erkennt {% site_name %} ein Problem, meldet es sich in einem Mattermost-Kanal. Melde dich bei {{ site_name }} an, um die Mattermost-Integration einzurichten:'''
+
+[[quelltext]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+anzahl = 1
+en = '''
+<p>Log into {% site_name %}, then go to the <strong>Integrations</strong>
+                page and click on <strong>Add Integration</strong> next to the
+                Mattermost integration.'''
+de = '''
+<p>Melde dich bei {% site_name %} an, öffne die Seite <strong>Integrationen</strong> und klick neben Mattermost auf <strong>Integration hinzufügen</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+If your team uses <a href="https://www.rocket.chat/">Rocket.Chat</a>,
+            you can set up {{ site_name }} to post alerts directly to an
+            appropriate Rocket.Chat channel when a check goes <strong>up</strong>
+            or <strong>down</strong>.'''
+de = '''
+Nutzt dein Team <a href="https://www.rocket.chat/">Rocket.Chat</a>, schickt {{ site_name }} Alarme direkt in einen passenden Rocket.Chat-Kanal, wenn ein Check <strong>ausfällt</strong> oder <strong>wieder in Ordnung</strong> ist.'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+is a free and
+            <a href="https://github.com/healthchecks/healthchecks">open source</a>
+            service for monitoring <strong>cron jobs</strong>, <strong>background processes</strong> and
+            <strong>scheduled tasks</strong>. When {% site_name %} detects a problem, it can notify
+            you by posting to a Rocket.Chat channel. To set up the Rocket.Chat
+            integration, please log into {{ site_name }}:'''
+de = '''
+ist ein kostenloser <a href="https://github.com/healthchecks/healthchecks">Open-Source</a>-Dienst zur Überwachung von <strong>Cron-Jobs</strong>, <strong>Hintergrundprozessen</strong> und <strong>geplanten Aufgaben</strong>. Erkennt {% site_name %} ein Problem, meldet es sich in einem Rocket.Chat-Kanal. Melde dich bei {{ site_name }} an, um die Rocket.Chat-Integration einzurichten:'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+<p>Log into {% site_name %}, then go to the <strong>Integrations</strong>
+                page and click on <strong>Add Integration</strong> next to the
+                Rocket.Chat integration.'''
+de = '''
+<p>Melde dich bei {% site_name %} an, öffne die Seite <strong>Integrationen</strong> und klick neben Rocket.Chat auf <strong>Integration hinzufügen</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+anzahl = 1
+en = '''
+Log into your Mattermost account and
+            select <strong>Integrations</strong> in the
+            top left menu.'''
+de = '''
+Melde dich bei Mattermost an und wähl im Menü oben links <strong>Integrations</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+anzahl = 1
+en = '''
+In the "Integrations" screen, select <strong>Incoming Webhook</strong>
+            and then <strong>Add Incoming Webhook</strong>.'''
+de = '''
+Wähl auf der Seite „Integrations“ <strong>Incoming Webhook</strong> und dann <strong>Add Incoming Webhook</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+anzahl = 1
+en = '''
+<p>Copy the displayed <strong>URL</strong> and paste it in the form below.</p>'''
+de = '''
+<p>Kopier die angezeigte <strong>Adresse</strong> und füge sie unten ein.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+anzahl = 1
+en = '''
+<p>Copy the displayed <strong>URL</strong>.</p>'''
+de = '''
+<p>Kopier die angezeigte <strong>Adresse</strong>.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+Log into your Rocket.Chat account and
+            navigate to <strong>Administration</strong> > <strong>Workspace</strong> > <strong>Integrations</strong>.'''
+de = '''
+Melde dich bei Rocket.Chat an und öffne <strong>Administration</strong> > <strong>Workspace</strong> > <strong>Integrations</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+<p>Click <strong>"+New"</strong> at the top right corner.</p>'''
+de = '''
+<p>Klick oben rechts auf <strong>"+New"</strong>.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+<p>Switch to the <strong>Incoming</strong> tab, and fill in the form:</p>'''
+de = '''
+<p>Wechsle zum Reiter <strong>Incoming</strong> und füll das Formular aus:</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+<li>Turn on the <strong>Enabled</strong> toggle.</li>'''
+de = '''
+<li>Schalte <strong>Enabled</strong> ein.</li>'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+<li><strong>Name:</strong> give the integration a descriptive name.</li>'''
+de = '''
+<li><strong>Name:</strong> ein aussagekräftiger Name für die Integration.</li>'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+<li><strong>Post to Channel: </strong> select the channel or user to receive alerts.</li>'''
+de = '''
+<li><strong>Post to Channel: </strong> der Kanal oder die Person, die die Alarme bekommt.</li>'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+<li><strong>Post as: </strong> choose the username that this integration posts as. The user must already exist.</li>'''
+de = '''
+<li><strong>Post as: </strong> der Nutzername, unter dem die Integration schreibt. Dieses Konto muss es schon geben.</li>'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+<p>Save the integration, then copy the generated
+            <strong>Webhook URL</strong> and paste it in the form below.</p>'''
+de = '''
+<p>Speichere die Integration, kopier dann die erzeugte <strong>Webhook URL</strong> und füge sie unten ein.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+anzahl = 1
+en = '''
+<p>Save the integration, then copy the generated <strong>Webhook URL</strong>.</p>'''
+de = '''
+<p>Speichere die Integration und kopier dann die erzeugte <strong>Webhook URL</strong>.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+is an open-source group chat app
+        with an email threading model. If you use or plan on using Zulip,
+        you can integrate it with your {{ site_name }} account in a few simple steps.'''
+de = '''
+ist ein Open-Source-Gruppenchat, der Unterhaltungen wie Mail-Threads ordnet. Nutzt du Zulip oder hast es vor, verbindest du es in wenigen Schritten mit deinem Konto bei {{ site_name }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+Log into your Zulip account,
+                click on the <strong>gear icon</strong> in the upper right corner,
+                and select <strong>Personal settings</strong>.'''
+de = '''
+Melde dich bei Zulip an, klick oben rechts auf das <strong>Zahnrad</strong> und wähl <strong>Personal settings</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+Go to <strong>Bots › Add a new bot </strong> and fill
+                out the fields.'''
+de = '''
+Öffne <strong>Bots › Add a new bot </strong> und füll die Felder aus.'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+For <strong>Bot type</strong>,
+                select "Incoming webhook". You can choose your preferred values
+                for the bot's name and email.'''
+de = '''
+Wähl bei <strong>Bot type</strong> „Incoming webhook“. Name und Mail-Adresse des Bots kannst du frei wählen.'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+For the profile picture, feel free to use the {{ site_name }} logo:'''
+de = '''
+Als Profilbild kannst du gern das Logo von {{ site_name }} nehmen:'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+After you have filled out the values,
+                click on <strong>Add</strong>.'''
+de = '''
+Hast du alles ausgefüllt, klick auf <strong>Add</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+After adding the bot, click on the <strong>Manage bot</strong> icon.'''
+de = '''
+Klick danach beim neuen Bot auf das Symbol <strong>Manage bot</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+In the dialog window that opens, scroll to the bottom and download the
+                bot's <code>zuliprc</code> file by clicking on the
+                <strong>purple download icon</strong>.'''
+de = '''
+Scroll im Dialog ganz nach unten und lade die Datei <code>zuliprc</code> des Bots über das <strong>lila Download-Symbol</strong> herunter.'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+If the user profile does not display their email address, this may be
+                due to their privacy settings. In this case, look up and use their
+                <strong>User ID</strong> instead.'''
+de = '''
+Zeigt das Profil keine Mail-Adresse, liegt das vermutlich an den Datenschutzeinstellungen der Person. Nimm dann ihre <strong>User ID</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+Example: "{% if form.mtype.value == "private" %}alice@example.org{% else %}general{% endif%}"'''
+de = '''
+Beispiel: „{% if form.mtype.value == "private" %}alice@example.org{% else %}general{% endif%}“'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+anzahl = 1
+en = '''
+Example: "Alerts". Leave empty to use auto-generated topics in the form:
+                    "{check name} is {status}".'''
+de = '''
+Beispiel: „Alarme“. Leer lassen, dann entstehen Themen nach dem Muster „{Check-Name} ist {Zustand}“.'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+anzahl = 1
+en = '''
+If your team uses <a href="https://matrix.org/">Matrix</a>,
+    you can set up {{ site_name }} to post notifications
+    to an appropriate Matrix room.'''
+de = '''
+Nutzt dein Team <a href="https://matrix.org/">Matrix</a>, schickt {{ site_name }} Benachrichtigungen in einen passenden Matrix-Raum.'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+anzahl = 1
+en = '''
+Invite <strong>{{ matrix_user_id }}</strong>
+                into your Matrix room.'''
+de = '''
+Lade <strong>{{ matrix_user_id }}</strong> in deinen Matrix-Raum ein.'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+anzahl = 1
+en = '''
+<strong>Note:</strong> after joining the room,
+                    {{ matrix_user_id }} will be
+                    able to read its messages.
+                    Do not invite to rooms with sensitive content.
+                    Consider creating a dedicated room for notifications.'''
+de = '''
+<strong>Hinweis:</strong> Im Raum liest {{ matrix_user_id }} alle Nachrichten mit. Lade das Konto deshalb in keine Räume mit vertraulichen Inhalten ein; am besten richtest du einen eigenen Raum für Benachrichtigungen ein.'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+anzahl = 1
+en = '''
+Navigate to the <strong>Room Settings › General</strong> screen
+                and look up the room's <strong>Published Address</strong>.'''
+de = '''
+Öffne <strong>Room Settings › General</strong> und such die <strong>Published Address</strong> des Raums.'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+anzahl = 1
+en = '''
+If the room does not have a Published Address,
+                look up its <strong>Internal Room ID</strong>
+                from the <strong>Room Settings › Advanced</strong> screen instead.'''
+de = '''
+Hat der Raum keine Published Address, nimm stattdessen die <strong>Internal Room ID</strong> aus <strong>Room Settings › Advanced</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+anzahl = 1
+en = '''
+{{ matrix_user_id }} will shortly join your room. After that,
+                you are all set! From now on {{ site_name }} will post notifications
+                to your room when checks go down or up.'''
+de = '''
+{{ matrix_user_id }} betritt gleich deinen Raum. Danach ist alles fertig: {{ site_name }} schreibt Benachrichtigungen in den Raum, wenn Checks ausfallen oder wieder in Ordnung sind.'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+Executes an HTTP request to your specified URL when a check
+            goes up or down.  You can use placeholders <strong>$NAME</strong>,
+            <strong>$STATUS</strong> and others in webhook URLs, request body and
+            header values
+            <a href="#" data-toggle="modal" data-target="#reference-modal">(available placeholders)</a>.'''
+de = '''
+Ruft deine Adresse per HTTP auf, wenn ein Check ausfällt oder wieder in Ordnung ist. In Adresse, Inhalt und Header-Werten kannst du Platzhalter wie <strong>$NAME</strong> und <strong>$STATUS</strong> nutzen <a href="#" data-toggle="modal" data-target="#reference-modal">(verfügbare Platzhalter)</a>.'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+Webhook retry policy:
+            {% site_name %} retries failed webhook calls up to 2 additional times.
+            {% site_name %} considers a HTTP request failed if:'''
+de = '''
+Wiederholungen: Scheitert ein Aufruf, versucht {% site_name %} es bis zu 2 weitere Male. Als gescheitert gilt eine HTTP-Anfrage, wenn:'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+Execute when a check goes <strong class="label-down">down</strong>'''
+de = '''
+Ausführen, wenn ein Check <strong class="label-down">ausfällt</strong>'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+Execute when a check goes <strong class="label-up">up</strong>'''
+de = '''
+Ausführen, wenn ein Check <strong class="label-up">wieder in Ordnung</strong> ist'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+You can use the below placeholders in webhook URL, request body
+                    and header values.  {% site_name %} will replace the placeholders
+                    with the correct values.'''
+de = '''
+Diese Platzhalter kannst du in Adresse, Inhalt und Header-Werten des Webhooks nutzen. {% site_name %} setzt die passenden Werte ein.'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+Name of the check, encoded as JSON string. If
+                            the check's name contains a double quote, this would produce
+                            invalid JSON:</p>'''
+de = '''
+Name des Checks als JSON-Zeichenkette. Enthält der Name ein doppeltes Anführungszeichen, entstünde hier ungültiges JSON:</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+Current UTC time in ISO8601 format. Example:
+                            "{% now_isoformat %}"'''
+de = '''
+Aktuelle Zeit in UTC im Format ISO 8601. Beispiel: „{% now_isoformat %}“'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+Check's current status ("up" or "down").'''
+de = '''
+Aktueller Zustand des Checks („up“ oder „down“).'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+A JSON representation of the check.
+                            The JSON document has the same fields as the
+                            <a href="{% url 'hc-serve-doc' 'api' %}#get-check">Get a Single Check</a>
+                            API response. You can nest <code>$JSON</code> in your own JSON structure, example: </p>'''
+de = '''
+Der Check als JSON. Das Dokument hat dieselben Felder wie die API-Antwort von <a href="{% url 'hc-serve-doc' 'api' %}#get-check">Get a Single Check</a>. Du kannst <code>$JSON</code> in eigenes JSON einbetten, etwa so: </p>'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+placeholder="X-Sample-Header: $NAME has gone down"'''
+de = '''
+placeholder="X-Sample-Header: $NAME ist ausgefallen"'''
+
+[[quelltext]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+anzahl = 1
+en = '''
+placeholder="X-Sample-Header: $NAME is back up"'''
+de = '''
+placeholder="X-Sample-Header: $NAME ist wieder in Ordnung"'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+anzahl = 1
+en = '''
+<p>If your team uses <a href="https://www.pagerduty.com">PagerDuty</a>,
+        you can set up {{ site_name }} to create a PagerDuty incident when
+        a check goes down, and resolve it when a check goes back up.</p>'''
+de = '''
+<p>Nutzt dein Team <a href="https://www.pagerduty.com">PagerDuty</a>, legt {{ site_name }} dort einen Incident an, wenn ein Check ausfällt, und schließt ihn, wenn der Check wieder in Ordnung ist.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+anzahl = 1
+en = '''
+is a <strong>free</strong> and
+        <a href="https://github.com/healthchecks/healthchecks">open source</a>
+        service for monitoring your cron jobs, background processes and
+        scheduled tasks. Before adding PagerDuty integration, please log into
+        {{ site_name }}:</p>'''
+de = '''
+ist ein <strong>kostenloser</strong> <a href="https://github.com/healthchecks/healthchecks">Open-Source</a>-Dienst zur Überwachung von Cron-Jobs, Hintergrundprozessen und geplanten Aufgaben. Melde dich bei {{ site_name }} an, bevor du die PagerDuty-Integration hinzufügst:</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+anzahl = 1
+en = '''
+After logging in, go
+                    {% endif %}'''
+de = '''
+Öffne nach der Anmeldung{% endif %}'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+anzahl = 1
+en = '''
+to the <strong>Integrations</strong> page,
+                    and click on <strong>Add Integration</strong> next to the
+                    PagerDuty integration.'''
+de = '''
+die Seite <strong>Integrationen</strong> und klick neben PagerDuty auf <strong>Integration hinzufügen</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+anzahl = 1
+en = '''
+And that is all! You will then be redirected back to
+                "Integrations" page on {{ site_name }} and see
+                the new integration!'''
+de = '''
+Das war es schon. Du kommst zurück auf die Seite „Integrationen“ von {{ site_name }} und siehst dort die neue Integration.'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+anzahl = 1
+en = '''
+If your team uses <a href="https://www.pagerduty.com/">PagerDuty</a>,
+        you can set up {{ site_name }} to create a PagerDuty incident
+        when a check goes down, and resolve it when a check goes back up.'''
+de = '''
+Nutzt dein Team <a href="https://www.pagerduty.com/">PagerDuty</a>, legt {{ site_name }} dort einen Incident an, wenn ein Check ausfällt, und schließt ihn, wenn der Check wieder in Ordnung ist.'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+anzahl = 1
+en = '''
+Log into your PagerDuty account,
+                go to <strong>Configuration &gt; Services</strong>,
+                and click on <strong>New Service</strong>.'''
+de = '''
+Melde dich bei PagerDuty an, öffne <strong>Configuration &gt; Services</strong> und klick auf <strong>New Service</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+anzahl = 1
+en = '''
+Give it a descriptive name, and
+                for Integration Type select
+                <strong>Use our API directly</strong>.'''
+de = '''
+Gib dem Service einen aussagekräftigen Namen und wähl als Integration Type <strong>Use our API directly</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+anzahl = 1
+en = '''
+After adding the new service, take note of its
+            <strong>Integration Key</strong>, a long string
+            of letters and digits.'''
+de = '''
+Notier dir danach den <strong>Integration Key</strong> des neuen Service, eine lange Folge aus Buchstaben und Ziffern.'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+anzahl = 1
+en = '''
+<p>If your team uses <a href="https://chat.google.com/">Google Chat</a>, you can set
+        up {{ site_name }} to post alerts directly to an appropriate
+        Google Chat space when a check goes <strong>up</strong>
+            or <strong>down</strong>.'''
+de = '''
+<p>Nutzt dein Team <a href="https://chat.google.com/">Google Chat</a>, schickt {{ site_name }} Alarme direkt in einen passenden Google-Chat-Bereich, wenn ein Check <strong>ausfällt</strong> oder <strong>wieder in Ordnung</strong> ist.'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+anzahl = 1
+en = '''
+is a free and
+            <a href="https://github.com/healthchecks/healthchecks">open source</a>
+            service for monitoring <strong>cron jobs</strong>, <strong>background processes</strong> and
+            <strong>scheduled tasks</strong>. When {% site_name %} detects a problem, it can notify
+            you by posting to a Google Chat space. To set up the Google Chat
+            integration, please log into {{ site_name }}:'''
+de = '''
+ist ein kostenloser <a href="https://github.com/healthchecks/healthchecks">Open-Source</a>-Dienst zur Überwachung von <strong>Cron-Jobs</strong>, <strong>Hintergrundprozessen</strong> und <strong>geplanten Aufgaben</strong>. Erkennt {% site_name %} ein Problem, meldet es sich in einem Google-Chat-Bereich. Melde dich bei {{ site_name }} an, um die Google-Chat-Integration einzurichten:'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+anzahl = 1
+en = '''
+From a browser, log into your Google Chat account, and go to the space
+                where you want to post {% site_name %} notifications.'''
+de = '''
+Melde dich im Browser bei Google Chat an und öffne den Bereich, in dem {% site_name %} Benachrichtigungen posten soll.'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+anzahl = 1
+en = '''
+Next to the space title, click the down arrow, and then click <strong>Apps & integrations</strong>.'''
+de = '''
+Klick neben dem Namen des Bereichs auf den Pfeil nach unten und dann auf <strong>Apps & integrations</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+anzahl = 1
+en = '''
+Click <strong>+ Add webhooks</strong>.'''
+de = '''
+Klick auf <strong>+ Add webhooks</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+anzahl = 1
+en = '''
+In the <strong>Name</strong> field, enter
+                <strong>{% site_name %}</strong>.'''
+de = '''
+Trag im Feld <strong>Name</strong> <strong>{% site_name %}</strong> ein.'''
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+anzahl = 1
+en = '''
+Click <strong>Save</strong>.'''
+de = '''
+Klick auf <strong>Save</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+anzahl = 1
+en = '''
+is an open-source, self-hosted
+        push notification service. If you use or plan on using Gotify,
+        you can can integrate it with your {{ site_name }} account in few simple steps.'''
+de = '''
+ist ein selbst betriebener Open-Source-Dienst für Push-Benachrichtigungen. Nutzt du Gotify oder hast es vor, verbindest du es in wenigen Schritten mit deinem Konto bei {{ site_name }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+anzahl = 1
+en = '''
+Log into your Gotify instance, go to
+                    <strong>Apps</strong>, and create a new application.'''
+de = '''
+Melde dich bei deiner Gotify-Instanz an, öffne <strong>Apps</strong> und leg eine neue Anwendung an.'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+anzahl = 1
+en = '''
+Pick a descriptive name and short description.
+                    After creating the app, you can also upload an icon for it
+                    (feel free to use <a href="{% absolute_site_logo_url %}">this one</a>).'''
+de = '''
+Wähl einen aussagekräftigen Namen und eine kurze Beschreibung. Danach kannst du auch ein Symbol hochladen (gern <a href="{% absolute_site_logo_url %}">dieses</a>).'''
+
+[[quelltext]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+anzahl = 1
+en = '''
+After you have created the application, copy its
+                    <strong>Token</strong>.'''
+de = '''
+Kopier danach das <strong>Token</strong> der Anwendung.'''
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/templates/ntfy_form.html"
+anzahl = 1
+en = '''
+is is a simple HTTP-based pub-sub
+            notification service. If you use or plan on using ntfy,
+            you can can integrate it with your {{ site_name }} account in few simple steps.'''
+de = '''
+ist ein einfacher Benachrichtigungsdienst nach dem Pub-Sub-Prinzip über HTTP. Nutzt du ntfy oder hast es vor, verbindest du es in wenigen Schritten mit deinem Konto bei {{ site_name }}.'''
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/templates/ntfy_form.html"
+anzahl = 1
+en = '''
+ntfy server's root URL, <em>without</em> the topic name.'''
+de = '''
+Grundadresse des ntfy-Servers, <em>ohne</em> den Namen des Themas.'''
+
+[[quelltext]]
+datei = "hc/integrations/github/templates/add_github.html"
+anzahl = 1
+en = '''
+<p>With this integration, {% site_name %} will create an issue in your chosen
+            GitHub repository when a check goes down.'''
+de = '''
+<p>Mit dieser Integration legt {% site_name %} ein Issue im gewählten GitHub-Repository an, wenn ein Check ausfällt.'''
+
+[[quelltext]]
+datei = "hc/integrations/github/templates/add_github_form.html"
+anzahl = 1
+en = '''
+When a check goes down, {% site_name %} will create a new issue
+                    in this repository.<br>
+                    If you do not see the repository you are looking for,
+                    make sure {% site_name %} GitHub app is installed
+                    in the repository owner's GitHub account.
+                    <a href="{{ install_url }}">Install…</a>'''
+de = '''
+Fällt ein Check aus, legt {% site_name %} in diesem Repository ein neues Issue an.<br>
+                    Fehlt das gesuchte Repository, prüf, ob die GitHub-App von {% site_name %} im GitHub-Konto des Repository-Eigentümers installiert ist.
+                    <a href="{{ install_url }}">Installieren…</a>'''
+
+[[quelltext]]
+datei = "hc/integrations/github/templates/add_github_form.html"
+anzahl = 1
+en = '''
+{% site_name %} will attach these labels to the issues it creates.'''
+de = '''
+{% site_name %} versieht neue Issues mit diesen Labels.'''
+
+[[quelltext]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+anzahl = 1
+en = '''
+<p>If you are using <a href="https://spike.sh">Spike.sh</a>,
+            you can set up {{ site_name }} to create a Spike.sh incident when a check
+            goes down, and resolve it when a check goes back up.</p>'''
+de = '''
+<p>Nutzt du <a href="https://spike.sh">Spike.sh</a>, legt {{ site_name }} dort einen Incident an, wenn ein Check ausfällt, und schließt ihn, wenn der Check wieder in Ordnung ist.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+anzahl = 1
+en = '''
+Log into your Spike.sh account and go to
+                    <strong>Integrations › New integration</strong>.
+                    Select "Healthchecks" and click "Next".'''
+de = '''
+Melde dich bei Spike.sh an und öffne <strong>Integrations › New integration</strong>. Wähl „Healthchecks“ und klick auf „Next“.'''
+
+[[quelltext]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+anzahl = 1
+en = '''
+Give the integration a descriptive <strong>name</strong> and select
+                    the Spike.sh <strong>service</strong> to add it to.'''
+de = '''
+Gib der Integration einen aussagekräftigen <strong>name</strong> und wähl den Spike.sh-<strong>service</strong>, zu dem sie gehört.'''
+
+[[quelltext]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+anzahl = 1
+en = '''
+In the following step, create or select an existing
+                    <strong>escalation policy</strong> to associate with the
+                    integration.'''
+de = '''
+Leg im nächsten Schritt eine <strong>escalation policy</strong> an oder wähl eine bestehende für die Integration.'''
+
+[[quelltext]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+anzahl = 1
+en = '''
+After you have created the integration, click on
+                    <strong>Copy Webhook</strong>.'''
+de = '''
+Klick nach dem Anlegen auf <strong>Copy Webhook</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+anzahl = 1
+en = '''
+<p>If your team uses <a href="https://pagertree.com">PagerTree</a>,
+      you can set up {{ site_name }} to create a PagerTree alert when
+      a check goes down, and resolve it when a check goes back up.</p>'''
+de = '''
+<p>Nutzt dein Team <a href="https://pagertree.com">PagerTree</a>, legt {{ site_name }} dort einen Alarm an, wenn ein Check ausfällt, und schließt ihn, wenn der Check wieder in Ordnung ist.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+anzahl = 1
+en = '''
+Log into your PagerTree account, navigate to the <a href="https://app.pagertree.com/integrations?direction=asc&limit=10&sort=tiny_id" target="_blank">Integrations page</a>.
+                Then click the <strong>New Integration</strong> button and
+                select the <strong>Healthchecks</strong> logo.'''
+de = '''
+Melde dich bei PagerTree an und öffne die <a href="https://app.pagertree.com/integrations?direction=asc&limit=10&sort=tiny_id" target="_blank">Integrations-Seite</a>. Klick dann auf <strong>New Integration</strong> und wähl das Logo von <strong>Healthchecks</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+anzahl = 1
+en = '''
+In the New Integration Form, fill out the details with appropriate values. Then click the <strong>Create</strong> button.'''
+de = '''
+Füll das Formular „New Integration“ passend aus und klick auf <strong>Create</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+anzahl = 1
+en = '''
+Copy the <strong>Endpoint URL</strong> and paste it
+                in the form below.
+                Save the integration, and you are done!'''
+de = '''
+Kopier die <strong>Endpoint URL</strong> und füge sie unten ein. Integration speichern, fertig.'''
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+anzahl = 1
+en = '''
+provides
+    alerting, on-call scheduling, escalation policies, and incident tracking.
+    You can integrate it with your {{ site_name }} account in a few
+    simple steps.</p>'''
+de = '''
+bietet Alarmierung, Bereitschaftspläne, Eskalationsregeln und Incident-Tracking. Mit wenigen Schritten verbindest du es mit deinem Konto bei {{ site_name }}.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+anzahl = 1
+en = '''
+Log into your Opsgenie account,
+                select a team, and go to the team's
+                <strong>Integrations</strong> page and click
+                <strong>Add integration</strong>.'''
+de = '''
+Melde dich bei Opsgenie an, wähl ein Team, öffne dessen Seite <strong>Integrations</strong> und klick auf <strong>Add integration</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+anzahl = 1
+en = '''
+Select <strong>API</strong> in the grid of offered integration types.'''
+de = '''
+Wähl in der Übersicht der Integrationsarten <strong>API</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+anzahl = 1
+en = '''
+<p>Copy the displayed API key, then click on
+               <strong>Turn on integration</strong>.'''
+de = '''
+<p>Kopier den angezeigten API-Schlüssel und klick dann auf <strong>Turn on integration</strong>.'''
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+anzahl = 1
+en = '''
+<p>Paste the API key in the form below, and make sure the correct
+                <strong>service region</strong> is selected.
+                Save the integration, and you are done!'''
+de = '''
+<p>Füge den API-Schlüssel unten ein und prüf, ob die richtige <strong>Region</strong> gewählt ist. Integration speichern, fertig.'''
+
+[[quelltext]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+anzahl = 1
+en = '''
+provides a
+          <a href="https://prometheus.io">Prometheus</a>-compatible metrics endpoint
+          for each project. The endpoints are secured using each project's
+          read-only API key.
+
+          If your team uses Prometheus, you can configure it to scrape {{ site_name }}
+          and have up-to-date check and tag status values available in Prometheus.'''
+de = '''
+bietet für jedes Projekt einen Endpunkt für Metriken im Format von <a href="https://prometheus.io">Prometheus</a>. Die Endpunkte sind mit dem API-Schlüssel (nur lesen) des Projekts geschützt. Nutzt dein Team Prometheus, kann es {{ site_name }} abfragen und hat die Zustände von Checks und Tags stets aktuell.'''
+
+[[quelltext]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+anzahl = 1
+en = '''
+Create a read-only API key in
+                    <strong>Project Settings › API Access</strong>.
+                </p>
+                <p>
+                    Note: make sure to use a <strong>read-only</strong> API key.
+                    Prometheus does not need read-write API access.'''
+de = '''
+Leg unter <strong>Projekteinstellungen › API-Zugang</strong> einen API-Schlüssel (nur lesen) an. Nimm unbedingt einen Schlüssel <strong>nur zum Lesen</strong>; Prometheus braucht keinen Schreibzugriff.'''
+
+[[quelltext]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+anzahl = 1
+en = '''
+Edit Prometheus configuration and add a new section in the
+                    <code>scrape_configs</code> section.'''
+de = '''
+Ergänze in der Konfiguration von Prometheus einen neuen Abschnitt unter <code>scrape_configs</code>.'''
+
+[[quelltext]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+anzahl = 1
+en = '''
+<strong>Note for Grafana Cloud users:</strong> Grafana Cloud
+                    requires the metrics endpoints to be authenticated using either
+                    HTTP "Basic" or "Bearer" authentication scheme. It refuses to
+                    scrape public endpoints. To fulfil this requirement,
+                    {% site_name %} provides an alternate metrics endpoint which
+                    requires "Bearer" authentication. Use the following settings
+                    with Grafana Cloud:'''
+de = '''
+<strong>Hinweis für Grafana Cloud:</strong> Grafana Cloud verlangt für Metrik-Endpunkte eine Anmeldung per HTTP „Basic“ oder „Bearer“ und fragt öffentliche Endpunkte nicht ab. Dafür bietet {% site_name %} einen zweiten Endpunkt mit „Bearer“-Anmeldung. Diese Einstellungen gelten für Grafana Cloud:'''
+
+[[quelltext]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+anzahl = 1
+en = '''
+Reload Prometheus' configuration. You should now start seeing
+                {{ site_name }} data appear in Prometheus.'''
+de = '''
+Lade die Konfiguration von Prometheus neu. Danach erscheinen die Daten von {{ site_name }} in Prometheus.'''
+
+[[quelltext]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+anzahl = 1
+en = '''
+<p>Executes a local shell command when a check
+        goes up or down.</p>'''
+de = '''
+<p>Führt einen Shell-Befehl auf dem Server aus, wenn ein Check ausfällt oder wieder in Ordnung ist.</p>'''
+
+[[quelltext]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+anzahl = 1
+en = '''
+You can use placeholders <strong>$NAME</strong>, <strong>$STATUS</strong>
+            and others
+            <a href="#" data-toggle="modal" data-target="#reference-modal">(quick reference)</a>.'''
+de = '''
+Du kannst Platzhalter wie <strong>$NAME</strong> und <strong>$STATUS</strong> nutzen <a href="#" data-toggle="modal" data-target="#reference-modal">(Übersicht)</a>.'''
+
+[[quelltext]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+anzahl = 1
+en = '''
+Execute when a check goes <span class="label-down">down</span>'''
+de = '''
+Ausführen, wenn ein Check <span class="label-down">ausfällt</span>'''
+
+[[quelltext]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+anzahl = 1
+en = '''
+Execute when a check goes <span class="label-up">up</span>'''
+de = '''
+Ausführen, wenn ein Check <span class="label-up">wieder in Ordnung</span> ist'''
+
+[[quelltext]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+anzahl = 1
+en = '''
+You can use the below placeholders in the command.
+                    {{ site_name }} will replace the placeholders
+                    with the correct values.'''
+de = '''
+Diese Platzhalter kannst du im Befehl nutzen. {{ site_name }} setzt die passenden Werte ein.'''
+
+[[quelltext]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+anzahl = 1
+en = '''
+Current UTC time in ISO8601 format.<br />
+                            Example: "{% now_isoformat %}"'''
+de = '''
+Aktuelle Zeit in UTC im Format ISO 8601.<br />
+                            Beispiel: „{% now_isoformat %}“'''
+
+[[quelltext]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+anzahl = 1
+en = '''
+Check's current status ("up" or "down")'''
+de = '''
+Aktueller Zustand des Checks („up“ oder „down“)'''
+
+[[quelltext]]
+datei = "hc/integrations/trello/templates/add_trello.html"
+anzahl = 1
+en = '''
+With this integration, {{ site_name }} will create a
+            <a href="https://trello.com/">Trello</a> card each
+            time a check goes down.'''
+de = '''
+Mit dieser Integration legt {{ site_name }} eine <a href="https://trello.com/">Trello</a>-Karte an, jedes Mal, wenn ein Check ausfällt.'''
+
+[[text]]
+datei = "*"
+en = "All the other checks are up."
+de = "Alle anderen Checks sind in Ordnung."
+
+[[text]]
+datei = "*"
+en = "Total Pings:"
+de = "Pings gesamt:"
+
+[[text]]
+datei = "*"
+en = "Last Ping Body:"
+de = "Inhalt des letzten Pings:"
+
+[[text]]
+datei = "*"
+en = "**Project:**"
+de = "**Projekt:**"
+
+[[text]]
+datei = "*"
+en = "**Tags:**"
+de = "**Tags:**"
+
+[[text]]
+datei = "*"
+en = "**Period:**"
+de = "**Intervall:**"
+
+[[text]]
+datei = "*"
+en = "**Schedule:** `"
+de = "**Zeitplan:** `"
+
+[[text]]
+datei = "*"
+en = "**Time Zone:**"
+de = "**Zeitzone:**"
+
+[[text]]
+datei = "*"
+en = "**Total Pings:**"
+de = "**Pings gesamt:**"
+
+[[text]]
+datei = "*"
+en = "**Last Ping:**"
+de = "**Letzter Ping:**"
+
+[[text]]
+datei = "*"
+en = "**Last Ping:** Never"
+de = "**Letzter Ping:** Nie"
+
+[[text]]
+datei = "*"
+en = "**Last Ping Body:**"
+de = "**Inhalt des letzten Pings:**"
+
+[[text]]
+datei = "*"
+en = "Integration for GitHub"
+de = "Integration für GitHub"
+
+[[text]]
+datei = "*"
+en = "Integration for Slack"
+de = "Integration für Slack"
+
+[[text]]
+datei = "*"
+en = "Setup Guide"
+de = "Anleitung"
+
+[[text]]
+datei = "*"
+en = "Screenshot"
+de = "Bildschirmfoto"
+
+[[text]]
+datei = "*"
+en = "Notify When"
+de = "Benachrichtigen, wenn"
+
+[[text]]
+datei = "*"
+en = "Paid plan required."
+de = "Nur mit bezahltem Tarif."
+
+[[text]]
+datei = "*"
+en = "Alice's Phone"
+de = "Handy von Alex"
+
+[[text]]
+datei = "*"
+en = "+1234567890"
+de = "+491701234567"
+
+[[text]]
+datei = "*"
+en = "Save the integration, and it's done!"
+de = "Integration speichern, fertig."
+
+[[text]]
+datei = "*"
+en = "Save the integration, and you are all set!"
+de = "Integration speichern, fertig."
+
+[[text]]
+datei = "hc/integrations/zulip/templates/zulip_content.html"
+en = "--- **Description**"
+de = "--- **Beschreibung**"
+
+[[text]]
+datei = "hc/integrations/trello/templates/trello_desc.html"
+en = "never"
+de = "nie"
+
+[[text]]
+datei = "hc/integrations/trello/templates/trello_desc.html"
+en = "` **Time Zone:**"
+de = "` **Zeitzone:**"
+
+[[text]]
+datei = "hc/integrations/apprise/templates/add_apprise.html"
+en = "Apprise Integration for"
+de = "Apprise-Integration für"
+
+[[text]]
+datei = "hc/integrations/apprise/templates/add_apprise.html"
+en = "Apprise"
+de = "Apprise"
+
+[[text]]
+datei = "hc/integrations/apprise/templates/add_apprise.html"
+en = "Apprise URL"
+de = "Apprise-Adresse"
+
+[[text]]
+datei = "hc/integrations/discord/templates/add_discord.html"
+en = "Discord Integration for"
+de = "Discord-Integration für"
+
+[[text]]
+datei = "hc/integrations/discord/templates/add_discord.html"
+en = "Discord"
+de = "Discord"
+
+[[text]]
+datei = "hc/integrations/discord/templates/add_discord.html"
+en = "Connect Discord"
+de = "Mit Discord verbinden"
+
+[[text]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+en = "Google Chat Integration for"
+de = "Google-Chat-Integration für"
+
+[[text]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+en = "Google Chat"
+de = "Google Chat"
+
+[[text]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+en = "Copy the the webhook URL and paste it in the form. Done!"
+de = "Kopier die Webhook-Adresse und füge sie ins Formular ein. Fertig."
+
+[[text]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+en = "Apps & integrations"
+de = "Apps & integrations"
+
+[[text]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+en = "+ Add webhooks"
+de = "+ Add webhooks"
+
+[[text]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+en = "Name"
+de = "Name"
+
+[[text]]
+datei = "hc/integrations/googlechat/templates/add_googlechat.html"
+en = "Save"
+de = "Save"
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Gotify Integration for"
+de = "Gotify-Integration für"
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Gotify"
+de = "Gotify"
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Click create integration button"
+de = "Knopf zum Anlegen der Anwendung"
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Create Healthchecks.io integration with details"
+de = "Anwendung mit Angaben anlegen"
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Enter the URL of your Gotify server, and the application token in the form below. Save the integration, and you are done!"
+de = "Trag unten die Adresse deines Gotify-Servers und das Token der Anwendung ein. Integration speichern, fertig."
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Gotify Server URL"
+de = "Adresse des Gotify-Servers"
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Application Token"
+de = "Token der Anwendung"
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Priority for \"down\" events"
+de = "Priorität bei Ausfall"
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Priority for \"up\" events"
+de = "Priorität, wenn wieder in Ordnung"
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Apps"
+de = "Apps"
+
+[[text]]
+datei = "hc/integrations/gotify/templates/gotify_form.html"
+en = "Token"
+de = "Token"
+
+[[text]]
+datei = "hc/integrations/group/templates/group_form.html"
+en = "Group Integration for"
+de = "Gruppen-Integration für"
+
+[[text]]
+datei = "hc/integrations/group/templates/group_form.html"
+en = "Group"
+de = "Gruppe"
+
+[[text]]
+datei = "hc/integrations/group/templates/group_form.html"
+en = "Dispatch a notification to multiple integrations at once."
+de = "Schickt eine Benachrichtigung an mehrere Integrationen auf einmal."
+
+[[text]]
+datei = "hc/integrations/group/templates/group_form.html"
+en = "VIP group"
+de = "VIP-Gruppe"
+
+[[text]]
+datei = "hc/integrations/group/templates/group_form.html"
+en = "Optional. If you add multiple groups, the labels will help you tell them apart."
+de = "Optional. Bei mehreren Gruppen hilft die Bezeichnung, sie auseinanderzuhalten."
+
+[[text]]
+datei = "hc/integrations/group/templates/group_form.html"
+en = "unnamed"
+de = "unbenannt"
+
+[[text]]
+datei = "hc/integrations/group/templates/group_form.html"
+en = "Save Group"
+de = "Gruppe speichern"
+
+[[text]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+en = "Matrix Integration for"
+de = "Matrix-Integration für"
+
+[[text]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+en = "Matrix"
+de = "Matrix"
+
+[[text]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+en = "Enter the Published Address or the Internal Room ID in the form below and save the integration."
+de = "Trag die Published Address oder die Internal Room ID unten ein und speichere die Integration."
+
+[[text]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+en = "Address or Internal ID"
+de = "Adresse oder interne ID"
+
+[[text]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+en = "#alias:matrix.org"
+de = "#alias:matrix.org"
+
+[[text]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+en = "Room Settings › General"
+de = "Room Settings › General"
+
+[[text]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+en = "Published Address"
+de = "Published Address"
+
+[[text]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+en = "Internal Room ID"
+de = "Internal Room ID"
+
+[[text]]
+datei = "hc/integrations/matrix/templates/add_matrix.html"
+en = "Room Settings › Advanced"
+de = "Room Settings › Advanced"
+
+[[text]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+en = "Mattermost Integration for"
+de = "Mattermost-Integration für"
+
+[[text]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+en = "Mattermost"
+de = "Mattermost"
+
+[[text]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+en = "Fill in the form and hit \"Save\"."
+de = "Füll das Formular aus und klick auf „Save“."
+
+[[text]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+en = "Incoming Webhook"
+de = "Incoming Webhook"
+
+[[text]]
+datei = "hc/integrations/mattermost/templates/add_mattermost.html"
+en = "Add Incoming Webhook"
+de = "Add Incoming Webhook"
+
+[[text]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+en = "Microsoft Teams Integration for"
+de = "Microsoft-Teams-Integration für"
+
+[[text]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+en = "Microsoft Teams"
+de = "Microsoft Teams"
+
+[[text]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+en = "Add the Incoming Webhook connector"
+de = "Den Connector für eingehende Webhooks hinzufügen"
+
+[[text]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+en = "Give the new workflow a descriptive name."
+de = "Gib dem neuen Workflow einen aussagekräftigen Namen."
+
+[[text]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+en = "Select the channel"
+de = "Kanal auswählen"
+
+[[text]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+en = "Copy the Webhook URL"
+de = "Webhook-Adresse kopieren"
+
+[[text]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+en = "Workflows"
+de = "Workflows"
+
+[[text]]
+datei = "hc/integrations/msteamsw/templates/add_msteams.html"
+en = "\"Post to a channel when a webhook request is received\""
+de = "\"Post to a channel when a webhook request is received\""
+
+[[text]]
+datei = "hc/integrations/ntfy/templates/ntfy_form.html"
+en = "ntfy Integration for"
+de = "ntfy-Integration für"
+
+[[text]]
+datei = "hc/integrations/ntfy/templates/ntfy_form.html"
+en = "ntfy"
+de = "ntfy"
+
+[[text]]
+datei = "hc/integrations/ntfy/templates/ntfy_form.html"
+en = "Topic"
+de = "Thema"
+
+[[text]]
+datei = "hc/integrations/ntfy/templates/ntfy_form.html"
+en = "Server URL"
+de = "Adresse des Servers"
+
+[[text]]
+datei = "hc/integrations/ntfy/templates/ntfy_form.html"
+en = "Access Token"
+de = "Zugangstoken"
+
+[[text]]
+datei = "hc/integrations/ntfy/templates/ntfy_form.html"
+en = "If publishing to the topic requires an access token, specify it here."
+de = "Braucht das Thema ein Zugangstoken zum Veröffentlichen, trag es hier ein."
+
+[[text]]
+datei = "hc/integrations/ntfy/templates/ntfy_form.html"
+en = "Priority for \"down\" events"
+de = "Priorität bei Ausfall"
+
+[[text]]
+datei = "hc/integrations/ntfy/templates/ntfy_form.html"
+en = "Priority for \"up\" events"
+de = "Priorität, wenn wieder in Ordnung"
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "Opsgenie Integration for"
+de = "Opsgenie-Integration für"
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "Opsgenie"
+de = "Opsgenie"
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "Give the integration a descriptive name."
+de = "Gib der Integration einen aussagekräftigen Namen."
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "API Key"
+de = "API-Schlüssel"
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "Region"
+de = "Region"
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "US (default)"
+de = "US (Vorgabe)"
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "EU"
+de = "EU"
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "Integrations"
+de = "Integrations"
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "Add integration"
+de = "Add integration"
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "API"
+de = "API"
+
+[[text]]
+datei = "hc/integrations/opsgenie/templates/add_opsgenie.html"
+en = "Turn on integration"
+de = "Turn on integration"
+
+[[text]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+en = "PagerTree Integration for"
+de = "PagerTree-Integration für"
+
+[[text]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+en = "PagerTree"
+de = "PagerTree"
+
+[[text]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+en = "Click create integration button"
+de = "Knopf zum Anlegen der Integration"
+
+[[text]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+en = "Create Healthchecks.io integration with details"
+de = "Integration mit Angaben anlegen"
+
+[[text]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+en = "Copy the Webhook URL"
+de = "Webhook-Adresse kopieren"
+
+[[text]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+en = "Endpoint"
+de = "Endpunkt"
+
+[[text]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+en = "New Integration"
+de = "New Integration"
+
+[[text]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+en = "Healthchecks"
+de = "Healthchecks"
+
+[[text]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+en = "Create"
+de = "Create"
+
+[[text]]
+datei = "hc/integrations/pagertree/templates/add_pagertree.html"
+en = "Endpoint URL"
+de = "Endpoint URL"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+en = "PagerDuty Integration for"
+de = "PagerDuty-Integration für"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+en = "PagerDuty"
+de = "PagerDuty"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+en = "Paste the Integration Key down below. Save the integration, and it's done!"
+de = "Füge den Integration Key unten ein. Integration speichern, fertig."
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+en = "Integration Key"
+de = "Integration Key"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+en = "Configuration &gt; Services"
+de = "Configuration &gt; Services"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+en = "New Service"
+de = "New Service"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd.html"
+en = "Use our API directly"
+de = "Use our API directly"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+en = "PagerDuty Integration for"
+de = "PagerDuty-Integration für"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+en = "PagerDuty"
+de = "PagerDuty"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+en = "Connect PagerDuty"
+de = "Mit PagerDuty verbinden"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+en = "Go"
+de = "Öffne"
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+en = "Click on \"Connect PagerDuty\", and you will be asked to log into your PagerDuty account."
+de = "Klick auf „Mit PagerDuty verbinden“ und melde dich bei PagerDuty an."
+
+[[text]]
+datei = "hc/integrations/pd/templates/add_pd_simple.html"
+en = "Next, PagerDuty will let set the services for this integration."
+de = "Danach legst du bei PagerDuty die Services für diese Integration fest."
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Pushover Integration for"
+de = "Pushover-Integration für"
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Pushover"
+de = "Pushover"
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Priority for \"down\" events"
+de = "Priorität bei Ausfall"
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Priority for \"up\" events"
+de = "Priorität, wenn wieder in Ordnung"
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Disabled: Does not notify about Down events."
+de = "Aus: keine Benachrichtigung bei Ausfall."
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Disabled: Does not notify about Up events."
+de = "Aus: keine Benachrichtigung, wenn ein Check wieder in Ordnung ist."
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Lowest Priority: Generates no notification on your device."
+de = "Niedrigste Priorität: keine Benachrichtigung auf dem Gerät."
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Lowest priority: Generates no notification on your device."
+de = "Niedrigste Priorität: keine Benachrichtigung auf dem Gerät."
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Low Priority: Sends a quiet notification."
+de = "Niedrige Priorität: leise Benachrichtigung."
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Low priority: Sends a quiet notification."
+de = "Niedrige Priorität: leise Benachrichtigung."
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Normal Priority:"
+de = "Normale Priorität:"
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Normal priority:"
+de = "Normale Priorität:"
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "High Priority: Bypasses user's quiet hours."
+de = "Hohe Priorität: auch während der Ruhezeiten."
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "High priority: Bypasses user's quiet hours."
+de = "Hohe Priorität: auch während der Ruhezeiten."
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover.html"
+en = "Subscribe with Pushover"
+de = "Mit Pushover abonnieren"
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+en = "Pushover Integration for"
+de = "Pushover-Integration für"
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+en = "Pushover"
+de = "Pushover"
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+en = "Go"
+de = "Öffne"
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+en = "Pushover supports different notification priorities from silent to \"Emergency\". Select your preferred priorities and click \"Subscribe with Pushover\"."
+de = "Pushover kennt verschiedene Prioritäten, von lautlos bis „Emergency“. Wähl deine Prioritäten und klick auf „Mit Pushover abonnieren“."
+
+[[text]]
+datei = "hc/integrations/po/templates/add_pushover_help.html"
+en = "pushover.net"
+de = "pushover.net"
+
+[[text]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+en = "Prometheus Integration for"
+de = "Prometheus-Integration für"
+
+[[text]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+en = "Prometheus"
+de = "Prometheus"
+
+[[text]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+en = "Click create integration button"
+de = "Bildschirmfoto"
+
+[[text]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+en = "Scrape Job URL:"
+de = "Scrape Job URL:"
+
+[[text]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+en = "Authentication type: Bearer"
+de = "Authentication type: Bearer"
+
+[[text]]
+datei = "hc/integrations/prometheus/templates/add_prometheus.html"
+en = "Bearer token: the read-only API key"
+de = "Bearer token: der API-Schlüssel (nur lesen)"
+
+[[text]]
+datei = "hc/integrations/pushbullet/templates/add_pushbullet.html"
+en = "Pushbullet Integration for"
+de = "Pushbullet-Integration für"
+
+[[text]]
+datei = "hc/integrations/pushbullet/templates/add_pushbullet.html"
+en = "Pushbullet"
+de = "Pushbullet"
+
+[[text]]
+datei = "hc/integrations/pushbullet/templates/add_pushbullet.html"
+en = "Connect Pushbullet"
+de = "Mit Pushbullet verbinden"
+
+[[text]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+en = "Rocket.Chat Integration for"
+de = "Rocket.Chat-Integration für"
+
+[[text]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+en = "Rocket.Chat"
+de = "Rocket.Chat"
+
+[[text]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+en = "Administration"
+de = "Administration"
+
+[[text]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+en = "Workspace"
+de = "Workspace"
+
+[[text]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+en = "\"+New\""
+de = "\"+New\""
+
+[[text]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+en = "Incoming"
+de = "Incoming"
+
+[[text]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+en = "Enabled"
+de = "Enabled"
+
+[[text]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+en = "Name:"
+de = "Name:"
+
+[[text]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+en = "Post to Channel:"
+de = "Post to Channel:"
+
+[[text]]
+datei = "hc/integrations/rocketchat/templates/add_rocketchat.html"
+en = "Post as:"
+de = "Post as:"
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "Spike.sh Integration for"
+de = "Spike.sh-Integration für"
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "Spike.sh"
+de = "Spike.sh"
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "Click create integration button"
+de = "Knopf zum Anlegen der Integration"
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "Create Healthchecks.io integration with details"
+de = "Integration mit Angaben anlegen"
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "Copy the shown webhook URL and paste it in the form below. Save the integration, and you are done!"
+de = "Füge die kopierte Webhook-Adresse unten ein. Integration speichern, fertig."
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "Copy the Webhook URL"
+de = "Webhook-Adresse kopieren"
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "Integrations › New integration"
+de = "Integrations › New integration"
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "name"
+de = "name"
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "service"
+de = "service"
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "escalation policy"
+de = "escalation policy"
+
+[[text]]
+datei = "hc/integrations/spike/templates/add_spike.html"
+en = "Copy Webhook"
+de = "Copy Webhook"
+
+[[text]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+en = "Telegram Integration for"
+de = "Telegram-Integration für"
+
+[[text]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+en = "Telegram"
+de = "Telegram"
+
+[[text]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+en = "Connect Telegram"
+de = "Mit Telegram verbinden"
+
+[[text]]
+datei = "hc/integrations/telegram/templates/add_telegram.html"
+en = "The bot will respond with a confirmation link."
+de = "Der Bot antwortet mit einem Bestätigungslink."
+
+[[text]]
+datei = "hc/integrations/trello/templates/add_trello.html"
+en = "Trello Integration for"
+de = "Trello-Integration für"
+
+[[text]]
+datei = "hc/integrations/trello/templates/add_trello.html"
+en = "Trello"
+de = "Trello"
+
+[[text]]
+datei = "hc/integrations/trello/templates/add_trello.html"
+en = "Connect Trello"
+de = "Mit Trello verbinden"
+
+[[text]]
+datei = "hc/integrations/victorops/templates/add_victorops.html"
+en = "Splunk On-Call Integration for"
+de = "Splunk-On-Call-Integration für"
+
+[[text]]
+datei = "hc/integrations/victorops/templates/add_victorops.html"
+en = "Splunk On-Call (VictorOps)"
+de = "Splunk On-Call (VictorOps)"
+
+[[text]]
+datei = "hc/integrations/victorops/templates/add_victorops.html"
+en = "Splunk On-Call"
+de = "Splunk On-Call"
+
+[[text]]
+datei = "hc/integrations/victorops/templates/add_victorops.html"
+en = "Service API Endpoint"
+de = "Service API Endpoint"
+
+[[text]]
+datei = "hc/integrations/victorops/templates/add_victorops.html"
+en = "$routing_key"
+de = "$routing_key"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Zulip Integration for"
+de = "Zulip-Integration für"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Zulip"
+de = "Zulip"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "If you want to deliver notifications to an individual Zulip user, look up their email address in their Zulip user profile."
+de = "Sollen Benachrichtigungen an eine einzelne Person gehen, such ihre Mail-Adresse in ihrem Zulip-Profil."
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Fill in the form below, save the integration and you are done!"
+de = "Füll das Formular unten aus und speichere die Integration. Fertig."
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "The zuliprc File"
+de = "Die Datei zuliprc"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Invalid file format."
+de = "Das Dateiformat stimmt nicht. Lade die zuliprc-Datei des Bots hoch."
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Post To"
+de = "Senden an"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Channel"
+de = "Kanal"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Private user"
+de = "Einzelne Person"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "User's Email"
+de = "Mail-Adresse der Person"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Topic"
+de = "Thema"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "{{ site_name }} logo"
+de = "Logo von {{ site_name }}"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Personal settings"
+de = "Personal settings"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Bots › Add a new bot"
+de = "Bots › Add a new bot"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Bot type"
+de = "Bot type"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Add"
+de = "Add"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "Manage bot"
+de = "Manage bot"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "User ID"
+de = "User ID"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "alice@example.org"
+de = "alice@example.org"
+
+[[text]]
+datei = "hc/integrations/zulip/templates/add_zulip.html"
+en = "general"
+de = "general"
+
+[[text]]
+datei = "hc/integrations/email/templates/email_form.html"
+en = "Set Up Email Notifications -"
+de = "Mail-Benachrichtigungen einrichten -"
+
+[[text]]
+datei = "hc/integrations/email/templates/email_form.html"
+en = "Email Settings -"
+de = "Mail-Einstellungen -"
+
+[[text]]
+datei = "hc/integrations/email/templates/email_form.html"
+en = "Get an email message when check goes up or down."
+de = "Du bekommst eine Mail, wenn ein Check ausfällt oder wieder in Ordnung ist."
+
+[[text]]
+datei = "hc/integrations/email/templates/email_form.html"
+en = "Requires confirmation."
+de = "Bestätigung nötig."
+
+[[text]]
+datei = "hc/integrations/email/templates/email_form.html"
+en = "Ticketing system integrations: untick this and avoid creating new tickets when checks come back up."
+de = "Für Ticketsysteme: Ohne Haken entstehen keine neuen Tickets, wenn Checks wieder in Ordnung sind."
+
+[[text]]
+datei = "hc/integrations/sms/templates/sms_form.html"
+en = "Add SMS Integration -"
+de = "SMS-Integration hinzufügen -"
+
+[[text]]
+datei = "hc/integrations/sms/templates/sms_form.html"
+en = "SMS Settings -"
+de = "SMS-Einstellungen -"
+
+[[text]]
+datei = "hc/integrations/sms/templates/sms_form.html"
+en = "SMS"
+de = "SMS"
+
+[[text]]
+datei = "hc/integrations/sms/templates/sms_form.html"
+en = "Get a SMS message to the specified phone number when a check goes down."
+de = "Du bekommst eine SMS an die angegebene Nummer, wenn ein Check ausfällt."
+
+[[text]]
+datei = "hc/integrations/whatsapp/templates/whatsapp_form.html"
+en = "Add WhatsApp Integration -"
+de = "WhatsApp-Integration hinzufügen -"
+
+[[text]]
+datei = "hc/integrations/whatsapp/templates/whatsapp_form.html"
+en = "WhatsApp Settings -"
+de = "WhatsApp-Einstellungen -"
+
+[[text]]
+datei = "hc/integrations/whatsapp/templates/whatsapp_form.html"
+en = "WhatsApp"
+de = "WhatsApp"
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+en = "Add Signal Integration -"
+de = "Signal-Integration hinzufügen -"
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+en = "Signal Settings -"
+de = "Signal-Einstellungen -"
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+en = "Signal"
+de = "Signal"
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+en = "Get a Signal message when a check goes up or down."
+de = "Du bekommst eine Signal-Nachricht, wenn ein Check ausfällt oder wieder in Ordnung ist."
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+en = "+1234567890 or xyz.123"
+de = "+491701234567 oder xyz.123"
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+en = "Send Test Message!"
+de = "Testnachricht schicken"
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+en = "Please verify the number by sending a test message first."
+de = "Prüf die Nummer zuerst mit einer Testnachricht."
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_form.html"
+en = "Phone or Username"
+de = "Telefonnummer oder Nutzername"
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_result.html"
+en = "Success!"
+de = "Geschafft:"
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_result.html"
+en = "All good, the message was sent."
+de = "Die Nachricht ist verschickt."
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_result.html"
+en = "We hit a Signal rate-limit while sending the message."
+de = "Signal hat den Versand gebremst, das Limit für Nachrichten ist erreicht."
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_result.html"
+en = "Recipient not found."
+de = "Empfänger nicht gefunden."
+
+[[text]]
+datei = "hc/integrations/signal/templates/signal_result.html"
+en = "Please make sure you have entered the phone number correctly."
+de = "Prüf, ob die Telefonnummer stimmt, und versuch es noch einmal."
+
+[[text]]
+datei = "hc/integrations/call/templates/add_call.html"
+en = "Add Phone Call Integration -"
+de = "Anruf-Integration hinzufügen -"
+
+[[text]]
+datei = "hc/integrations/call/templates/add_call.html"
+en = "Phone Call"
+de = "Anruf"
+
+[[text]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+en = "Add to Slack"
+de = "Add to Slack"
+
+[[text]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+en = "Go"
+de = "Öffne"
+
+[[text]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+en = "Slack"
+de = "Slack"
+
+[[text]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+en = "would like access to"
+de = "would like access to"
+
+[[text]]
+datei = "hc/integrations/slack/templates/add_slack_btn.html"
+en = "TEAM NAME"
+de = "TEAM NAME"
+
+[[text]]
+datei = "hc/integrations/slack/templates/add_slack.html"
+en = "Slack"
+de = "Slack"
+
+[[text]]
+datei = "hc/integrations/slack/templates/add_slack.html"
+en = "Read Slack Instructions"
+de = "Anleitung von Slack lesen"
+
+[[text]]
+datei = "hc/integrations/slack/templates/add_slack.html"
+en = "Incoming Webhook"
+de = "Incoming Webhook"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Add Webhook Integration -"
+de = "Webhook-Integration hinzufügen -"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Webhook Settings -"
+de = "Webhook-Einstellungen -"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Webhook"
+de = "Webhook"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "The destination server does not return a complete response within 30 seconds."
+de = "Der Zielserver antwortet nicht innerhalb von 30 Sekunden vollständig."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "The HTTP response status code is not one of: 200, 201, 202 or 204."
+de = "Der Statuscode der Antwort ist weder 200, 201, 202 noch 204."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Give this integration a descriptive name, so you can easily recognize it later."
+de = "Gib der Integration einen aussagekräftigen Namen, damit du sie später schnell wiedererkennst."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "https://..."
+de = "https://..."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Request Body"
+de = "Inhalt der Anfrage"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Request Headers"
+de = "Header der Anfrage"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Optional \"Header-Name: value\" pairs, one pair per line."
+de = "Optional: Paare der Form „Header-Name: Wert“, eins pro Zeile."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Supported Placeholders"
+de = "Verfügbare Platzhalter"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "The UUID code of the check."
+de = "Die UUID des Checks."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Name of the check."
+de = "Name des Checks."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "But this would work:"
+de = "So klappt es:"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Check's slug."
+de = "Slug des Checks."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Check's tags, separated by spaces."
+de = "Tags des Checks, durch Leerzeichen getrennt."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Value of the first tag, the second tag, …"
+de = "Wert des ersten Tags, des zweiten Tags, …"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "The request body of the most recent ping. Works only in the webhook's \"Request Body\" field."
+de = "Inhalt des letzten Pings. Nur im Feld „Inhalt der Anfrage“ des Webhooks."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Same as $BODY, but encoded as JSON string."
+de = "Wie $BODY, als JSON-Zeichenkette."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "The exit status value of the most recent ping. Default value: \"-1\"."
+de = "Exit-Status des letzten Pings. Vorgabe: „-1“."
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "The resulting payload would be:"
+de = "Daraus wird:"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "$NAME"
+de = "$NAME"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "$STATUS"
+de = "$STATUS"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "GET"
+de = "GET"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "POST"
+de = "POST"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "PUT"
+de = "PUT"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "Get a Single Check"
+de = "Get a Single Check"
+
+[[text]]
+datei = "hc/integrations/webhook/templates/webhook_form.html"
+en = "{\"status\": \"$STATUS\"}"
+de = "{\"status\": \"$STATUS\"}"
+
+[[text]]
+datei = "hc/integrations/github/templates/add_github.html"
+en = "GitHub mark"
+de = "GitHub-Logo"
+
+[[text]]
+datei = "hc/integrations/github/templates/add_github.html"
+en = "Connect GitHub"
+de = "Mit GitHub verbinden"
+
+[[text]]
+datei = "hc/integrations/github/templates/add_github_form.html"
+en = "Success, GitHub connected!"
+de = "Geschafft: GitHub ist verbunden."
+
+[[text]]
+datei = "hc/integrations/github/templates/add_github_form.html"
+en = "Repository"
+de = "Repository"
+
+[[text]]
+datei = "hc/integrations/github/templates/add_github_form.html"
+en = "Issue Labels"
+de = "Labels für Issues"
+
+[[text]]
+datei = "hc/integrations/github/templates/add_github_form.html"
+en = "Optional, separate multiple labels with commas."
+de = "Optional, mehrere Labels trennst du mit Kommas."
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "Add Shell Command -"
+de = "Shell-Befehl hinzufügen -"
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "Shell Command"
+de = "Shell-Befehl"
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "/home/user/notify.sh \"$NAME has gone down\""
+de = "/home/user/notify.sh \"$NAME ist ausgefallen\""
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "/home/user/notify.sh \"$NAME is back up\""
+de = "/home/user/notify.sh \"$NAME ist wieder in Ordnung\""
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "Supported Placeholders"
+de = "Verfügbare Platzhalter"
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "The UUID code of the check"
+de = "Die UUID des Checks"
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "Name of the check"
+de = "Name des Checks"
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "Check's tags, separated by spaces"
+de = "Tags des Checks, durch Leerzeichen getrennt"
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "Value of the first tag, the second tag, …"
+de = "Wert des ersten Tags, des zweiten Tags, …"
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "$NAME"
+de = "$NAME"
+
+[[text]]
+datei = "hc/integrations/shell/templates/add_shell.html"
+en = "$STATUS"
+de = "$STATUS"
+
+[[text]]
+datei = "hc/integrations/trello/templates/trello_settings.html"
+en = "Authentication successful!"
+de = "Anmeldung bei Trello hat geklappt."
+
+[[text]]
+datei = "hc/integrations/trello/templates/trello_settings.html"
+en = "Please select the Trello list to post notifications to:"
+de = "Wähl die Trello-Liste für die Benachrichtigungen:"
+
+[[text]]
+datei = "hc/integrations/trello/templates/trello_settings.html"
+en = "Post Notifications to"
+de = "Benachrichtigungen an"
+
+[[text]]
+datei = "hc/integrations/trello/templates/trello_settings.html"
+en = "Could not retrieve data from your Trello account. Received an unexpected response from Trello."
+de = "Die Daten aus deinem Trello-Konto ließen sich nicht abrufen, Trello hat unerwartet geantwortet. Versuch es später noch einmal."
+
+[[text]]
+datei = "hc/integrations/trello/templates/trello_settings.html"
+en = "Could not find any boards with lists in your Trello account. Are you logged in the correct Trello account?"
+de = "In deinem Trello-Konto gibt es keine Boards mit Listen. Prüf, ob du im richtigen Trello-Konto angemeldet bist."

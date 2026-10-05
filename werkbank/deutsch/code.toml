@@ -990,3 +990,532 @@ datei = "hc/api/models.py"
 anzahl = 1
 en = 'return "Success"'
 de = 'return "Erfolg"'
+
+# --- Alarme der Integrationen (hc/integrations/*/transport.py) ---------------------------------
+# Feldnamen, Knöpfe und Sätze, die Slack, Teams, Google Chat, Rocket.Chat, PagerDuty, Opsgenie,
+# ntfy und Pushover zeigen. Erzeugt mit artefakte/kq_transporte.py.
+
+[[quelltext]]
+datei = "hc/integrations/call/transport.py"
+anzahl = 1
+en = '"Twiml": f"<Response><Say>{escaped_message}</Say></Response>",'
+de = "\"Twiml\": f'<Response><Say language=\"de-DE\">{escaped_message}</Say></Response>',"
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/transport.py"
+anzahl = 1
+en = 'fields.add("Project", '
+de = 'fields.add("Projekt", '
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/transport.py"
+anzahl = 1
+en = 'fields.add("Period", '
+de = 'fields.add("Intervall", '
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/transport.py"
+anzahl = 1
+en = 'fields.add("Schedule", '
+de = 'fields.add("Zeitplan", '
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/transport.py"
+anzahl = 1
+en = 'fields.add("Time Zone", '
+de = 'fields.add("Zeitzone", '
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/transport.py"
+anzahl = 1
+en = 'fields.add("Total Pings", str(ping.n))'
+de = 'fields.add("Pings gesamt", str(ping.n))'
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/transport.py"
+anzahl = 1
+en = 'fields.add("Total Pings", "0")'
+de = 'fields.add("Pings gesamt", "0")'
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/transport.py"
+anzahl = 1
+en = 'fields.add("Last Ping", ping.formatted_kind_created())'
+de = 'fields.add("Letzter Ping", ping.formatted_kind_created())'
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/transport.py"
+anzahl = 1
+en = 'fields.add("Last Ping", "Never")'
+de = 'fields.add("Letzter Ping", "Nie")'
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/transport.py"
+anzahl = 1
+en = '"text": f"View in {settings.SITE_NAME}",'
+de = '"text": f"In {settings.SITE_NAME} ansehen",'
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = 'fields.add("Description:", '
+de = 'fields.add("Beschreibung:", '
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = 'fields.add("Project:", '
+de = 'fields.add("Projekt:", '
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = 'fields.add("Period:", '
+de = 'fields.add("Intervall:", '
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = 'fields.add("Schedule:", '
+de = 'fields.add("Zeitplan:", '
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = 'fields.add("Time Zone:", '
+de = 'fields.add("Zeitzone:", '
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = 'fields.add("Total Pings:", str(ping.n))'
+de = 'fields.add("Pings gesamt:", str(ping.n))'
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = 'fields.add("Total Pings:", "0")'
+de = 'fields.add("Pings gesamt:", "0")'
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = 'fields.add("Last Ping:", ping.formatted_kind_created())'
+de = 'fields.add("Letzter Ping:", ping.formatted_kind_created())'
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = 'fields.add("Last Ping:", "Never")'
+de = 'fields.add("Letzter Ping:", "Nie")'
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = '"text": "Last Ping Body:",'
+de = '"text": "Inhalt des letzten Pings:",'
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = '"fallbackText": f"“{escape(name)}” is {flip.new_status.upper()}.",'
+de = "\"fallbackText\": f\"„{escape(name)}“ ist {getattr(settings, 'WERKBANK_ZUSTAENDE', {}).get(flip.new_status, flip.new_status).upper()}.\","
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = '"title": f"View in {settings.SITE_NAME}",'
+de = '"title": f"In {settings.SITE_NAME} ansehen",'
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/transport.py"
+anzahl = 1
+en = '"label": f"View on {settings.SITE_NAME}",'
+de = '"label": f"In {settings.SITE_NAME} ansehen",'
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+anzahl = 1
+en = 'details["Project"] = '
+de = 'details["Projekt"] = '
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+anzahl = 1
+en = 'details["Total pings"] = ping.n'
+de = 'details["Pings gesamt"] = ping.n'
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+anzahl = 1
+en = 'details["Last ping"] = ping.formatted_kind_created()'
+de = 'details["Letzter Ping"] = ping.formatted_kind_created()'
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+anzahl = 1
+en = 'details["Total pings"] = 0'
+de = 'details["Pings gesamt"] = 0'
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+anzahl = 1
+en = 'details["Last ping"] = "Never"'
+de = 'details["Letzter Ping"] = "Nie"'
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+anzahl = 1
+en = 'details["Period"] = '
+de = 'details["Intervall"] = '
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+anzahl = 1
+en = 'details["Schedule"] = '
+de = 'details["Zeitplan"] = '
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+anzahl = 1
+en = 'details["Time zone"] = '
+de = 'details["Zeitzone"] = '
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+anzahl = 1
+en = 'details["Full details"] = '
+de = 'details["Alle Details"] = '
+
+[[quelltext]]
+datei = "hc/integrations/pd/transport.py"
+anzahl = 1
+en = '"Project": check.project.name,'
+de = '"Projekt": check.project.name,'
+
+[[quelltext]]
+datei = "hc/integrations/pd/transport.py"
+anzahl = 1
+en = 'details["Total pings"] = ping.n'
+de = 'details["Pings gesamt"] = ping.n'
+
+[[quelltext]]
+datei = "hc/integrations/pd/transport.py"
+anzahl = 1
+en = 'details["Last ping"] = ping.formatted_kind_created()'
+de = 'details["Letzter Ping"] = ping.formatted_kind_created()'
+
+[[quelltext]]
+datei = "hc/integrations/pd/transport.py"
+anzahl = 1
+en = 'details["Total pings"] = 0'
+de = 'details["Pings gesamt"] = 0'
+
+[[quelltext]]
+datei = "hc/integrations/pd/transport.py"
+anzahl = 1
+en = 'details["Last ping"] = "Never"'
+de = 'details["Letzter Ping"] = "Nie"'
+
+[[quelltext]]
+datei = "hc/integrations/pd/transport.py"
+anzahl = 1
+en = 'details["Description"] = '
+de = 'details["Beschreibung"] = '
+
+[[quelltext]]
+datei = "hc/integrations/pd/transport.py"
+anzahl = 1
+en = 'details["Period"] = '
+de = 'details["Intervall"] = '
+
+[[quelltext]]
+datei = "hc/integrations/pd/transport.py"
+anzahl = 1
+en = 'details["Schedule"] = '
+de = 'details["Zeitplan"] = '
+
+[[quelltext]]
+datei = "hc/integrations/pd/transport.py"
+anzahl = 1
+en = 'details["Time zone"] = '
+de = 'details["Zeitzone"] = '
+
+[[quelltext]]
+datei = "hc/integrations/po/transport.py"
+anzahl = 1
+en = '"url_title": f"View on {settings.SITE_NAME}",'
+de = '"url_title": f"In {settings.SITE_NAME} ansehen",'
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'fields.add("Description", '
+de = 'fields.add("Beschreibung", '
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'fields.add("Project", '
+de = 'fields.add("Projekt", '
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'fields.add("Period", '
+de = 'fields.add("Intervall", '
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'fields.add("Schedule", '
+de = 'fields.add("Zeitplan", '
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'fields.add("Time Zone", '
+de = 'fields.add("Zeitzone", '
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'fields.add("Total Pings", str(ping.n))'
+de = 'fields.add("Pings gesamt", str(ping.n))'
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'fields.add("Total Pings", "0")'
+de = 'fields.add("Pings gesamt", "0")'
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'fields.add("Last Ping", ping.formatted_kind_created())'
+de = 'fields.add("Letzter Ping", ping.formatted_kind_created())'
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'fields.add("Last Ping", "Never")'
+de = 'fields.add("Letzter Ping", "Nie")'
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'fields.add("Last Ping Body", '
+de = 'fields.add("Inhalt des letzten Pings", '
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'bytes_str = "byte" if body_size == 1 else "bytes"'
+de = 'bytes_str = "Byte" if body_size == 1 else "Bytes"'
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = 'text = f"{body_size} {bytes_str}, [show body]({ping_url})"'
+de = 'text = f"{body_size} {bytes_str}, [Inhalt anzeigen]({ping_url})"'
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'fields.add("Description", '
+de = 'fields.add("Beschreibung", '
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'fields.add("Project", '
+de = 'fields.add("Projekt", '
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'fields.add("Period", '
+de = 'fields.add("Intervall", '
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'fields.add("Schedule", '
+de = 'fields.add("Zeitplan", '
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'fields.add("Time Zone", '
+de = 'fields.add("Zeitzone", '
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'fields.add("Total Pings", str(ping.n))'
+de = 'fields.add("Pings gesamt", str(ping.n))'
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'fields.add("Total Pings", "0")'
+de = 'fields.add("Pings gesamt", "0")'
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'fields.add("Last Ping", ping.formatted_kind_created())'
+de = 'fields.add("Letzter Ping", ping.formatted_kind_created())'
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'fields.add("Last Ping", "Never")'
+de = 'fields.add("Letzter Ping", "Nie")'
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'fields.add("Last Ping Body", '
+de = 'fields.add("Inhalt des letzten Pings", '
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'text = f"Reason: {flip.reason_long()}." if flip.reason else None'
+de = 'text = f"Grund: {flip.reason_long()}." if flip.reason else None'
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = 'text = f"The downtime lasted {formatted_duration}."'
+de = 'text = f"Der Ausfall dauerte {formatted_duration}."'
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = "\"fallback\": f'The check \"{name}\" is {flip.new_status.upper()}.',"
+de = "\"fallback\": f'Der Check „{name}“ ist {getattr(settings, \"WERKBANK_ZUSTAENDE\", {}).get(flip.new_status, flip.new_status).upper()}.',"
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = '"title": f"“{name}” is {flip.new_status.upper()}.",'
+de = "\"title\": f\"„{name}“ ist {getattr(settings, 'WERKBANK_ZUSTAENDE', {}).get(flip.new_status, flip.new_status).upper()}.\","
+
+# --- Grund eines Ausfalls (hc/api/models.py, Flip.reason_long) ---------------------------------
+# Steht in Alarmen hinter „ist AUSGEFALLEN (…)“ und hinter „Grund:“.
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = 'return "success signal did not arrive on time, grace time passed"'
+de = 'return "Erfolgssignal blieb aus, Kulanz abgelaufen"'
+
+[[quelltext]]
+datei = "hc/api/models.py"
+anzahl = 1
+en = 'return "received a failure signal"'
+de = 'return "Fehlschlag gemeldet"'
+
+# --- Skripte der Integrationen (hc/integrations/*/static/js/) -----------------------------------
+
+[[quelltext]]
+datei = "hc/integrations/zulip/static/js/add_zulip.js"
+anzahl = 1
+en = '$("#z-to-label").text("Channel");'
+de = '$("#z-to-label").text("Kanal");'
+
+[[quelltext]]
+datei = "hc/integrations/zulip/static/js/add_zulip.js"
+anzahl = 1
+en = '''$("#z-to-help").text('Example: "general"');'''
+de = '''$("#z-to-help").text('Beispiel: „general“');'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/static/js/add_zulip.js"
+anzahl = 1
+en = '''$("#z-to-label").text("User's Email or ID");'''
+de = '''$("#z-to-label").text("Mail-Adresse oder ID der Person");'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/static/js/add_zulip.js"
+anzahl = 1
+en = '''$("#z-to-help").text('Example: "alice@example.org" or "12345"');'''
+de = '''$("#z-to-help").text('Beispiel: „alice@example.org“ oder „12345“');'''
+
+[[quelltext]]
+datei = "hc/integrations/zulip/static/js/add_zulip.js"
+anzahl = 1
+en = '.text("Invalid file format.");'
+de = '.text("Das Dateiformat stimmt nicht. Lade die zuliprc-Datei des Bots hoch.");'
+
+[[quelltext]]
+datei = "hc/integrations/trello/static/js/add_trello.js"
+anzahl = 1
+en = '.text("Loading...");'
+de = '.text("Lädt …");'
+
+# --- Prioritäten in den Formularen von Gotify und ntfy (forms.py) ---------------------------------
+# Die Skripte der Formulare trennen jede Option am Doppelpunkt in Titel und Beschreibung;
+# jede Option enthält deshalb genau einen Doppelpunkt.
+
+[[quelltext]]
+datei = "hc/integrations/gotify/forms.py"
+anzahl = 1
+en = '(0, "Disabled: Does not notify."),'
+de = '(0, "Aus: keine Benachrichtigung."),'
+
+[[quelltext]]
+datei = "hc/integrations/gotify/forms.py"
+anzahl = 1
+en = '(2, "Low Priority: Quiet icon in notification bar."),'
+de = '(2, "Niedrige Priorität: leises Symbol in der Benachrichtigungsleiste."),'
+
+[[quelltext]]
+datei = "hc/integrations/gotify/forms.py"
+anzahl = 1
+en = '(5, "Normal Priority: Sends a notification with sound."),'
+de = '(5, "Normale Priorität: Benachrichtigung mit Ton."),'
+
+[[quelltext]]
+datei = "hc/integrations/gotify/forms.py"
+anzahl = 1
+en = '(9, "High Priority: Sends a notification with sound and vibration."),'
+de = '(9, "Hohe Priorität: Benachrichtigung mit Ton und Vibration."),'
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/forms.py"
+anzahl = 1
+en = '"Max priority: Really long vibration bursts, default notification sound with a pop-over notification.",'
+de = '"Höchste Priorität: sehr lange Vibration, Standardton und Pop-up-Benachrichtigung.",'
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/forms.py"
+anzahl = 1
+en = '"High priority: Long vibration burst, default notification sound with a pop-over notification.",'
+de = '"Hohe Priorität: lange Vibration, Standardton und Pop-up-Benachrichtigung.",'
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/forms.py"
+anzahl = 1
+en = '"Default priority: Short default vibration and sound. Default notification behavior.",'
+de = '"Standardpriorität: kurze Vibration und Standardton, normales Verhalten.",'
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/forms.py"
+anzahl = 1
+en = '"Low priority: No vibration or sound. Notification will not visibly show up until notification drawer is pulled down.",'
+de = '"Niedrige Priorität: ohne Vibration und Ton. Die Benachrichtigung erscheint erst beim Aufziehen der Benachrichtigungsleiste.",'
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/forms.py"
+anzahl = 1
+en = '''"Min priority: No vibration or sound. The notification will be under the fold in 'Other notifications'.",'''
+de = '''"Niedrigste Priorität: ohne Vibration und Ton. Die Benachrichtigung steht eingeklappt unter „Weitere Benachrichtigungen“.",'''
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/forms.py"
+anzahl = 1
+en = '(0, "Disabled: Will not notify."),'
+de = '(0, "Aus: keine Benachrichtigung."),'

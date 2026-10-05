@@ -125,6 +125,15 @@ def test_opake_bereiche_und_kommentare_bleiben(tmp_path):
     assert lies(wurzel, "templates/c.html") == quelle.replace("<p>Close</p>", "<p>Schließen</p>")
 
 
+
+def test_attribute_am_oeffnenden_tag_opaker_bereiche(tmp_path):
+    quelle = ('<textarea placeholder="Your notes" rows="3">Your notes</textarea>'
+              '<pre title="Raw output">Raw output</pre><textarea placeholder="{{ x }}">y</textarea>')
+    wurzel, werkbank = aufbau(tmp_path, text("*", "Your notes", "Deine Notizen"), {"templates/t.html": quelle})
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert lies(wurzel, "templates/t.html") == quelle.replace('placeholder="Your notes"', 'placeholder="Deine Notizen"')
+    assert [r["text"] for r in bericht["englisch"]] == ["Raw output"]
+
 def test_quelltext_ersetzt_alle_und_prueft_die_anzahl(tmp_path):
     katalog = """
 [[quelltext]]

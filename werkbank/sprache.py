@@ -70,6 +70,8 @@ KNOPF_TYPEN = ("submit", "button", "reset")
 BUCHSTABEN = re.compile(r"[A-Za-z]{2}")
 # Template-Ausdrücke tragen keinen Text; Wörter mit Ziffern sind Fassungen, Zeiten oder Adressen.
 AUSDRUCK = re.compile(r"\{\{.*?\}\}|\{%.*?%\}|&(?:[A-Za-z]+|#\d+|#x[0-9A-Fa-f]+);", re.S)
+# HTML-Tag; Django-Ausdrücke darin zählen als Einheit, auch mit < oder > in Bedingungen.
+TAG = r"</?[A-Za-z](?:\{\{.*?\}\}|\{%.*?%\}|\{#.*?#\}|[^<>{]|\{)*>"
 TOKEN = re.compile(
     r"\{#.*?#\}"
     r"|\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}"
@@ -78,12 +80,13 @@ TOKEN = re.compile(
     r"|<!--.*?-->"
     r"|<![A-Za-z][^>]*>"
     r"|<(?P<opak>script|style|pre|code|textarea)\b.*?</(?P=opak)\s*>"
-    # HTML-Tags; Django-Ausdrücke darin zählen als Einheit, auch mit < oder > in Bedingungen.
-    r"|</?[A-Za-z](?:\{\{.*?\}\}|\{%.*?%\}|\{#.*?#\}|[^<>{]|\{)*>",
+    r"|" + TAG,
     re.S | re.I,
 )
 ATTRIBUT = re.compile(r"""(?P<name>[A-Za-z_:][-A-Za-z0-9_:.]*)\s*=\s*(?P<q>["'])(?P<wert>.*?)(?P=q)""", re.S)
 TAGNAME = re.compile(r"<([A-Za-z][A-Za-z0-9-]*)")
+# Öffnender Tag eines opaken Bereichs: Sein Inhalt bleibt unberührt, seine Attribute zählen.
+OEFFNENDER_TAG = re.compile(TAG, re.S)
 
 
 class SprachFehler(Exception):
@@ -179,7 +182,10 @@ def stuecke(quelle: str) -> list[Stueck]:
         if treffer.start() > pos:
             ergebnis.append(Stueck("text", pos, treffer.start(), quelle[pos : treffer.start()]))
         roh = treffer.group(0)
-        if roh.startswith("<") and not roh.startswith(("<!--", "</")) and not treffer.group("opak"):
+        if treffer.group("opak"):
+            kopf = OEFFNENDER_TAG.match(roh)
+            ergebnis.extend(_attribute(kopf.group(0), treffer.start()) if kopf else [])
+        elif roh.startswith("<") and not roh.startswith(("<!--", "</")):
             ergebnis.extend(_attribute(roh, treffer.start()))
         pos = treffer.end()
     if pos < len(quelle):
