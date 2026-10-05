@@ -9,6 +9,7 @@ Quelle: Skill `bright-color-design` (`~/.claude/skills/bright-color-design`), ko
 | `assets/css/bc-workbench.css` | Bausteine von Leiste und Kopfzeile, Teil von `werkbank.css` |
 | `assets/fonts/` | Anton, Atkinson Hyperlegible, IBM Plex Mono mit `OFL.txt` |
 | `assets/logo/bc-logo-light-noclaim.svg` | Logo in der Leiste und auf der Anmeldeseite |
+| `assets/logo/png/bc-logo-light-noclaim.png` | Logo im Tinte-Balken der Mails (PNG, weil Gmail und Outlook kein SVG zeigen); kopiert am 05.10.2026 |
 | `scripts/bc_check.py` | Lint und Kontrastrechnung |
 | `scripts/check-contrast.js` | Kontrastlauf im Browser |
 
