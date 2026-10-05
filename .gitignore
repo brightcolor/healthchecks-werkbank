@@ -1,0 +1,9 @@
+.upstream/
+.venv/
+node_modules/
+artefakte/
+fehler/
+tests/e2e/ergebnisse/
+__pycache__/
+*.pyc
+.pytest_cache/
