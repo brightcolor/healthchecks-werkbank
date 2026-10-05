@@ -59,7 +59,9 @@
 		ZUSTAENDE.forEach(function (z) { punkt.classList.remove('ic-' + z); });
 		punkt.classList.add('ic-' + zustand);
 		var text = punkt.parentElement.querySelector('.wb-zustand__text');
-		if (text) text.textContent = ' (' + zustand + ')';
+		// Das Wort kommt aus der Vorlage (Filter zustand), damit das Skript jede Sprache spricht.
+		var wort = app.getAttribute('data-zustand-' + zustand) || zustand;
+		if (text) text.textContent = ' (' + wort + ')';
 	}
 
 	function zustandAus(element) {

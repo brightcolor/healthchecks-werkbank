@@ -41,6 +41,8 @@ VORGABEN = {
 }
 
 UPSTREAM = WURZEL / ".upstream"
+# Fassung des lokalen Aufbaus; mit Ziffern, damit die Spracherkennung sie als Nummer übergeht.
+DEV_FASSUNG = "0.0.0-dev"
 VENV = WURZEL / ".venv"
 ZUGANG = UPSTREAM / "dev-zugang.txt"
 MUSTERDATEN = WURZEL / "tests" / "e2e" / "ergebnisse" / "musterdaten.json"
@@ -102,8 +104,8 @@ def einsetzen(arbeit: Path) -> dict:
     for logo in (hausschrift / "assets" / "logo").glob("*.svg"):
         shutil.copy2(logo, bc / "logo" / logo.name)
     shutil.copy2(werkbank / "static" / "bc" / "leiste.js", bc / "leiste.js")
-    einbau.einbauen(arbeit, einbau.lade_plan(einbau.PLAN_VORGABE), "dev")
-    css, farben_css, bericht = farben.bauen(arbeit, hausschrift, werkbank, "dev")
+    einbau.einbauen(arbeit, einbau.lade_plan(einbau.PLAN_VORGABE), DEV_FASSUNG)
+    css, farben_css, bericht = farben.bauen(arbeit, hausschrift, werkbank, DEV_FASSUNG)
     farben.schreibe(arbeit, css, farben_css)
     bericht_pfad = UPSTREAM / "dev-bericht.json"
     bericht_pfad.write_bytes((json.dumps(bericht, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
@@ -215,7 +217,7 @@ def nur_stil(version: str) -> None:
             if e.art == "quelltext" and e.datei == "static/bc/leiste.js":
                 text = sprache.quelltext_anwenden(text, e)[0]
         sprache.schreibe(leiste, text, crlf)
-    css, farben_css, bericht = farben.bauen(arbeit, WURZEL / "vendor" / "hausschrift", werkbank, "dev")
+    css, farben_css, bericht = farben.bauen(arbeit, WURZEL / "vendor" / "hausschrift", werkbank, DEV_FASSUNG)
     farben.schreibe(arbeit, css, farben_css)
     print(f"werkbank.css neu gebaut: {bericht['deklarationen']} Farbangaben, "
           f"{len(bericht['automatisch'])} automatisch zugeordnet.")

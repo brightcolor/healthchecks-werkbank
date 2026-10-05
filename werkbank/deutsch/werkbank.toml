@@ -1,0 +1,198 @@
+# Eigene Texte der Werkbank: Leiste, Kopfzeile, Markenfläche, Skript der Leiste, Mail-Layout.
+
+# --- Leiste und Kopfzeile (templates/bc/leiste.html) ---------------------------------------
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Skip to content"
+de = "Zum Inhalt springen"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Navigation"
+de = "Navigation"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Checks"
+de = "Checks"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Integrations"
+de = "Integrationen"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Badges"
+de = "Badges"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Settings"
+de = "Einstellungen"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Some integrations need attention"
+de = "Einige Integrationen brauchen Aufmerksamkeit"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "(needs attention)"
+de = "(braucht Aufmerksamkeit)"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "The other projects can’t be shown right now. Reload the page to load them again."
+de = "Die übrigen Projekte lassen sich gerade nicht anzeigen. Lade die Seite neu, dann erscheinen sie wieder."
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "New Project"
+de = "Neues Projekt"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Projects"
+de = "Projekte"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Docs"
+de = "Doku"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Account Settings"
+de = "Konto"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Site Administration"
+de = "Verwaltung"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Log In"
+de = "Anmelden"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Log Out"
+de = "Abmelden"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Menu"
+de = "Menü"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Breadcrumb"
+de = "Pfad"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Events"
+de = "Ereignisse"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Appearance"
+de = "Darstellung"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Light"
+de = "Hell"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Dark"
+de = "Dunkel"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Moin."
+de = "Moin."
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "Healthchecks"
+de = "Healthchecks"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "· Werkbank"
+de = "· Werkbank"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "bright color"
+de = "bright color"
+
+[[text]]
+datei = "templates/bc/leiste.html"
+en = "bright color: {{ site_name }}"
+de = "bright color: {{ site_name }}"
+
+# --- Skript der Leiste (static/bc/leiste.js) ------------------------------------------------
+
+[[quelltext]]
+datei = "static/bc/leiste.js"
+anzahl = 1
+en = "['zielIntegrations', 'Integrations']"
+de = "['zielIntegrations', 'Integrationen']"
+
+[[quelltext]]
+datei = "static/bc/leiste.js"
+anzahl = 1
+en = "['zielSettings', 'Settings']"
+de = "['zielSettings', 'Einstellungen']"
+
+[[quelltext]]
+datei = "static/bc/leiste.js"
+anzahl = 1
+en = "'Your appearance setting wasn’t saved because your session has expired or the page is outdated. Reload the page, log in if asked, and try again.'"
+de = "'Deine Darstellung ist nicht gespeichert: Die Sitzung ist abgelaufen, oder die Seite ist veraltet. Lade die Seite neu, melde dich bei Bedarf an und versuch es noch einmal.'"
+
+[[quelltext]]
+datei = "static/bc/leiste.js"
+anzahl = 1
+en = "'Your appearance setting wasn’t saved: Healthchecks answered with an error (HTTP {status}). Reload the page and try again; if it happens again, check the server log.'"
+de = "'Deine Darstellung ist nicht gespeichert: Healthchecks hat mit einem Fehler geantwortet (HTTP {status}). Lade die Seite neu und versuch es noch einmal; passiert es wieder, sieh ins Serverprotokoll.'"
+
+[[quelltext]]
+datei = "static/bc/leiste.js"
+anzahl = 1
+en = "'Your appearance setting wasn’t saved because Healthchecks didn’t respond. Check your connection, reload the page and try again.'"
+de = "'Deine Darstellung ist nicht gespeichert, weil Healthchecks nicht geantwortet hat. Prüf deine Verbindung, lade die Seite neu und versuch es noch einmal.'"
+
+# --- Mail-Layout (werkbank/mails/base.html an der Stelle von templates/emails/base.html) -----
+
+[[quelltext]]
+datei = "templates/emails/base.html"
+anzahl = 2
+en = 'lang="en"'
+de = 'lang="de"'
+
+[[text]]
+datei = "templates/emails/base.html"
+en = "This message comes from"
+de = "Diese Mail kommt von"
+
+[[text]]
+datei = "templates/emails/base.html"
+en = "Legal notice"
+de = "Impressum"
+
+[[text]]
+datei = "templates/emails/base.html"
+en = "Privacy policy"
+de = "Datenschutz"
+
+[[text]]
+datei = "templates/emails/base.html"
+en = "bright color"
+de = "bright color"

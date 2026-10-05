@@ -1,0 +1,816 @@
+# Texte im Code von Healthchecks: Dauern, Seitentitel, Datumsformate im Browser, Sätze in
+# Skripten, Meldungen und Formularfehler in Python, Fehlertexte der Integrationen.
+# Antworten der API (hc/api/) und Protokollzeilen bleiben englisch, Skripte werten sie aus.
+
+# --- Dauern (hc/lib/date.py) ----------------------------------------------------------------
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'self.plural = name + "s"'
+de = 'self.plural = name + ("e" if name == "Tag" else "n")'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'SECOND = Unit("second", 1)'
+de = 'SECOND = Unit("Sekunde", 1)'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'MINUTE = Unit("minute", 60)'
+de = 'MINUTE = Unit("Minute", 60)'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'HOUR = Unit("hour", MINUTE.nsecs * 60)'
+de = 'HOUR = Unit("Stunde", MINUTE.nsecs * 60)'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'DAY = Unit("day", HOUR.nsecs * 24)'
+de = 'DAY = Unit("Tag", HOUR.nsecs * 24)'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'WEEK = Unit("week", DAY.nsecs * 7)'
+de = 'WEEK = Unit("Woche", DAY.nsecs * 7)'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'return f"{total_seconds:.2f} sec"'
+de = 'return f"{total_seconds:.2f} s"'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'result.append(f"{secs} sec")'
+de = 'result.append(f"{secs} s")'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'return f"1 day {hours} h"'
+de = 'return f"1 Tag {hours} h"'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'return f"{days} days {hours} h"'
+de = 'return f"{days} Tage {hours} h"'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'return f"{mins} min {secs} sec"'
+de = 'return f"{mins} min {secs} s"'
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'return f"{days} day{pluralize(days)}, {hours} hour{pluralize(hours)}"'
+de = '''return f"{days} Tag{pluralize(days, 'e')}, {hours} Stunde{pluralize(hours, 'n')}"'''
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'return f"{hours} hour{pluralize(hours)}, {mins} minute{pluralize(mins)}"'
+de = '''return f"{hours} Stunde{pluralize(hours, 'n')}, {mins} Minute{pluralize(mins, 'n')}"'''
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'return f"{mins} minute{pluralize(mins)}, {secs} second{pluralize(secs)}"'
+de = '''return f"{mins} Minute{pluralize(mins, 'n')}, {secs} Sekunde{pluralize(secs, 'n')}"'''
+
+[[quelltext]]
+datei = "hc/lib/date.py"
+anzahl = 1
+en = 'return f"{secs} second{pluralize(secs)}"'
+de = '''return f"{secs} Sekunde{pluralize(secs, 'n')}"'''
+
+# --- Seitentitel (hc/front/templatetags/hc_extras.py) ------------------------------------------
+
+[[quelltext]]
+datei = "hc/front/templatetags/hc_extras.py"
+anzahl = 1
+en = 'return f"{num_down} down – {settings.SITE_NAME}"'
+de = 'return f"{num_down} ausgefallen – {settings.SITE_NAME}"'
+
+[[quelltext]]
+datei = "hc/front/templatetags/hc_extras.py"
+anzahl = 1
+en = 's = "DOWN – " + s'
+de = 's = "AUSGEFALLEN – " + s'
+
+# --- Datum und Uhrzeit im Browser (static/js/dates.js) ------------------------------------------
+
+[[quelltext]]
+datei = "static/js/dates.js"
+anzahl = 3
+en = 'new Intl.DateTimeFormat("en-US"'
+de = 'new Intl.DateTimeFormat("de-DE"'
+
+[[quelltext]]
+datei = "static/js/dates.js"
+anzahl = 2
+en = 'new Intl.DateTimeFormat("en-GB"'
+de = 'new Intl.DateTimeFormat("de-DE"'
+
+# --- Sätze in Skripten (static/js/) ----------------------------------------------------------------
+
+[[quelltext]]
+datei = "static/js/add-check-modal.js"
+anzahl = 2
+en = '"Must not exceed 365 days"'
+de = '"Höchstens 365 Tage"'
+
+[[quelltext]]
+datei = "static/js/add-check-modal.js"
+anzahl = 1
+en = '"Please enter a valid expression"'
+de = '"Gib bitte einen gültigen Ausdruck ein"'
+
+[[quelltext]]
+datei = "static/js/update-timeout-modal.js"
+anzahl = 4
+en = '"Must not exceed 365 days"'
+de = '"Höchstens 365 Tage"'
+
+[[quelltext]]
+datei = "static/js/checks.js"
+anzahl = 1
+en = "'The word \"confirm\" was found in request body'"
+de = "'Der Inhalt enthält das Wort „confirm“'"
+
+[[quelltext]]
+datei = "static/js/checks.js"
+anzahl = 1
+en = '"This check is already paused."'
+de = '"Dieser Check ist schon pausiert."'
+
+[[quelltext]]
+datei = "static/js/checks.js"
+anzahl = 1
+en = '"Pause this check?<br />Click again to confirm."'
+de = '"Check pausieren?<br />Zum Bestätigen noch einmal klicken."'
+
+[[quelltext]]
+datei = "static/js/checks.js"
+anzahl = 1
+en = '"New. Has never received a ping."'
+de = '"Neu. Hat noch keinen Ping bekommen."'
+
+[[quelltext]]
+datei = "static/js/checks.js"
+anzahl = 1
+en = '"Monitoring paused.<br />Ping to resume."'
+de = '"Überwachung pausiert.<br />Ein Ping setzt sie fort."'
+
+[[quelltext]]
+datei = "static/js/checks.js"
+anzahl = 1
+en = '"Sort by name<br />(but failed always first)"'
+de = '"Nach Name sortieren<br />(ausgefallene stehen immer oben)"'
+
+[[quelltext]]
+datei = "static/js/checks.js"
+anzahl = 1
+en = '"Sort by last ping<br />(but failed always first)"'
+de = '"Nach letztem Ping sortieren<br />(ausgefallene stehen immer oben)"'
+
+[[quelltext]]
+datei = "static/js/checks.js"
+anzahl = 1
+en = 'title: "Click to copy"'
+de = 'title: "Zum Kopieren klicken"'
+
+[[quelltext]]
+datei = "static/js/checks.js"
+anzahl = 1
+en = '.text("Copied!")'
+de = '.text("Kopiert.")'
+
+[[quelltext]]
+datei = "static/js/details.js"
+anzahl = 1
+en = 'title: "Click to copy"'
+de = 'title: "Zum Kopieren klicken"'
+
+[[quelltext]]
+datei = "static/js/details.js"
+anzahl = 1
+en = '.text("Copied!")'
+de = '.text("Kopiert.")'
+
+[[quelltext]]
+datei = "static/js/initialize-timezone-selects.js"
+anzahl = 1
+en = 'label: "Common time zones"'
+de = 'label: "Häufige Zeitzonen"'
+
+[[quelltext]]
+datei = "static/js/initialize-timezone-selects.js"
+anzahl = 1
+en = 'label: "All time zones"'
+de = 'label: "Alle Zeitzonen"'
+
+[[quelltext]]
+datei = "static/js/initialize-timezone-selects.js"
+anzahl = 1
+en = 'placeholder: "Type to search"'
+de = 'placeholder: "Zum Suchen tippen"'
+
+[[quelltext]]
+datei = "static/js/profile.js"
+anzahl = 1
+en = 'placeholder: "Type to search"'
+de = 'placeholder: "Zum Suchen tippen"'
+
+[[quelltext]]
+datei = "static/js/project.js"
+anzahl = 1
+en = '"title": "Click to reveal"'
+de = '"title": "Zum Anzeigen klicken"'
+
+[[quelltext]]
+datei = "static/js/set-password.js"
+anzahl = 1
+en = '"Please pick a stronger password."'
+de = '"Wähl bitte ein stärkeres Passwort."'
+
+[[quelltext]]
+datei = "static/js/slug-suggestions.js"
+anzahl = 1
+en = '"Allowed characters: a-z, 0-9, hyphens, underscores."'
+de = '"Erlaubt sind a–z, 0–9, Bindestrich und Unterstrich."'
+
+[[quelltext]]
+datei = "static/js/snippet-copy.js"
+anzahl = 1
+en = 'title: "Copied"'
+de = 'title: "Kopiert"'
+
+# --- Konto (hc/accounts/) -----------------------------------------------------------------------
+
+[[quelltext]]
+datei = "hc/accounts/forms.py"
+anzahl = 1
+en = '"Please enter your email address."'
+de = '"Gib bitte deine E-Mail-Adresse ein."'
+
+[[quelltext]]
+datei = "hc/accounts/forms.py"
+en = '"Too many attempts, please try later."'
+de = '"Zu viele Versuche. Versuch es bitte später noch einmal."'
+
+[[quelltext]]
+datei = "hc/accounts/forms.py"
+anzahl = 1
+en = '"Address is too long."'
+de = '"Die Adresse ist zu lang."'
+
+[[quelltext]]
+datei = "hc/accounts/forms.py"
+anzahl = 1
+en = 'f"{v} is already registered"'
+de = 'f"{v} ist schon registriert"'
+
+[[quelltext]]
+datei = "hc/accounts/forms.py"
+anzahl = 1
+en = '"The code you entered was incorrect."'
+de = '"Der eingegebene Code stimmt nicht. Prüf ihn und gib ihn noch einmal ein."'
+
+[[quelltext]]
+datei = "hc/accounts/forms.py"
+anzahl = 1
+en = '"Incorrect email or password."'
+de = '"E-Mail-Adresse oder Passwort stimmen nicht."'
+
+[[quelltext]]
+datei = "hc/accounts/views.py"
+anzahl = 1
+en = '"You are now the owner of this project!"'
+de = '"Du bist jetzt Eigentümer dieses Projekts."'
+
+# --- Checks und Formulare (hc/front/) ---------------------------------------------------------------
+
+[[quelltext]]
+datei = "hc/front/forms.py"
+anzahl = 1
+en = '"Invalid phone number format."'
+de = '"Die Telefonnummer hat kein gültiges Format. Gib sie mit Ländervorwahl ein, etwa +49 30 1234567."'
+
+[[quelltext]]
+datei = "hc/front/forms.py"
+anzahl = 1
+en = '"Please select at least one."'
+de = '"Wähl bitte mindestens eine Möglichkeit aus."'
+
+[[quelltext]]
+datei = "hc/front/validators.py"
+anzahl = 1
+en = '"Not a valid cron expression."'
+de = '"Das ist kein gültiger Cron-Ausdruck."'
+
+[[quelltext]]
+datei = "hc/front/validators.py"
+anzahl = 1
+en = '"Not a valid OnCalendar expression."'
+de = '"Das ist kein gültiger OnCalendar-Ausdruck."'
+
+[[quelltext]]
+datei = "hc/front/validators.py"
+anzahl = 1
+en = '"Not a valid time zone."'
+de = '"Das ist keine gültige Zeitzone."'
+
+[[quelltext]]
+datei = "hc/front/views.py"
+anzahl = 1
+en = '"Check transferred successfully!"'
+de = '"Der Check ist verschoben."'
+
+[[quelltext]]
+datei = "hc/front/views.py"
+anzahl = 1
+en = 'f"Could not send a test notification. {error}."'
+de = 'f"Die Testbenachrichtigung ließ sich nicht senden: {error}."'
+
+[[quelltext]]
+datei = "hc/front/views.py"
+anzahl = 1
+en = '"Test notification sent!"'
+de = '"Testbenachrichtigung gesendet."'
+
+# --- Einrichtung der Integrationen (hc/integrations/*/views.py, forms.py) ----------------------------
+
+[[quelltext]]
+datei = "hc/integrations/apprise/views.py"
+anzahl = 1
+en = '"The Apprise integration has been added!"'
+de = '"Die Integration Apprise ist eingerichtet."'
+
+[[quelltext]]
+datei = "hc/integrations/discord/views.py"
+anzahl = 1
+en = '"The Discord integration has been added!"'
+de = '"Die Integration Discord ist eingerichtet."'
+
+[[quelltext]]
+datei = "hc/integrations/discord/views.py"
+anzahl = 1
+en = '"Discord setup was cancelled."'
+de = '"Die Einrichtung von Discord ist abgebrochen."'
+
+[[quelltext]]
+datei = "hc/integrations/discord/views.py"
+anzahl = 1
+en = 'f"Response from Discord: {e}. Integration not added."'
+de = 'f"Antwort von Discord: {e}. Die Integration ist nicht eingerichtet; versuch es noch einmal."'
+
+[[quelltext]]
+datei = "hc/integrations/discord/views.py"
+anzahl = 1
+en = '"Received an unexpected response from Discord. Integration not added."'
+de = '"Discord hat unerwartet geantwortet. Die Integration ist nicht eingerichtet; versuch es noch einmal."'
+
+[[quelltext]]
+datei = "hc/integrations/github/views.py"
+anzahl = 1
+en = '"Success, integration added!"'
+de = '"Die Integration ist eingerichtet."'
+
+[[quelltext]]
+datei = "hc/integrations/github/views.py"
+anzahl = 1
+en = '"GitHub setup was cancelled."'
+de = '"Die Einrichtung von GitHub ist abgebrochen."'
+
+[[quelltext]]
+datei = "hc/integrations/github/views.py"
+anzahl = 2
+en = '"GitHub setup failed, GitHub access was revoked."'
+de = '"Die Einrichtung von GitHub ist gescheitert, weil der Zugriff auf GitHub widerrufen wurde. Starte die Einrichtung noch einmal."'
+
+[[quelltext]]
+datei = "hc/integrations/googlechat/views.py"
+anzahl = 1
+en = '"The Google Chat integration has been added!"'
+de = '"Die Integration Google Chat ist eingerichtet."'
+
+[[quelltext]]
+datei = "hc/integrations/matrix/views.py"
+anzahl = 1
+en = '"The Matrix integration has been added!"'
+de = '"Die Integration Matrix ist eingerichtet."'
+
+[[quelltext]]
+datei = "hc/integrations/pd/views.py"
+anzahl = 1
+en = '"The PagerDuty integration has been added!"'
+de = '"Die Integration PagerDuty ist eingerichtet."'
+
+[[quelltext]]
+datei = "hc/integrations/po/views.py"
+anzahl = 1
+en = '"The Pushover integration has been added!"'
+de = '"Die Integration Pushover ist eingerichtet."'
+
+[[quelltext]]
+datei = "hc/integrations/pushbullet/views.py"
+anzahl = 1
+en = '"The Pushbullet integration has been added!"'
+de = '"Die Integration Pushbullet ist eingerichtet."'
+
+[[quelltext]]
+datei = "hc/integrations/pushbullet/views.py"
+anzahl = 1
+en = '"Pushbullet setup was cancelled."'
+de = '"Die Einrichtung von Pushbullet ist abgebrochen."'
+
+[[quelltext]]
+datei = "hc/integrations/pushbullet/views.py"
+anzahl = 1
+en = '"Received an unexpected response from Pushbullet. Integration not added."'
+de = '"Pushbullet hat unerwartet geantwortet. Die Integration ist nicht eingerichtet; versuch es noch einmal."'
+
+[[quelltext]]
+datei = "hc/integrations/slack/views.py"
+anzahl = 1
+en = '"Success, integration added!"'
+de = '"Die Integration ist eingerichtet."'
+
+[[quelltext]]
+datei = "hc/integrations/slack/views.py"
+anzahl = 1
+en = '"Slack setup was cancelled."'
+de = '"Die Einrichtung von Slack ist abgebrochen."'
+
+[[quelltext]]
+datei = "hc/integrations/slack/views.py"
+anzahl = 1
+en = '"Received an unexpected response from Slack. Integration not added."'
+de = '"Slack hat unerwartet geantwortet. Die Integration ist nicht eingerichtet; versuch es noch einmal."'
+
+[[quelltext]]
+datei = "hc/integrations/telegram/views.py"
+anzahl = 1
+en = '"The Telegram integration has been added!"'
+de = '"Die Integration Telegram ist eingerichtet."'
+
+[[quelltext]]
+datei = "hc/integrations/email/forms.py"
+anzahl = 1
+en = '"Please select at least one."'
+de = '"Wähl bitte mindestens eine Möglichkeit aus."'
+
+[[quelltext]]
+datei = "hc/integrations/signal/forms.py"
+anzahl = 1
+en = '"Please select at least one."'
+de = '"Wähl bitte mindestens eine Möglichkeit aus."'
+
+[[quelltext]]
+datei = "hc/integrations/signal/forms.py"
+anzahl = 1
+en = '"Invalid username format."'
+de = '"Der Benutzername hat kein gültiges Format."'
+
+[[quelltext]]
+datei = "hc/integrations/signal/forms.py"
+anzahl = 1
+en = '"Invalid phone number format."'
+de = '"Die Telefonnummer hat kein gültiges Format. Gib sie mit Ländervorwahl ein, etwa +49 30 1234567."'
+
+[[quelltext]]
+datei = "hc/integrations/webhook/forms.py"
+anzahl = 1
+en = '"""Use "Header-Name: value" pairs, one per line."""'
+de = '"""Gib je Zeile ein Paar „Header-Name: Wert“ an."""'
+
+[[quelltext]]
+datei = "hc/integrations/webhook/forms.py"
+anzahl = 1
+en = '"Header names must not contain special characters"'
+de = '"Header-Namen dürfen keine Sonderzeichen enthalten"'
+
+[[quelltext]]
+datei = "hc/integrations/webhook/forms.py"
+anzahl = 1
+en = '"Value too long"'
+de = '"Der Wert ist zu lang"'
+
+[[quelltext]]
+datei = "hc/integrations/webhook/forms.py"
+anzahl = 1
+en = '"Enter a valid URL."'
+de = '"Gib eine gültige Adresse ein."'
+
+# --- Fehlertexte der Integrationen (TransportError, sichtbar auf der Integrationsseite) ---------
+
+[[quelltext]]
+datei = "hc/api/transports.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/apprise/transport.py"
+anzahl = 1
+en = '"Apprise is disabled and/or not installed"'
+de = '"Apprise ist auf dieser Instanz abgeschaltet oder fehlt"'
+
+[[quelltext]]
+datei = "hc/integrations/apprise/transport.py"
+anzahl = 1
+en = '"Failed"'
+de = '"Apprise meldet einen Fehlschlag"'
+
+[[quelltext]]
+datei = "hc/integrations/call/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/call/transport.py"
+anzahl = 1
+en = '"Call notifications are not enabled"'
+de = '"Anrufe sind auf dieser Instanz abgeschaltet"'
+
+[[quelltext]]
+datei = "hc/integrations/call/transport.py"
+anzahl = 1
+en = '"Monthly phone call limit exceeded"'
+de = '"Das Monatskontingent für Anrufe ist aufgebraucht"'
+
+[[quelltext]]
+datei = "hc/integrations/call/transport.py"
+anzahl = 1
+en = '"Invalid phone number"'
+de = '"Die Telefonnummer ist ungültig"'
+
+[[quelltext]]
+datei = "hc/integrations/discord/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/email/transport.py"
+anzahl = 1
+en = '"Email not verified"'
+de = '"Die E-Mail-Adresse ist noch nicht bestätigt"'
+
+[[quelltext]]
+datei = "hc/integrations/github/client.py"
+anzahl = 1
+en = 'f"Unexpected response from GitHub: {content_str}"'
+de = 'f"Unerwartete Antwort von GitHub: {content_str}"'
+
+[[quelltext]]
+datei = "hc/integrations/github/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/github/transport.py"
+anzahl = 1
+en = '"GitHub notifications are not enabled."'
+de = '"Benachrichtigungen über GitHub sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/github/transport.py"
+anzahl = 1
+en = 'f"GitHub denied access to {self.channel.github.repo}"'
+de = 'f"GitHub verweigert den Zugriff auf {self.channel.github.repo}"'
+
+[[quelltext]]
+datei = "hc/integrations/group/transport.py"
+anzahl = 1
+en = 'f"{error_count} out of {len(channels)} notifications failed"'
+de = 'f"{error_count} von {len(channels)} Benachrichtigungen gescheitert"'
+
+[[quelltext]]
+datei = "hc/integrations/mattermost/transport.py"
+anzahl = 1
+en = '"Mattermost notifications are not enabled."'
+de = '"Benachrichtigungen über Mattermost sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/msteamsw/transport.py"
+anzahl = 1
+en = '"MS Teams notifications are not enabled."'
+de = '"Benachrichtigungen über MS Teams sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/ntfy/transport.py"
+anzahl = 1
+en = '"Rate limit exceeded"'
+de = '"Zu viele Nachrichten in kurzer Zeit; der Dienst hat abgelehnt"'
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/opsgenie/transport.py"
+anzahl = 1
+en = '"Opsgenie notifications are not enabled."'
+de = '"Benachrichtigungen über Opsgenie sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/pagertree/transport.py"
+anzahl = 1
+en = '"PagerTree notifications are not enabled."'
+de = '"Benachrichtigungen über PagerTree sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/pd/transport.py"
+anzahl = 1
+en = '"PagerDuty notifications are not enabled."'
+de = '"Benachrichtigungen über PagerDuty sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/po/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/po/transport.py"
+anzahl = 1
+en = '"Pushover notifications are not enabled."'
+de = '"Benachrichtigungen über Pushover sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/po/transport.py"
+anzahl = 1
+en = '"Rate limit exceeded"'
+de = '"Zu viele Nachrichten in kurzer Zeit; der Dienst hat abgelehnt"'
+
+[[quelltext]]
+datei = "hc/integrations/rocketchat/transport.py"
+anzahl = 1
+en = '"Rocket.Chat notifications are not enabled."'
+de = '"Benachrichtigungen über Rocket.Chat sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/shell/transport.py"
+anzahl = 1
+en = '"Shell commands are not enabled"'
+de = '"Shell-Befehle sind auf dieser Instanz abgeschaltet"'
+
+[[quelltext]]
+datei = "hc/integrations/shell/transport.py"
+anzahl = 1
+en = 'f"Command returned exit code {code}"'
+de = 'f"Der Befehl endete mit Exit-Code {code}"'
+
+[[quelltext]]
+datei = "hc/integrations/signal/transport.py"
+anzahl = 2
+en = '"Signal notifications are not enabled"'
+de = '"Benachrichtigungen über Signal sind auf dieser Instanz abgeschaltet"'
+
+[[quelltext]]
+datei = "hc/integrations/signal/transport.py"
+anzahl = 1
+en = '"Rate limit exceeded"'
+de = '"Zu viele Nachrichten in kurzer Zeit; der Dienst hat abgelehnt"'
+
+[[quelltext]]
+datei = "hc/integrations/signal/transport.py"
+anzahl = 1
+en = '"signal-cli call failed (unexpected response)"'
+de = '"Aufruf von signal-cli gescheitert (unerwartete Antwort)"'
+
+[[quelltext]]
+datei = "hc/integrations/signal/transport.py"
+anzahl = 1
+en = '"Recipient not found"'
+de = '"Empfänger nicht gefunden"'
+
+[[quelltext]]
+datei = "hc/integrations/signal/transport.py"
+anzahl = 1
+en = '"signal-cli call timed out"'
+de = '"Aufruf von signal-cli: Frist überschritten"'
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/slack/transport.py"
+anzahl = 1
+en = '"Slack notifications are not enabled."'
+de = '"Benachrichtigungen über Slack sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/sms/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/sms/transport.py"
+anzahl = 1
+en = '"SMS notifications are not enabled"'
+de = '"SMS sind auf dieser Instanz abgeschaltet"'
+
+[[quelltext]]
+datei = "hc/integrations/sms/transport.py"
+anzahl = 1
+en = '"Monthly SMS limit exceeded"'
+de = '"Das Monatskontingent für SMS ist aufgebraucht"'
+
+[[quelltext]]
+datei = "hc/integrations/sms/transport.py"
+anzahl = 1
+en = '"Invalid phone number"'
+de = '"Die Telefonnummer ist ungültig"'
+
+[[quelltext]]
+datei = "hc/integrations/spike/transport.py"
+anzahl = 1
+en = '"Spike notifications are not enabled."'
+de = '"Benachrichtigungen über Spike sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/telegram/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/telegram/transport.py"
+anzahl = 1
+en = '"Rate limit exceeded"'
+de = '"Zu viele Nachrichten in kurzer Zeit; der Dienst hat abgelehnt"'
+
+[[quelltext]]
+datei = "hc/integrations/trello/transport.py"
+anzahl = 1
+en = '"Trello notifications are not enabled."'
+de = '"Benachrichtigungen über Trello sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/victorops/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/victorops/transport.py"
+anzahl = 1
+en = '"Splunk On-Call notifications are not enabled."'
+de = '"Benachrichtigungen über Splunk On-Call sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/webhook/transport.py"
+anzahl = 1
+en = '"Webhook notifications are not enabled."'
+de = '"Benachrichtigungen über Webhooks sind auf dieser Instanz abgeschaltet."'
+
+[[quelltext]]
+datei = "hc/integrations/webhook/transport.py"
+anzahl = 1
+en = '"Empty webhook URL"'
+de = '"Die Webhook-Adresse ist leer"'
+
+[[quelltext]]
+datei = "hc/integrations/whatsapp/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/whatsapp/transport.py"
+anzahl = 1
+en = '"Monthly message limit exceeded"'
+de = '"Das Monatskontingent für Nachrichten ist aufgebraucht"'
+
+[[quelltext]]
+datei = "hc/integrations/whatsapp/transport.py"
+anzahl = 1
+en = '"WhatsApp notifications are not enabled"'
+de = '"WhatsApp-Nachrichten sind auf dieser Instanz abgeschaltet"'
+
+[[quelltext]]
+datei = "hc/integrations/whatsapp/transport.py"
+anzahl = 1
+en = '"Invalid phone number"'
+de = '"Die Telefonnummer ist ungültig"'
+
+[[quelltext]]
+datei = "hc/integrations/zulip/transport.py"
+en = 'f"Received status code {response.status_code}"'
+de = 'f"Antwort mit Statuscode {response.status_code}"'
+
+[[quelltext]]
+datei = "hc/integrations/zulip/transport.py"
+anzahl = 1
+en = '"Zulip notifications are not enabled."'
+de = '"Benachrichtigungen über Zulip sind auf dieser Instanz abgeschaltet."'

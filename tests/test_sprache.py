@@ -138,6 +138,14 @@ de = "<p>Jetzt <b>starten</b></p>"
     assert bericht["englisch"] == [{"datei": "templates/f.html", "text": "Hello world"}]
 
 
+def test_erkennung_uebergeht_ausdruecke_und_nummern(tmp_path):
+    quelle = ('<!DOCTYPE html><a title="{{ project }}">x</a><i>4.4-wb1.1.0</i><b>v4.4</b><b>Werkbank 0.0.0-dev</b>'
+              '<p>{{ n }} checks</p><s>&#8204;&nbsp;&#x2014;</s>')
+    wurzel, werkbank = aufbau(tmp_path, dateien={"templates/o.html": quelle})
+    bericht = sprache.bauen(wurzel, werkbank)
+    assert [r["text"] for r in bericht["englisch"]] == ["Werkbank 0.0.0-dev", "checks"]
+
+
 def test_fehlende_datei_und_unbenutzte_globale_eintraege(tmp_path):
     katalog = text("templates/fehlt.html", "Hello", "Hallo") + text("*", "Nowhere", "Nirgends")
     wurzel, werkbank = aufbau(tmp_path, katalog, {"templates/g.html": "<b>x</b>"})

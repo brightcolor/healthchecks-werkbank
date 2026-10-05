@@ -51,12 +51,15 @@ PFAD_EINSTELLUNGEN = ("WB_EINSTELLUNGSMODUL", "WB_FORMATMODUL", "WB_LOCAL_SETTIN
 SICHTBARE_ATTRIBUTE = ("title", "placeholder", "aria-label", "alt")
 KNOPF_TYPEN = ("submit", "button", "reset")
 BUCHSTABEN = re.compile(r"[A-Za-z]{2}")
+# Template-Ausdrücke tragen keinen Text; Wörter mit Ziffern sind Fassungen, Zeiten oder Adressen.
+AUSDRUCK = re.compile(r"\{\{.*?\}\}|\{%.*?%\}|&(?:[A-Za-z]+|#\d+|#x[0-9A-Fa-f]+);", re.S)
 TOKEN = re.compile(
     r"\{#.*?#\}"
     r"|\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}"
     r"|\{%.*?%\}"
     r"|\{\{.*?\}\}"
     r"|<!--.*?-->"
+    r"|<![A-Za-z][^>]*>"
     r"|<(?P<opak>script|style|pre|code|textarea)\b.*?</(?P=opak)\s*>"
     r"|</?[A-Za-z][^<>]*>",
     re.S | re.I,
@@ -211,13 +214,19 @@ def quelltext_anwenden(quelle: str, eintrag: Eintrag) -> tuple[str, int, bool]:
     return (quelle.replace(eintrag.en, eintrag.de) if passt else quelle), gefunden, passt
 
 
+def traegt_text(kern: str) -> bool:
+    """Ob ein Textstück Wörter trägt: ohne Template-Ausdrücke, Zeichenreferenzen und Wörter mit Ziffern."""
+    woerter = [w for w in AUSDRUCK.sub(" ", kern).split() if not any(z.isdigit() for z in w)]
+    return bool(BUCHSTABEN.search(" ".join(woerter)))
+
+
 def englische_reste(original: str, ergebnis: str, gleich: set[str]) -> list[str]:
-    """Textstücke des Ergebnisses, die unverändert aus dem Original stammen und Buchstaben tragen."""
+    """Textstücke des Ergebnisses, die unverändert aus dem Original stammen und Wörter tragen."""
     vorher = {norm(s.roh) for s in stuecke(original)}
     reste: list[str] = []
     for stueck in stuecke(ergebnis):
         kern = norm(stueck.roh)
-        if kern in vorher and kern not in gleich and BUCHSTABEN.search(kern) and kern not in reste:
+        if kern in vorher and kern not in gleich and traegt_text(kern) and kern not in reste:
             reste.append(kern)
     return reste
 

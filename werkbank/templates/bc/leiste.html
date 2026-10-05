@@ -21,7 +21,8 @@ Texte englisch wie Healthchecks; Adressen nur über {% url %}.
     data-ziel-badges="{% url 'hc-badges' muster %}"
     data-ziel-settings="{% url 'hc-project-settings' muster %}"
     {% if request.user.is_authenticated %}data-projektmenue="{% url 'hc-projects-menu' %}" data-darstellung="{% url 'hc-appearance' %}"{% endif %}
-    {% if project %}data-aktuell="{{ project.code }}"{% endif %}>
+    {% if project %}data-aktuell="{{ project.code }}"{% endif %}
+    data-zustand-up="{{ "up"|zustand }}" data-zustand-grace="{{ "grace"|zustand }}" data-zustand-down="{{ "down"|zustand }}">
     <nav class="bc-rail" id="wb-leiste" aria-label="Navigation">
         <div class="bc-rail__brand">
             <a href="{% url 'hc-index' %}"><img src="{% static 'bc/logo/bc-logo-light-noclaim.svg' %}" alt="bright color: {{ site_name }}" width="170" height="28"></a>
@@ -56,7 +57,7 @@ Texte englisch wie Healthchecks; Adressen nur über {% url %}.
                 <form method="post" action="{% url 'hc-logout' %}">{% csrf_token %}<button class="bc-rail__item" type="submit">Log Out</button></form>
             </li>
         </ul>
-        {% if request.user.is_superuser %}<div class="bc-rail__foot">Healthchecks {% site_version %} · Werkbank @@WERKBANK_FASSUNG@@</div>{% endif %}
+        {% if request.user.is_superuser %}<div class="bc-rail__foot">Healthchecks {% site_version %} · Werkbank <span class="wb-fassung">@@WERKBANK_FASSUNG@@</span></div>{% endif %}
         {% else %}
         <ul class="bc-rail__nav wb-konto">
             <li><a class="bc-rail__item" href="{% url 'hc-docs' %}"{% if page == "docs" or page == "docs-cron" %} aria-current="page"{% endif %}>Docs</a></li>
