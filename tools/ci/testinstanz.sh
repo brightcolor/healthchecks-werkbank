@@ -9,6 +9,7 @@ NAME="${WB_TESTINSTANZ:-wb-test}"
 PORT="${WB_TESTPORT:-8000}"
 ERGEBNIS="${WB_MUSTERDATEN:-tests/e2e/ergebnisse/musterdaten.json}"
 FRIST="${WB_START_FRIST:-180}"
+MAILS="${WB_MAILS:-tests/e2e/ergebnisse/mails}"
 
 passwort="$(openssl rand -hex 16)"
 echo "::add-mask::${passwort}"
@@ -46,5 +47,14 @@ if [ ! -s "$ERGEBNIS" ]; then
 	echo "::error::manage.py shell lief durch, gab aber keine Zeile MUSTERDATEN aus. Die Ausgabe steht darüber."
 	exit 1
 fi
+# Jede Mail mit den Musterdaten rendern; Bilder und Kontrast prüft tests/e2e/mails.spec.mjs.
+if ! docker exec -e WB_MAILS_ZIEL=/tmp/werkbank-mails "$NAME" ./manage.py shell -c "$(cat tests/mails/rendern.py)" > "$roh" 2>&1; then
+	tail -n 40 "$roh"
+	echo "::error::Die Mails wurden nicht gerendert. Die Ausgabe von manage.py shell steht darüber."
+	exit 1
+fi
+mkdir -p "$MAILS"
+docker cp "$NAME:/tmp/werkbank-mails/." "$MAILS/"
+echo "Mails mit Musterdaten in ${MAILS}."
 echo "WB_TEST_PASSWORT=${passwort}" >> "${GITHUB_ENV:-/dev/null}"
 echo "Testinstanz ${NAME} läuft auf Port ${PORT}, Musterdaten in ${ERGEBNIS}."

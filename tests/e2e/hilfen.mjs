@@ -87,3 +87,9 @@ export async function ueberdeckungen(page, zeilen, teile) {
     return befunde;
   }, [zeilen, teile]);
 }
+
+// Healthchecks-Version, für die der Katalog vollständig ist, und die geprüfte Version.
+// Tests, die bestimmte deutsche Texte von Healthchecks erwarten, laufen nur, wenn beide gleich sind.
+export const stand = (readFileSync('werkbank/deutsch/katalog.toml', 'utf8').match(/^stand\s*=\s*"([^"]+)"/m) || [])[1] || '';
+export const hcVersion = process.env.WB_HC_VERSION || '';
+export const katalogStand = hcVersion !== '' && hcVersion === stand;

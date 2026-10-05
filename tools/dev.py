@@ -2,10 +2,12 @@
 """Lokaler Aufbau von Healthchecks mit der Werkbank, ohne Docker.
 
   python tools/dev.py vorbereiten   Quelle holen, venv füllen, Werkbank einsetzen, Datenbank und Musterdaten
-  python tools/dev.py einsetzen     Vorlagen und Stil neu einsetzen, Arbeitskopie bleibt (danach Server neu starten)
+  python tools/dev.py einsetzen     Vorlagen, Stil, Mail-Layout und Sprache neu einsetzen, Arbeitskopie bleibt
+                                    (danach Server neu starten)
   python tools/dev.py stil          nur werkbank.css und leiste.js neu bauen; der Server läuft weiter
   python tools/dev.py starten       Server auf WB_DEV_ADRESSE starten (vorher vorbereiten)
-  python tools/dev.py pruefen       Browserprüfung gegen den laufenden Server
+  python tools/dev.py mails         jede Mail mit den Musterdaten nach tests/e2e/ergebnisse/mails/ rendern
+  python tools/dev.py pruefen       Mails rendern, dann Browserprüfung gegen den laufenden Server
 
 Einstellungen über Umgebungsvariablen; die Vorgaben stehen in VORGABEN.
 Der Zugang der Musterkonten liegt in .upstream/dev-zugang.txt (nicht im Repo).
@@ -27,6 +29,8 @@ WURZEL = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(WURZEL / "werkbank"))
 import einbau  # noqa: E402
 import farben  # noqa: E402
+import mails  # noqa: E402
+import sprache  # noqa: E402
 
 VORGABEN = {
     "HC_VERSION": "v4.4",
@@ -40,6 +44,7 @@ UPSTREAM = WURZEL / ".upstream"
 VENV = WURZEL / ".venv"
 ZUGANG = UPSTREAM / "dev-zugang.txt"
 MUSTERDATEN = WURZEL / "tests" / "e2e" / "ergebnisse" / "musterdaten.json"
+MAILS = WURZEL / "tests" / "e2e" / "ergebnisse" / "mails"
 
 
 def einstellung(name: str) -> str:
@@ -100,9 +105,18 @@ def einsetzen(arbeit: Path) -> dict:
     einbau.einbauen(arbeit, einbau.lade_plan(einbau.PLAN_VORGABE), "dev")
     css, farben_css, bericht = farben.bauen(arbeit, hausschrift, werkbank, "dev")
     farben.schreibe(arbeit, css, farben_css)
-    (UPSTREAM / "dev-bericht.json").write_text(json.dumps(bericht, indent=2, ensure_ascii=False), encoding="utf-8")
+    bericht_pfad = UPSTREAM / "dev-bericht.json"
+    bericht_pfad.write_bytes((json.dumps(bericht, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+    hinweise = mails.einsetzen(arbeit, werkbank, hausschrift)
+    mails.bericht_schreiben(bericht_pfad, hinweise)
+    uebersetzung = sprache.bauen(arbeit, werkbank, bericht_pfad)
     print(f"Werkbank eingesetzt: {bericht['deklarationen']} Farbangaben, "
-          f"{len(bericht['automatisch'])} automatisch zugeordnet (Liste in .upstream/dev-bericht.json).")
+          f"{len(bericht['automatisch'])} automatisch zugeordnet (Bericht in .upstream/dev-bericht.json).")
+    if uebersetzung["sprache"] == "de":
+        print(f"Übersetzung: {uebersetzung['ersetzt']} Ersetzungen, {len(uebersetzung['englisch'])} Textstücke englisch, "
+              f"{len(uebersetzung['ohne_fundstelle'])} Einträge ohne Fundstelle.")
+    for hinweis in hinweise:
+        print(f"Hinweis: {hinweis}")
     return bericht
 
 
@@ -155,7 +169,10 @@ COMPRESS_OFFLINE = False
 
 
 def lokale_einstellungen(arbeit: Path) -> None:
-    (arbeit / "hc" / "local_settings.py").write_text(LOKALE_EINSTELLUNGEN, encoding="utf-8")
+    """Hängt die lokalen Zeilen an die local_settings.py, die sprache.bauen mit dem Import anlegt."""
+    pfad = arbeit / sprache.einstellung("WB_LOCAL_SETTINGS")
+    vorhanden = pfad.read_bytes().decode("utf-8") if pfad.is_file() else ""
+    pfad.write_bytes((vorhanden + "\n" + LOKALE_EINSTELLUNGEN).encode("utf-8"))
 
 
 def musterdaten(py: Path, arbeit: Path, env: dict) -> None:
@@ -189,7 +206,15 @@ def nur_stil(version: str) -> None:
     if not (arbeit / "manage.py").is_file():
         raise DevFehler(f"{arbeit} fehlt. Zuerst python tools/dev.py vorbereiten ausführen.")
     werkbank = WURZEL / "werkbank"
-    shutil.copy2(werkbank / "static" / "bc" / "leiste.js", arbeit / "static" / "bc" / "leiste.js")
+    leiste = arbeit / "static" / "bc" / "leiste.js"
+    shutil.copy2(werkbank / "static" / "bc" / "leiste.js", leiste)
+    if sprache.sprache_pruefen() == "de":
+        katalog = sprache.lade_katalog(werkbank / sprache.einstellung("WB_KATALOG"))
+        text, crlf = sprache.lies(leiste)
+        for e in katalog.eintraege:
+            if e.art == "quelltext" and e.datei == "static/bc/leiste.js":
+                text = sprache.quelltext_anwenden(text, e)[0]
+        sprache.schreibe(leiste, text, crlf)
     css, farben_css, bericht = farben.bauen(arbeit, WURZEL / "vendor" / "hausschrift", werkbank, "dev")
     farben.schreibe(arbeit, css, farben_css)
     print(f"werkbank.css neu gebaut: {bericht['deklarationen']} Farbangaben, "
@@ -201,8 +226,11 @@ def nur_einsetzen(version: str) -> None:
     arbeit = UPSTREAM / f"arbeit-{version}"
     if not (arbeit / "manage.py").is_file():
         raise DevFehler(f"{arbeit} fehlt. Zuerst python tools/dev.py vorbereiten ausführen.")
-    vorlage = einbau.lade_plan(einbau.PLAN_VORGABE).vorlage
-    shutil.copy2(quelle(version) / vorlage, arbeit / vorlage)
+    # Einbau, Erweiterungen und Katalog wirken nur auf unberührte Dateien.
+    sauber = quelle(version)
+    for teil in ("templates", "static", "hc"):
+        if (sauber / teil).is_dir():
+            shutil.copytree(sauber / teil, arbeit / teil, dirs_exist_ok=True)
     einsetzen(arbeit)
     lokale_einstellungen(arbeit)
     print("Den Server neu starten, damit Django die Vorlagen neu lädt: python tools/dev.py starten")
@@ -225,6 +253,23 @@ ANMELDESPERRE_LOESEN = (
 )
 
 
+def mails_rendern(version: str) -> None:
+    """Rendert jede Mail mit den Musterdaten nach tests/e2e/ergebnisse/mails/, ohne sie zu verschicken."""
+    arbeit = UPSTREAM / f"arbeit-{version}"
+    if not (arbeit / "manage.py").is_file():
+        raise DevFehler(f"{arbeit} fehlt. Zuerst python tools/dev.py vorbereiten ausführen.")
+    MAILS.mkdir(parents=True, exist_ok=True)
+    skript = (WURZEL / "tests" / "mails" / "rendern.py").read_bytes().decode("utf-8")
+    env = dict(umgebung(version), WB_MAILS_ZIEL=str(MAILS))
+    ergebnis = subprocess.run([str(venv_python()), "manage.py", "shell", "-c", skript], cwd=arbeit, env=env,
+                              capture_output=True, text=True, encoding="utf-8")
+    zeilen = [z for z in ergebnis.stdout.splitlines() if z.startswith("MAILS: ")]
+    if ergebnis.returncode != 0 or not zeilen:
+        raise DevFehler("Die Mails wurden nicht gerendert. Ausgabe von manage.py shell:\n"
+                        + (ergebnis.stderr or ergebnis.stdout)[-3000:])
+    print(f"{len(json.loads(zeilen[-1].removeprefix('MAILS: ')))} Mails in {MAILS.relative_to(WURZEL)}")
+
+
 def pruefen(version: str, argumente: list[str]) -> None:
     npx = shutil.which("npx")
     if not npx:
@@ -233,15 +278,17 @@ def pruefen(version: str, argumente: list[str]) -> None:
     if not (arbeit / "manage.py").is_file():
         raise DevFehler(f"{arbeit} fehlt. Zuerst python tools/dev.py vorbereiten ausführen.")
     lauf([venv_python(), "manage.py", "shell", "-c", ANMELDESPERRE_LOESEN], cwd=arbeit, env=umgebung(version))
+    mails_rendern(version)
     env = dict(os.environ, WB_BASIS_URL=einstellung("WB_DEV_SITE_ROOT"), WB_TEST_PASSWORT=zugang(),
-               WB_MUSTERDATEN=str(MUSTERDATEN), WB_BROWSER_KANAL=einstellung("WB_BROWSER_KANAL"))
+               WB_MUSTERDATEN=str(MUSTERDATEN), WB_BROWSER_KANAL=einstellung("WB_BROWSER_KANAL"),
+               WB_HC_VERSION=version, WB_MAILS=str(MAILS))
     lauf([npx, "playwright", "test", *argumente], cwd=WURZEL, env=env)
 
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Lokaler Aufbau von Healthchecks mit der Werkbank.")
     p.add_argument("--version", default=einstellung("HC_VERSION"), help="Healthchecks-Version, etwa v4.4")
-    p.add_argument("befehl", choices=["vorbereiten", "einsetzen", "stil", "starten", "pruefen"])
+    p.add_argument("befehl", choices=["vorbereiten", "einsetzen", "stil", "starten", "mails", "pruefen"])
     p.add_argument("rest", nargs=argparse.REMAINDER, help="bei pruefen: weitere Argumente für Playwright")
     args = p.parse_args(argv)
     try:
@@ -253,9 +300,11 @@ def main(argv: list[str] | None = None) -> int:
             nur_stil(args.version)
         elif args.befehl == "starten":
             starten(args.version)
+        elif args.befehl == "mails":
+            mails_rendern(args.version)
         else:
             pruefen(args.version, args.rest)
-    except (DevFehler, einbau.EinbauFehler, farben.FarbFehler) as err:
+    except (DevFehler, einbau.EinbauFehler, farben.FarbFehler, mails.MailFehler, sprache.SprachFehler) as err:
         print(f"Abbruch: {err}", file=sys.stderr)
         return 1
     return 0
