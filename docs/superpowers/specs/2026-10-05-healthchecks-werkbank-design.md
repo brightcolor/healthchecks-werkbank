@@ -110,7 +110,7 @@ Onyx, 256 px breit, fest links, scrollt in sich, in beiden Modi gleich. Healthch
 60 px hoch, klebt oben, weiß, im dunklen Modus in der Kartenfläche.
 
 - Menüknopf unter 900 px.
-- Brotkrumen „Projekt › Seite“, auf Check-Details und Log „Projekt › Checks › Name des Checks“.
+- Brotkrumen „Projekt › Seite“, auf Check-Details „Projekt › Checks › Name des Checks“, auf dem Log dazu „› Events“ wie bei Healthchecks. Lange Namen kürzen sich mit Tooltip; unter 640 px nennt die Kopfzeile die aktuelle Seite.
 - Umschalter Hell/Dunkel: schickt `theme=dark` oder `theme=` samt CSRF-Token per POST an die Darstellungs-Seite und setzt `body.dark` sofort. Scheitert das Speichern, springt der Modus zurück, und eine Meldung unter der Kopfzeile nennt Ursache und nächsten Schritt, etwa: „Your appearance setting wasn't saved because Healthchecks didn't respond. Reload the page and try again.“ Steht die Einstellung auf „System“, wechselt der Umschalter vom gerade angezeigten Modus in den anderen und speichert diesen fest. „System“ bleibt im Profil wählbar.
 - Avatar (Onyx-Kreis mit gelbem Anfangsbuchstaben der E-Mail) und „Log Out“ als Textlink, der das Abmeldeformular von Healthchecks abschickt.
 - Ohne Anmeldung trägt die Kopfzeile den Menüknopf für schmale Bildschirme; die Anmeldeseite hat keine Kopfzeile.
@@ -129,7 +129,7 @@ Onyx, 256 px breit, fest links, scrollt in sich, in beiden Modi gleich. Healthch
 - Anton in Versalien für Seiten- und Kartentitel, Text in Atkinson Hyperlegible, Cron-Ausdrücke, Ping-Adressen und Code in IBM Plex Mono.
 - Textlinks hell `#b3146a`, dunkel Cyan. Fokus hell `#0a86ad`, dunkel Cyan.
 - Vierfarbband 4 px fest am oberen Rand.
-- Zustände in der Hausampel: up Limette, grace Gelb, down Pink, started Cyan, paused und new leise. Die Symbole behalten ihre Form, der Zustand bleibt so auch ohne Farbe erkennbar.
+- Zustände in der Hausampel: up Limette, grace Gelb, beide als Scheibe auf Tinte; down Pink, started Cyan, paused und new leise. Die Symbole behalten ihre Form, der Zustand bleibt so auch ohne Farbe erkennbar.
 
 ### Schmale Bildschirme
 
@@ -138,6 +138,8 @@ Onyx, 256 px breit, fest links, scrollt in sich, in beiden Modi gleich. Healthch
   - Checks: Titel ist der Name mit den Tags darunter, so wie Healthchecks sie in derselben Zelle setzt; darunter leise letzter Ping · Zeitplan.
   - Integrations: Titel ist der Name der Integration, darunter ihre übrigen Spalten.
   - Ping-Log: Titel ist das Ereignis mit Zeitpunkt, darunter die übrigen Spalten.
+  - Projekte im Konto und Team eines Projekts: Titel ist der Name oder die E-Mail, darunter Rolle · Link.
+  - Weitere Integrationen: Titel und Beschreibung behalten die Breite, der Knopf wird zum kompakten Plus am rechten Rand.
 
 ### Anmeldeseite
 
@@ -210,14 +212,14 @@ Nur bei Grün und außerhalb von Pull Requests: `docker buildx imagetools create
 Ablauf eines Laufs:
 
 1. Sperre per `flock`, damit immer nur ein Lauf arbeitet.
-2. `docker pull <IMAGE>:<TRACK_TAG>`, Fassung aus dem Label `org.opencontainers.image.version`. Steht dieselbe Fassung schon in `<TAG_VARIABLE>` der `.env`, endet der Lauf mit 0.
+2. `docker pull <IMAGE>:<TRACK_TAG>`, Fassung aus dem Label `org.opencontainers.image.version`. Steht dieselbe Fassung schon in `<TAG_VARIABLE>` der `.env`, endet der Lauf mit 0. Steht sie in `FAILED_FILE`, weil ein früherer Lauf sie zurückgenommen hat, endet der Lauf mit 1 und ändert nichts; `--erneut` versucht sie trotzdem.
 3. Sicherung: SQLite-Sicherungsfunktion im laufenden Container, Kopie nach `<BACKUP_DIR>/healthchecks-<alter Tag>-<Zeitstempel UTC>.sqlite` mit Rechten 600. `PRAGMA integrity_check` muss `ok` liefern. Sicherungen über `BACKUP_KEEP` hinaus fallen weg, die älteste zuerst.
 4. `<TAG_VARIABLE>` in `<COMPOSE_DIR>/.env` auf den neuen Tag setzen, dann `docker compose up -d --wait --wait-timeout <WAIT_SECONDS>`.
 5. Prüfung im Container gegen `http://localhost:<APP_PORT>`: Der Container ist `healthy`, jeder Pfad aus `CHECK_PATHS` antwortet mit 200, die Anmeldeseite enthält `STYLE_MARKER`.
-6. Scheitert Schritt 4 oder 5, folgt der Rückweg: Container stoppen, Datenbank aus der Sicherung zurück ins Volume, alter Tag in die `.env`, `up -d --wait`, Prüfung wiederholen. Pings, die zwischen Sicherung und Rückweg ankommen, gehen dabei verloren.
+6. Scheitert Schritt 4 oder 5, folgt der Rückweg: Fassung in `FAILED_FILE` vermerken, Container stoppen, Datenbank aus der Sicherung zurück ins Volume, alter Tag in die `.env`, `up -d --wait`, Prüfung wiederholen. Pings, die zwischen Sicherung und Rückweg ankommen, gehen dabei verloren. Ein gelungener Wechsel löscht den Vermerk.
 7. Jeder Schritt landet mit Zeitstempel in UTC in `LOG_FILE`; eine logrotate-Regel hält die Datei klein.
 
-Rückgabewerte: 0 aktuell oder erfolgreich gewechselt, 1 Update gescheitert und zurückgenommen (oder ghcr.io nicht erreichbar), 2 ungültige Einstellung, 3 Rückweg gescheitert.
+Rückgabewerte: 0 aktuell oder erfolgreich gewechselt, 1 Update gescheitert und zurückgenommen, Fassung ausgelassen oder ghcr.io nicht erreichbar, 2 ungültige Einstellung, 3 Rückweg gescheitert.
 
 ### Einstellungen
 
@@ -235,9 +237,12 @@ Rückgabewerte: 0 aktuell oder erfolgreich gewechselt, 1 Update gescheitert und 
 | `BACKUP_KEEP` | `10` | Zahl der Sicherungen, die bleiben | 1 bis 100 |
 | `WAIT_SECONDS` | `180` | Frist, bis der Container gesund sein muss | 30 bis 1800 |
 | `APP_PORT` | `8000` | Port von Healthchecks im Container | 1 bis 65535 |
+| `CHECK_TIMEOUT` | `10` | Frist je Prüfanfrage in Sekunden | 1 bis 120 |
 | `CHECK_PATHS` | `/api/v3/status/ /accounts/login/` | Pfade, die nach dem Start mit 200 antworten müssen | Pfade mit `/` am Anfang |
 | `STYLE_MARKER` | `bc/werkbank` | Text, den die Anmeldeseite enthalten muss | mindestens ein Zeichen |
 | `LOG_FILE` | `/var/log/hc-werkbank-update.log` | Protokoll der Läufe | absoluter Pfad |
+| `LOCK_FILE` | `/run/lock/hc-werkbank-update.lock` | Sperre gegen doppelte Läufe | absoluter Pfad |
+| `FAILED_FILE` | `/var/lib/hc-werkbank-update/failed-version` | Vermerk der zurückgenommenen Fassung | absoluter Pfad |
 
 ### Meldungen
 
@@ -276,4 +281,5 @@ Die Umstellung bringt das Update von Healthchecks v4.3 auf v4.4 mit, samt Datenb
 | Sicherung scheitert oder die Integritätsprüfung meldet einen Fehler | Update unterbleibt, Lauf endet mit 1 | Fehlschlag mit Grund |
 | Neuer Container wird nicht gesund, oder eine Prüfung scheitert | Rückweg auf alten Tag und Sicherung, Lauf endet mit 1 | Fehlschlag mit Grund und den letzten Zeilen |
 | Rückweg scheitert | Lauf endet mit 3; das Log nennt Sicherung und Befehle für die Handarbeit | Uptime Kuma meldet den Ausfall von hc.bcsrv.de |
+| Zurückgenommene Fassung ist weiter die neueste | Spätere Läufe lassen sie aus und enden mit 1, bis `--erneut` läuft oder eine neuere Fassung erscheint | Der Check bleibt rot; das Log nennt `--erneut` |
 | Ungültige Einstellung | Lauf endet mit 2, nichts wird geändert | Meldung nennt Einstellung, Wert und erlaubten Bereich |
