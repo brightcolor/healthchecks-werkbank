@@ -42,6 +42,8 @@ hc.bcsrv.de, das selbst betriebene Healthchecks auf docker-a1, bekommt die Werkb
 Dockerfile                  FROM healthchecks/healthchecks:${HC_VERSION}
 VERSION                     Fassung des Themes, beginnend mit 1.0.0
 werkbank/einbau.py          setzt die Zeilen in base.html und die Fassung in leiste.html
+werkbank/farben.py          leitet aus den Stylesheets von Healthchecks bc/farben.css ab
+werkbank/farben.json        Zuordnung fester Farben zu Werkbank-Rollen
 werkbank/static/bc/         werkbank.css, Schriften, Logos, leiste.js
 werkbank/templates/bc/      leiste.html (Leiste, Kopfzeile, Markenfläche der Anmeldung)
 deploy/                     hc-werkbank-update, systemd-Dienst und -Timer, logrotate, Beispiel der Einstellungsdatei
@@ -58,7 +60,15 @@ LICENSE, UPSTREAM-LICENCE, README.md, CHANGELOG.md
    - vor `<nav class="navbar navbar-default">` die Zeile `{% include "bc/leiste.html" %}`.
 
    Jeder Anker muss genau einmal vorkommen. Fehlt einer oder steht er mehrfach da, bricht der Bau ab, und die Meldung nennt Anker, Datei und gefundene Anzahl. Außerdem schreibt `einbau.py` die Fassung aus `VERSION` in `leiste.html`.
-3. Danach laufen `collectstatic` und `compress` wie im offiziellen Dockerfile.
+3. `farben.py` liest die Stylesheets aus dem `{% compress css %}`-Block von `base.html` in dessen Reihenfolge, ohne `variables.css`, und schreibt jede Deklaration mit fester Farbe mit demselben Selektor neu, die Farbe ersetzt durch eine Werkbank-Rolle. Ergebnis ist `static/bc/farben.css`; `werkbank.css` bindet es vor der Stilschicht ein (Abschnitt 5).
+4. Danach laufen `collectstatic` und `compress` wie im offiziellen Dockerfile.
+
+**Farbableitung** (Grundlage: `tools/derive.py` aus `postal-brightcolor`)
+
+- Ausgangslage in v4.4: 627 Deklarationen mit fester Farbe und 181 verschiedenen Werten, davon 325 in `bootstrap.css`, 121 in `syntax.css` (Codehervorhebung der Docs) und 59 im Tag-Feld.
+- `farben.json` ordnet jeder bekannten Farbe je Art eine Rolle zu: Schrift (`color`), Fläche (`background`), Rand (`border`, `outline`), Schatten. Ausnahmen je Selektor gehen vor, etwa weiße Schrift auf dem Hauptknopf, die zur Tinte wird.
+- Rollen sind Werkbank-Variablen mit hellem Wert auf `:root` und dunklem auf `body.dark`. So folgt jede abgeleitete Farbe dem Modus.
+- Eine Farbe ohne Eintrag bekommt ihre Rolle nach Farbton und Helligkeit: Grün wird zum Ton für „läuft“, Rot zu Pink, Orange und Gelb zu Gelb, Blau zu Link oder Hinweis, Grau je nach Helligkeit zu Fläche, Linie oder leiser Schrift. Der Bau läuft weiter, die Zusammenfassung des CI-Laufs listet diese Farben als Hinweis mit Datei, Selektor und gewählter Rolle.
 
 **Tags**
 
@@ -107,11 +117,12 @@ Onyx, 256 px breit, fest links, scrollt in sich, in beiden Modi gleich. Healthch
 
 ### Farben und Bausteine
 
-`werkbank.css` lädt zuletzt und besteht aus drei Teilen:
+`werkbank.css` lädt zuletzt und besteht aus vier Teilen:
 
 1. Schriften (Anton, Atkinson Hyperlegible, IBM Plex Mono aus `bc-fonts.css`) und Tokens (`bc-tokens.css`) der Hausschrift,
 2. den 78 Variablen von Healthchecks, hell auf `:root` und dunkel auf `body.dark`, jeweils auf Werkbank-Tokens gesetzt,
-3. der Stilschicht: Leiste, Kopfzeile, Karten, Knöpfe, Felder, Tabellen, Zustände, Anmeldeseite, schmale Bildschirme.
+3. den abgeleiteten festen Farben aus `farben.css` (Abschnitt 4, Farbableitung),
+4. der Stilschicht: Leiste, Kopfzeile, Karten, Knöpfe, Felder, Tabellen, Zustände, Anmeldeseite, schmale Bildschirme.
 
 - Papiergrund, weiße Karten mit 12 px Rundung, 1 px Linie und leisem Schatten. Felder und Knöpfe mit 8 px Rundung und 38 px Höhe.
 - Hauptknopf (`btn-primary`) Gelb mit Tinte-Schrift, Löschen (`btn-danger`) Pink mit weißer Schrift, die übrigen Knöpfe mit Umriss.
@@ -167,6 +178,7 @@ arm64: Der Container startet, wird gesund, und die Anmeldeseite lädt `werkbank.
 amd64 vollständig:
 
 - **Variablen:** Die Namen in `variables.css` des Basis-Images werden mit den Namen in `werkbank.css` verglichen, getrennt nach hell und dunkel. Eine neue Variable macht den Lauf rot und wird genannt. Eine entfallene Variable steht als Hinweis in der Zusammenfassung.
+- **Farbableitung:** Tests für `farben.py` (Zerlegen, Zuordnen, Ausnahmen je Selektor, automatische Zuordnung). Automatisch zugeordnete Farben stehen als Hinweis in der Zusammenfassung.
 - **Musterdaten** über `manage.py shell`: Superuser mit zufälligem Passwort aus dem Lauf, zwei Projekte, Checks in jedem Zustand (up, grace, down, started, paused, new), Integrationen, Pings.
 - **Browser** mit Playwright (Chromium), Anmeldung über das Formular von Healthchecks. Seiten: Anmeldung, Projektübersicht, Checks, Check-Details, Log, Integrations, Badges, Projekt-Settings, Account Settings, Appearance, Docs. Jede Seite hell und dunkel, Seiten ohne Anmeldung hell. Je Seite: Antwort 200, Leiste vorhanden, `werkbank.css` geladen, Konsole ohne Fehler.
 - **Kontrast** über jede sichtbare Schrift mit `check-contrast.js` aus der Hausschrift.
@@ -256,6 +268,7 @@ Die Umstellung bringt das Update von Healthchecks v4.3 auf v4.4 mit, samt Datenb
 |---|---|---|
 | Anker in `base.html` fehlt oder steht mehrfach da | Bau bricht ab, nichts wird veröffentlicht | Issue nennt Anker, Datei, Anzahl und Version |
 | Neue Variable in `variables.css` | Prüfung rot | Issue nennt die Variablen |
+| Feste Farbe ohne Eintrag in `farben.json` | Rolle nach Farbton und Helligkeit, Bau läuft weiter | Hinweis in der Zusammenfassung mit Datei, Selektor und Rolle |
 | Seite mit Fehler, Kontrast unter der Grenze, Querscrollen oder einzeilige Liste auf dem Handy | Prüfung rot | Issue nennt Seite, Modus, Breite und Befund; Bilder hängen am Lauf |
 | Update-Probe scheitert | Prüfung rot | Issue nennt den gescheiterten Schritt |
 | Basis-Image fehlt noch auf Docker Hub | Lauf endet grün, der nächste Durchgang versucht es erneut | Hinweis in der Zusammenfassung |
