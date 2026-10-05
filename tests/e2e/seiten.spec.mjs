@@ -86,3 +86,20 @@ test('Integrationen: Text, Symbole und Knöpfe stehen frei', async ({ page }) =>
   }
   expect(befunde).toEqual([]);
 });
+
+test('Knöpfe fassen ihre Beschriftung', async ({ page }) => {
+  await anmelden(page, 'hell');
+  const befunde = [];
+  for (const breite of [390, 1280]) {
+    await page.setViewportSize({ width: breite, height: 900 });
+    for (const [name, pfad] of angemeldeteSeiten) {
+      await page.goto(pfad);
+      await page.waitForLoadState('networkidle');
+      const zuEng = await page.evaluate(() => [...document.querySelectorAll('.btn, button')]
+        .filter((el) => el.offsetParent !== null && el.scrollWidth > el.clientWidth + 1)
+        .map((el) => `„${el.textContent.trim().replace(/\s+/g, ' ')}“ (${el.scrollWidth} > ${el.clientWidth} px)`));
+      for (const knopf of zuEng) befunde.push(`${name}, ${breite} px: ${knopf}`);
+    }
+  }
+  expect(befunde).toEqual([]);
+});

@@ -47,6 +47,13 @@ if [ ! -s "$ERGEBNIS" ]; then
 	echo "::error::manage.py shell lief durch, gab aber keine Zeile MUSTERDATEN aus. Die Ausgabe steht darüber."
 	exit 1
 fi
+# Jede Vorlage kompilieren: Ein Katalog-Eintrag darf die Template-Syntax nicht brechen.
+if ! docker exec "$NAME" ./manage.py shell -c "$(cat tests/vorlagen/pruefen.py)" > "$roh" 2>&1; then
+	tail -n 40 "$roh"
+	echo "::error::Mindestens eine Vorlage lässt sich nicht kompilieren. Vorlage und Fehler stehen darüber."
+	exit 1
+fi
+grep '^VORLAGEN: ' "$roh"
 # Jede Mail mit den Musterdaten rendern; Bilder und Kontrast prüft tests/e2e/mails.spec.mjs.
 if ! docker exec -e WB_MAILS_ZIEL=/tmp/werkbank-mails "$NAME" ./manage.py shell -c "$(cat tests/mails/rendern.py)" > "$roh" 2>&1; then
 	tail -n 40 "$roh"

@@ -35,7 +35,7 @@ test('Zustand des Projekts steht als Punkt und als Wort in der Leiste', async ({
   await page.goto(daten.seiten.checks);
   const nord = page.locator(`.wb-projekt[data-code="${daten.projekte[0].code}"]`);
   await expect(nord.locator('.wb-zustand')).toHaveClass(/ic-down/);
-  await expect(nord.locator('.wb-zustand__text')).toHaveText(/\(down\)/);
+  await expect(nord.locator('.wb-zustand__text')).toHaveText(/\(ausgefallen\)/);
 });
 
 test('Brotkrumen nennen Projekt und Seite', async ({ page }) => {
@@ -43,7 +43,7 @@ test('Brotkrumen nennen Projekt und Seite', async ({ page }) => {
   await page.goto(daten.seiten.log);
   const krumen = page.locator('.bc-crumbs');
   await expect(krumen).toContainText(daten.projekte[0].name);
-  await expect(krumen.locator('[aria-current="page"]')).toHaveText('Events');
+  await expect(krumen.locator('[aria-current="page"]')).toHaveText('Ereignisse');
 });
 
 test('Brotkrumen auf dem Handy zeigen die aktuelle Seite ganz', async ({ page }) => {
@@ -105,6 +105,6 @@ test('Umschalter: scheitert das Speichern, springt der Modus zurück und eine Me
   await page.click('.bc-mode [data-mode="dark"]');
   const meldung = page.locator('.wb-meldung');
   await expect(meldung).toBeVisible();
-  await expect(meldung).toContainText(/reload the page/i);
+  await expect(meldung).toContainText(/lade die Seite neu/i);
   await expect(page.locator('body')).not.toHaveClass(/\bdark\b/);
 });

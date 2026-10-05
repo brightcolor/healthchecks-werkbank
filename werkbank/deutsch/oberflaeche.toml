@@ -144,9 +144,9 @@ en = '''
                 page.
 '''
 de = '''
-                Richte deine Benachrichtigungswege auf der Seite
+                Lege auf der Seite
                 <a href="{% url 'hc-channels' project.code %}">Integrationen</a>
-                ein.
+                fest, wie du benachrichtigt wirst.
 '''
 
 [[quelltext]]
@@ -1659,12 +1659,12 @@ de = "AUS"
 [[text]]
 datei = "templates/front/details.html"
 en = "Notification Methods"
-de = "Benachrichtigungswege"
+de = "Integrationen"
 
 [[text]]
 datei = "templates/front/details.html"
 en = "No notification methods set up yet."
-de = "Noch kein Benachrichtigungsweg eingerichtet."
+de = "Noch keine Integration eingerichtet."
 
 [[text]]
 datei = "templates/front/details.html"

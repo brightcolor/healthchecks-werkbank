@@ -7,7 +7,9 @@
   python tools/dev.py stil          nur werkbank.css und leiste.js neu bauen; der Server läuft weiter
   python tools/dev.py starten       Server auf WB_DEV_ADRESSE starten (vorher vorbereiten)
   python tools/dev.py mails         jede Mail mit den Musterdaten nach tests/e2e/ergebnisse/mails/ rendern
-  python tools/dev.py pruefen       Mails rendern, dann Browserprüfung gegen den laufenden Server
+  python tools/dev.py vorlagen      jede Vorlage der Arbeitskopie mit Django kompilieren
+  python tools/dev.py pruefen       Vorlagen kompilieren, Mails rendern, dann Browserprüfung gegen den
+                                    laufenden Server
 
 Einstellungen über Umgebungsvariablen; die Vorgaben stehen in VORGABEN.
 Der Zugang der Musterkonten liegt in .upstream/dev-zugang.txt (nicht im Repo).
@@ -47,6 +49,8 @@ VENV = WURZEL / ".venv"
 ZUGANG = UPSTREAM / "dev-zugang.txt"
 MUSTERDATEN = WURZEL / "tests" / "e2e" / "ergebnisse" / "musterdaten.json"
 MAILS = WURZEL / "tests" / "e2e" / "ergebnisse" / "mails"
+VORLAGEN_PRUEFEN = WURZEL / "tests" / "vorlagen" / "pruefen.py"
+DEV_BERICHT = UPSTREAM / "dev-bericht.json"
 
 
 def einstellung(name: str) -> str:
@@ -94,7 +98,7 @@ def arbeitskopie(version: str) -> Path:
     return ziel
 
 
-def einsetzen(arbeit: Path) -> dict:
+def einsetzen(arbeit: Path, bericht_pfad: Path = DEV_BERICHT) -> dict:
     werkbank = WURZEL / "werkbank"
     hausschrift = WURZEL / "vendor" / "hausschrift"
     shutil.copytree(werkbank / "templates" / "bc", arbeit / "templates" / "bc", dirs_exist_ok=True)
@@ -107,13 +111,12 @@ def einsetzen(arbeit: Path) -> dict:
     einbau.einbauen(arbeit, einbau.lade_plan(einbau.PLAN_VORGABE), DEV_FASSUNG)
     css, farben_css, bericht = farben.bauen(arbeit, hausschrift, werkbank, DEV_FASSUNG)
     farben.schreibe(arbeit, css, farben_css)
-    bericht_pfad = UPSTREAM / "dev-bericht.json"
     bericht_pfad.write_bytes((json.dumps(bericht, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
     hinweise = mails.einsetzen(arbeit, werkbank, hausschrift)
     mails.bericht_schreiben(bericht_pfad, hinweise)
     uebersetzung = sprache.bauen(arbeit, werkbank, bericht_pfad)
     print(f"Werkbank eingesetzt: {bericht['deklarationen']} Farbangaben, "
-          f"{len(bericht['automatisch'])} automatisch zugeordnet (Bericht in .upstream/dev-bericht.json).")
+          f"{len(bericht['automatisch'])} automatisch zugeordnet (Bericht in {bericht_pfad.name}).")
     if uebersetzung["sprache"] == "de":
         print(f"Übersetzung: {uebersetzung['ersetzt']} Ersetzungen, {len(uebersetzung['englisch'])} Textstücke englisch, "
               f"{len(uebersetzung['ohne_fundstelle'])} Einträge ohne Fundstelle.")
@@ -272,6 +275,21 @@ def mails_rendern(version: str) -> None:
     print(f"{len(json.loads(zeilen[-1].removeprefix('MAILS: ')))} Mails in {MAILS.relative_to(WURZEL)}")
 
 
+def vorlagen_pruefen(version: str) -> None:
+    """Kompiliert jede Vorlage der Arbeitskopie; ein Katalog-Eintrag darf die Template-Syntax nicht brechen."""
+    arbeit = UPSTREAM / f"arbeit-{version}"
+    if not (arbeit / "manage.py").is_file():
+        raise DevFehler(f"{arbeit} fehlt. Zuerst python tools/dev.py vorbereiten ausführen.")
+    skript = VORLAGEN_PRUEFEN.read_bytes().decode("utf-8")
+    ergebnis = subprocess.run([str(venv_python()), "manage.py", "shell", "-c", skript], cwd=arbeit,
+                              env=umgebung(version), capture_output=True, text=True, encoding="utf-8")
+    zeilen = [z for z in ergebnis.stdout.splitlines() if z.startswith(("VORLAGEN: ", "FEHLER "))]
+    if ergebnis.returncode != 0 or not zeilen:
+        raise DevFehler("Mindestens eine Vorlage lässt sich nicht kompilieren:\n"
+                        + ("\n".join(zeilen) or (ergebnis.stderr or ergebnis.stdout)[-3000:]))
+    print(zeilen[-1])
+
+
 def pruefen(version: str, argumente: list[str]) -> None:
     npx = shutil.which("npx")
     if not npx:
@@ -280,6 +298,7 @@ def pruefen(version: str, argumente: list[str]) -> None:
     if not (arbeit / "manage.py").is_file():
         raise DevFehler(f"{arbeit} fehlt. Zuerst python tools/dev.py vorbereiten ausführen.")
     lauf([venv_python(), "manage.py", "shell", "-c", ANMELDESPERRE_LOESEN], cwd=arbeit, env=umgebung(version))
+    vorlagen_pruefen(version)
     mails_rendern(version)
     env = dict(os.environ, WB_BASIS_URL=einstellung("WB_DEV_SITE_ROOT"), WB_TEST_PASSWORT=zugang(),
                WB_MUSTERDATEN=str(MUSTERDATEN), WB_BROWSER_KANAL=einstellung("WB_BROWSER_KANAL"),
@@ -290,7 +309,7 @@ def pruefen(version: str, argumente: list[str]) -> None:
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Lokaler Aufbau von Healthchecks mit der Werkbank.")
     p.add_argument("--version", default=einstellung("HC_VERSION"), help="Healthchecks-Version, etwa v4.4")
-    p.add_argument("befehl", choices=["vorbereiten", "einsetzen", "stil", "starten", "mails", "pruefen"])
+    p.add_argument("befehl", choices=["vorbereiten", "einsetzen", "stil", "starten", "mails", "vorlagen", "pruefen"])
     p.add_argument("rest", nargs=argparse.REMAINDER, help="bei pruefen: weitere Argumente für Playwright")
     args = p.parse_args(argv)
     try:
@@ -304,6 +323,8 @@ def main(argv: list[str] | None = None) -> int:
             starten(args.version)
         elif args.befehl == "mails":
             mails_rendern(args.version)
+        elif args.befehl == "vorlagen":
+            vorlagen_pruefen(args.version)
         else:
             pruefen(args.version, args.rest)
     except (DevFehler, einbau.EinbauFehler, farben.FarbFehler, mails.MailFehler, sprache.SprachFehler) as err:
