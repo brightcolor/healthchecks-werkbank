@@ -1,1 +1,118 @@
-{% comment %}Werkbank-Leiste von healthchecks-werkbank, Fassung @@WERKBANK_FASSUNG@@.{% endcomment %}
+{% load static hc_extras %}{% comment %}
+Leiste, Kopfzeile und Markenfläche von healthchecks-werkbank, Fassung @@WERKBANK_FASSUNG@@.
+templates/base.html bindet diese Datei vor der Navigation von Healthchecks ein.
+Texte englisch wie Healthchecks; Adressen nur über {% url %}.
+{% endcomment %}
+<a class="wb-sprung" href="#wb-inhalt">Skip to content</a>
+<div class="bc-brandbar" aria-hidden="true"></div>
+<script src="{% static 'bc/leiste.js' %}?v=@@WERKBANK_FASSUNG@@" defer></script>
+{% if page == "login" %}
+<aside class="wb-marke" aria-label="{{ site_name }}">
+    <img src="{% static 'bc/logo/bc-logo-light-noclaim.svg' %}" alt="bright color" width="170" height="28">
+    <p class="wb-marke__gruss" aria-hidden="true">Moin.</p>
+    <p class="wb-marke__name">{{ site_name }}</p>
+</aside>
+{% else %}
+{% with muster="00000000-0000-0000-0000-000000000000" %}
+<div class="bc-app wb-app" data-rail="closed"
+    data-muster="{{ muster }}"
+    data-ziel-checks="{% url 'hc-checks' muster %}"
+    data-ziel-integrations="{% url 'hc-channels' muster %}"
+    data-ziel-badges="{% url 'hc-badges' muster %}"
+    data-ziel-settings="{% url 'hc-project-settings' muster %}"
+    {% if request.user.is_authenticated %}data-projektmenue="{% url 'hc-projects-menu' %}" data-darstellung="{% url 'hc-appearance' %}"{% endif %}
+    {% if project %}data-aktuell="{{ project.code }}"{% endif %}>
+    <nav class="bc-rail" id="wb-leiste" aria-label="Navigation">
+        <div class="bc-rail__brand">
+            <a href="{% url 'hc-index' %}"><img src="{% static 'bc/logo/bc-logo-light-noclaim.svg' %}" alt="bright color: {{ site_name }}" width="170" height="28"></a>
+            <span class="bc-rail__area">{{ site_name }}</span>
+        </div>
+        {% if request.user.is_authenticated %}
+        <ul class="bc-rail__nav wb-projekte">
+            {% if project %}
+            <li class="wb-projekt" data-code="{{ project.code }}">
+                <button class="bc-rail__item" type="button" aria-expanded="true" aria-controls="wb-sub-{{ project.code }}">
+                    <span class="wb-zustand" aria-hidden="true"></span>
+                    <span class="wb-projekt__name">{{ project }}</span>
+                    <span class="bc-sr wb-zustand__text"></span>
+                    <svg class="bc-rail__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                </button>
+                <ul class="bc-rail__sub" id="wb-sub-{{ project.code }}">
+                    <li><a class="bc-rail__link" href="{% url 'hc-checks' project.code %}"{% if page == "checks" %} aria-current="page"{% elif page == "details" or page == "log" %} aria-current="location"{% endif %}>Checks</a></li>
+                    <li><a class="bc-rail__link" href="{% url 'hc-channels' project.code %}"{% if page == "channels" %} aria-current="page"{% endif %}>Integrations{% if project.have_channel_issues %} <span class="wb-hinweis ic-grace" title="Some integrations need attention"></span><span class="bc-sr"> (needs attention)</span>{% endif %}</a></li>
+                    <li><a class="bc-rail__link" href="{% url 'hc-badges' project.code %}"{% if page == "badges" %} aria-current="page"{% endif %}>Badges</a></li>
+                    <li><a class="bc-rail__link" href="{% url 'hc-project-settings' project.code %}"{% if page == "project" %} aria-current="page"{% endif %}>Settings</a></li>
+                </ul>
+            </li>
+            {% endif %}
+        </ul>
+        <p class="wb-leiste__hinweis" role="status" hidden>The other projects can’t be shown right now. Reload the page to load them again.</p>
+        <ul class="bc-rail__nav wb-konto">
+            <li><a class="bc-rail__item" href="{% url 'hc-index' %}" data-wb-neues-projekt>New Project</a></li>
+            <li><a class="bc-rail__item" href="{% url 'hc-docs' %}"{% if page == "docs" or page == "docs-cron" %} aria-current="page"{% endif %}>Docs</a></li>
+            <li><a class="bc-rail__item" href="{% url 'hc-profile' %}"{% if page == "profile" or page == "appearance" %} aria-current="page"{% endif %}>Account Settings</a></li>
+            {% if request.user.is_superuser %}<li><a class="bc-rail__item" href="{% url 'admin:index' %}">Site Administration</a></li>{% endif %}
+            <li>
+                <form method="post" action="{% url 'hc-logout' %}">{% csrf_token %}<button class="bc-rail__item" type="submit">Log Out</button></form>
+            </li>
+        </ul>
+        {% if request.user.is_superuser %}<div class="bc-rail__foot">Healthchecks {% site_version %} · Werkbank @@WERKBANK_FASSUNG@@</div>{% endif %}
+        {% else %}
+        <ul class="bc-rail__nav wb-konto">
+            <li><a class="bc-rail__item" href="{% url 'hc-docs' %}"{% if page == "docs" or page == "docs-cron" %} aria-current="page"{% endif %}>Docs</a></li>
+            <li><a class="bc-rail__item" href="{% url 'hc-login' %}">Log In</a></li>
+        </ul>
+        {% endif %}
+    </nav>
+    <div class="bc-shade" hidden></div>
+</div>
+{% endwith %}
+<header class="bc-topbar wb-kopf">
+    <button class="bc-burger" type="button" aria-controls="wb-leiste" aria-expanded="false">
+        <svg class="bc-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        <span class="bc-sr">Menu</span>
+    </button>
+    <nav class="bc-crumbs" aria-label="Breadcrumb">
+        {% if project %}<a href="{% url 'hc-checks' project.code %}">{{ project }}</a><span aria-hidden="true">›</span>{% endif %}
+        {% if page == "details" or page == "log" %}
+            <a href="{% url 'hc-checks' project.code %}">Checks</a><span aria-hidden="true">›</span>
+            {% if page == "log" %}
+            <a href="{% url 'hc-details' check.code %}">{{ check.name_then_code }}</a><span aria-hidden="true">›</span><span aria-current="page">Log</span>
+            {% else %}
+            <span aria-current="page">{{ check.name_then_code }}</span>
+            {% endif %}
+        {% elif page == "checks" %}<span aria-current="page">Checks</span>
+        {% elif page == "channels" %}<span aria-current="page">Integrations</span>
+        {% elif page == "badges" %}<span aria-current="page">Badges</span>
+        {% elif page == "project" %}<span aria-current="page">Settings</span>
+        {% elif page == "profile" %}<span aria-current="page">Account Settings</span>
+        {% elif page == "appearance" %}<a href="{% url 'hc-profile' %}">Account Settings</a><span aria-hidden="true">›</span><span aria-current="page">Appearance</span>
+        {% elif page == "projects" %}<span aria-current="page">Projects</span>
+        {% elif page == "docs" or page == "docs-cron" %}<span aria-current="page">Docs</span>
+        {% else %}<span aria-current="page">{{ site_name }}</span>{% endif %}
+    </nav>
+    <span class="bc-topbar__spacer"></span>
+    {% if request.user.is_authenticated %}
+    <div class="bc-mode" role="group" aria-label="Appearance">
+        <button type="button" data-mode="light" aria-pressed="{% if request.profile.theme == 'dark' %}false{% else %}true{% endif %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            <span class="bc-sr">Light</span>
+        </button>
+        <button type="button" data-mode="dark" aria-pressed="{% if request.profile.theme == 'dark' %}true{% else %}false{% endif %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+            <span class="bc-sr">Dark</span>
+        </button>
+    </div>
+    <form class="bc-user" method="post" action="{% url 'hc-logout' %}">
+        {% csrf_token %}
+        <span class="bc-avatar" aria-hidden="true">{{ request.user.email|first|upper }}</span>
+        <span class="bc-user__text">
+            <span class="bc-user__name">{{ request.user.email }}</span>
+            <button class="bc-logout" type="submit">Log Out</button>
+        </span>
+    </form>
+    {% endif %}
+</header>
+<p class="wb-meldung" role="alert" hidden></p>
+{% endif %}
+<div id="wb-inhalt" tabindex="-1"></div>

@@ -4,6 +4,7 @@ node_modules/
 artefakte/
 fehler/
 tests/e2e/ergebnisse/
+tests/e2e/.sitzungen/
 __pycache__/
 *.pyc
 .pytest_cache/

@@ -2,7 +2,8 @@
 """Lokaler Aufbau von Healthchecks mit der Werkbank, ohne Docker.
 
   python tools/dev.py vorbereiten   Quelle holen, venv füllen, Werkbank einsetzen, Datenbank und Musterdaten
-  python tools/dev.py einsetzen     nur die Werkbank neu einsetzen (nach Änderungen in werkbank/)
+  python tools/dev.py einsetzen     Werkbank neu einsetzen (nach Änderungen an Vorlagen; danach Server neu starten)
+  python tools/dev.py stil          nur werkbank.css und leiste.js neu bauen; der Server läuft weiter
   python tools/dev.py starten       Server auf WB_DEV_ADRESSE starten (vorher vorbereiten)
   python tools/dev.py pruefen       Browserprüfung gegen den laufenden Server
 
@@ -172,6 +173,19 @@ def vorbereiten(version: str) -> None:
     musterdaten(py, arbeit, env)
 
 
+def nur_stil(version: str) -> None:
+    """werkbank.css und leiste.js in der laufenden Arbeitskopie neu bauen; der Server lädt sie beim nächsten Abruf."""
+    arbeit = UPSTREAM / f"arbeit-{version}"
+    if not (arbeit / "manage.py").is_file():
+        raise DevFehler(f"{arbeit} fehlt. Zuerst python tools/dev.py vorbereiten ausführen.")
+    werkbank = WURZEL / "werkbank"
+    shutil.copy2(werkbank / "static" / "bc" / "leiste.js", arbeit / "static" / "bc" / "leiste.js")
+    css, farben_css, bericht = farben.bauen(arbeit, WURZEL / "vendor" / "hausschrift", werkbank, "dev")
+    farben.schreibe(arbeit, css, farben_css)
+    print(f"werkbank.css neu gebaut: {bericht['deklarationen']} Farbangaben, "
+          f"{len(bericht['automatisch'])} automatisch zugeordnet.")
+
+
 def nur_einsetzen(version: str) -> None:
     arbeit = arbeitskopie(version)
     einsetzen(arbeit)
@@ -187,10 +201,23 @@ def starten(version: str) -> None:
          cwd=arbeit, env=umgebung(version))
 
 
-def pruefen(argumente: list[str]) -> None:
+# Healthchecks erlaubt je Konto 20 Anmeldungen mit Passwort am Tag. Vor jeder lokalen
+# Prüfung wird diese Sperre in der lokalen Testdatenbank gelöst; in der CI ist die
+# Datenbank bei jedem Lauf frisch.
+ANMELDESPERRE_LOESEN = (
+    "from hc.api.models import TokenBucket; "
+    "TokenBucket.objects.filter(value__startswith='pw-').delete()"
+)
+
+
+def pruefen(version: str, argumente: list[str]) -> None:
     npx = shutil.which("npx")
     if not npx:
         raise DevFehler("npx fehlt. Node.js 22 oder neuer installieren.")
+    arbeit = UPSTREAM / f"arbeit-{version}"
+    if not (arbeit / "manage.py").is_file():
+        raise DevFehler(f"{arbeit} fehlt. Zuerst python tools/dev.py vorbereiten ausführen.")
+    lauf([venv_python(), "manage.py", "shell", "-c", ANMELDESPERRE_LOESEN], cwd=arbeit, env=umgebung(version))
     env = dict(os.environ, WB_BASIS_URL=einstellung("WB_DEV_SITE_ROOT"), WB_TEST_PASSWORT=zugang(),
                WB_MUSTERDATEN=str(MUSTERDATEN), WB_BROWSER_KANAL=einstellung("WB_BROWSER_KANAL"))
     lauf([npx, "playwright", "test", *argumente], cwd=WURZEL, env=env)
@@ -199,7 +226,7 @@ def pruefen(argumente: list[str]) -> None:
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Lokaler Aufbau von Healthchecks mit der Werkbank.")
     p.add_argument("--version", default=einstellung("HC_VERSION"), help="Healthchecks-Version, etwa v4.4")
-    p.add_argument("befehl", choices=["vorbereiten", "einsetzen", "starten", "pruefen"])
+    p.add_argument("befehl", choices=["vorbereiten", "einsetzen", "stil", "starten", "pruefen"])
     p.add_argument("rest", nargs=argparse.REMAINDER, help="bei pruefen: weitere Argumente für Playwright")
     args = p.parse_args(argv)
     try:
@@ -207,10 +234,12 @@ def main(argv: list[str] | None = None) -> int:
             vorbereiten(args.version)
         elif args.befehl == "einsetzen":
             nur_einsetzen(args.version)
+        elif args.befehl == "stil":
+            nur_stil(args.version)
         elif args.befehl == "starten":
             starten(args.version)
         else:
-            pruefen(args.rest)
+            pruefen(args.version, args.rest)
     except (DevFehler, einbau.EinbauFehler, farben.FarbFehler) as err:
         print(f"Abbruch: {err}", file=sys.stderr)
         return 1

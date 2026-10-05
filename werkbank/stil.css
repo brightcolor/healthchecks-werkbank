@@ -1,3 +1,217 @@
 /* healthchecks-werkbank: Stilschicht.
    Letzter Teil von werkbank.css, nach Tokens, Rollen, Variablen, abgeleiteten
    Farben und den Bausteinen der Hausschrift. Farben nur über Tokens. */
+
+/* Grund ------------------------------------------------------------------- */
+
+html { background: var(--bc-ground); }
+
+body {
+	padding-top: 4px;
+	font-family: var(--bc-font-text);
+	font-size: var(--bc-size-body);
+	line-height: var(--bc-leading);
+	-webkit-font-smoothing: antialiased;
+}
+
+a { text-underline-offset: 3px; }
+::selection { background: var(--bc-yellow); color: var(--bc-ink); }
+
+/* Fokus sichtbar in der Farbe der Werkbank; Bootstrap setzt a:focus und .btn:focus
+   spezifischer, deshalb stehen die Elemente hier mit im Selektor. */
+:focus-visible,
+a:focus-visible,
+.btn:focus-visible,
+.btn:active:focus-visible { outline: 3px solid var(--bc-focus); outline-offset: 2px; }
+
+a:focus:not(:focus-visible),
+.btn:focus:not(:focus-visible) { outline: 0; }
+
+.wb-sprung {
+	position: absolute;
+	top: -200px;
+	left: 12px;
+	z-index: 1100;
+	padding: 8px 14px;
+	background: var(--bc-yellow);
+	border-radius: var(--bc-radius-sm);
+	color: var(--bc-ink);
+	font-weight: 700;
+}
+
+.wb-sprung:focus,
+.wb-sprung:hover { top: 12px; color: var(--bc-ink); }
+#wb-inhalt:focus { outline: 0; }
+
+/* Rahmen: Leiste links, Inhalt daneben ---------------------------------------- */
+
+body:has(.wb-app) { padding-left: var(--bc-rail-w); }
+
+body:has(.wb-app) > .navbar,
+body.page-login > .navbar { display: none; }
+
+body:has(.wb-app) > .container,
+body:has(.wb-app) > .container-fluid {
+	width: auto;
+	max-width: 1240px;
+	margin-right: 0;
+	margin-left: 0;
+	padding: 28px 32px 48px;
+}
+
+body:has(.wb-app) > .container-fluid { max-width: none; }
+
+.footer { border-top: 1px solid var(--bc-rule); color: var(--bc-text-quiet); font-size: 13px; }
+.footer a { color: var(--bc-text-quiet); }
+
+/* Healthchecks setzt die Fußzeile absolut und 100 % breit; neben der Leiste
+   begänne sie hinter dem Innenabstand und ragte rechts hinaus. */
+body:has(.wb-app) > .footer { right: 0; left: var(--bc-rail-w); width: auto; }
+
+body:has(.wb-app) > .footer > .container,
+body:has(.wb-app) > .footer > .container-fluid { width: auto; margin-left: 0; padding: 16px 32px; }
+
+/* Leiste --------------------------------------------------------------------- */
+
+.bc-rail { font-family: var(--bc-font-text); }
+.bc-rail form { margin: 0; }
+
+.bc-rail__nav.wb-konto { margin: 4px 12px 0; padding: 12px 0 24px; border-top: 1px solid var(--bc-rail-line); }
+
+.bc-rail a.bc-rail__item,
+.bc-rail a.bc-rail__link { text-decoration: none; }
+
+.bc-rail__item[aria-current] { background: var(--bc-rail-2); color: var(--bc-white); }
+
+.bc-rail__item[aria-current]::before {
+	content: "";
+	position: absolute;
+	top: 8px;
+	bottom: 8px;
+	left: -12px;
+	width: 4px;
+	border-radius: 0 3px 3px 0;
+	background: var(--bc-yellow);
+}
+
+.bc-rail__link[aria-current="location"] { color: var(--bc-white); }
+.bc-rail__link[aria-current="location"]::before { background: var(--bc-cyan); }
+
+.wb-projekt__name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.wb-zustand { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--bc-rail-muted); }
+.wb-zustand.wb-zustand::before { content: none; }
+.wb-zustand.ic-up { background: var(--bc-lime); }
+.wb-zustand.ic-grace { background: var(--bc-yellow); }
+.wb-zustand.ic-down { background: var(--bc-pink); }
+
+.wb-hinweis { color: var(--bc-yellow); font-size: 12px; }
+.wb-leiste__hinweis { margin: 0 22px 12px; color: var(--bc-rail-text); font-size: 12.5px; line-height: 1.4; }
+.bc-rail__foot { font-family: var(--bc-font-mono); font-size: 11px; }
+
+/* Kopfzeile -------------------------------------------------------------------- */
+
+.wb-kopf form.bc-user { margin: 0; }
+
+.wb-meldung {
+	margin: 0;
+	padding: 12px 32px;
+	background: var(--bc-bad-tint);
+	border-bottom: 1px solid var(--bc-pink);
+	color: var(--bc-text);
+	font-weight: 700;
+}
+
+/* Anmeldeseite: Onyx-Fläche links, Karte rechts ------------------------------------ */
+
+body.page-login { padding-left: 50vw; }
+
+.wb-marke {
+	position: fixed;
+	top: 4px;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: var(--bc-space-4);
+	width: 50vw;
+	padding: 48px;
+	background: var(--bc-ink);
+	color: var(--bc-on-ink);
+}
+
+.wb-marke img { display: block; width: 170px; height: auto; }
+
+.wb-marke__gruss {
+	margin: 0;
+	font-family: var(--bc-font-display);
+	font-size: clamp(3rem, 2rem + 4vw, 5.5rem);
+	line-height: 1.06;
+	letter-spacing: .015em;
+	text-transform: uppercase;
+	color: var(--bc-on-ink);
+}
+
+.wb-marke__name { margin: 0; color: var(--bc-on-ink-quiet); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+
+/* Die Anmeldung als Karte; Healthchecks verschachtelt dort Spalten mit Versatz,
+   in der halben Breite würde das Formular sonst schmal wie ein Streifen. */
+body.page-login > .container {
+	width: auto;
+	max-width: 30rem;
+	margin: 64px auto;
+	padding: 32px;
+	background: var(--bc-surface);
+	border: 1px solid var(--bc-rule);
+	border-radius: var(--bc-radius);
+	box-shadow: var(--bc-shadow);
+}
+
+body.page-login > .container .row { margin-right: 0; margin-left: 0; }
+
+body.page-login > .container [class*="col-"] {
+	float: none;
+	width: auto;
+	margin-left: 0;
+	padding-right: 0;
+	padding-left: 0;
+}
+
+body.page-login .form-control { margin-bottom: 12px; }
+
+/* In der Karte stehen Login-Link und Passwort untereinander: ohne den Einzug für
+   zwei Spalten, ohne den senkrechten Trenner, mit dem „or“ der schmalen Ansicht. */
+body.page-login #login-form,
+body.page-login #magic-link-form { margin-right: 0; margin-left: 0; }
+body.page-login #login-sep { display: none !important; }
+body.page-login > .container .visible-xs-block { display: block !important; }
+body.page-login > .footer { right: 0; left: 50vw; width: auto; }
+body.page-login > .footer > .container { width: auto; }
+
+/* Schmale Bildschirme: Rahmen ---------------------------------------------------- */
+
+@media (max-width: 900px) {
+	body:has(.wb-app) { padding-left: 0; }
+
+	body:has(.wb-app) > .container,
+	body:has(.wb-app) > .container-fluid { padding: 20px 16px 40px; }
+
+	body:has(.wb-app) > .footer > .container,
+	body:has(.wb-app) > .footer > .container-fluid { padding: 16px; }
+
+	body:has(.wb-app) > .footer,
+	body.page-login > .footer { left: 0; }
+
+	.wb-meldung { padding: 12px 16px; }
+	body.page-login { padding-left: 0; }
+	body.page-login > .container { margin: 24px 16px; padding: 24px; }
+	.wb-marke { position: static; width: auto; padding: 32px 24px; }
+	.wb-marke__gruss { font-size: 3rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.bc-rail,
+	.bc-rail__chev,
+	.bc-rail__item { transition: none !important; }
+}

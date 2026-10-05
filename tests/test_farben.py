@@ -167,8 +167,9 @@ def test_tokens_auf_root_body_und_dunkel():
     t = farben.tokens_fuer_healthchecks(TOKENS, "body.dark")
     assert ":root,\nbody {" in t
     assert "--bc-primary: var(--bc-yellow);" in t
-    assert t.index("body.dark {") < t.index("--bc-surface: #141415;")
-    assert "html.nacht {" in farben.tokens_fuer_healthchecks(TOKENS, "html.nacht")
+    # Auch html bekommt die dunklen Tokens, damit die Fläche unter dem Inhalt dunkel ist.
+    assert t.index("body.dark,\n:root:has(body.dark) {") < t.index("--bc-surface: #141415;")
+    assert "html.nacht,\n:root:has(html.nacht) {" in farben.tokens_fuer_healthchecks(TOKENS, "html.nacht")
 
 
 def test_tokens_ohne_werkbank_block_melden_sich():
@@ -264,7 +265,7 @@ def test_bauen_mit_anderem_dunklen_selektor(tmp_path, monkeypatch):
     werkbank = mini_werkbank(tmp_path / "werkbank")
     css, _, _ = farben.bauen(hc, WURZEL / "vendor/hausschrift", werkbank, "x")
     assert "html.nacht .bc-mode" in css
-    assert "html.nacht {" in css
+    assert "html.nacht,\n:root:has(html.nacht) {" in css
 
 
 def test_schreibe_legt_beide_dateien_ab(tmp_path):

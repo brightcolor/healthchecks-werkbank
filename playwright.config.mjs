@@ -7,6 +7,7 @@ const kanal = process.env.WB_BROWSER_KANAL || 'chrome';
 
 export default defineConfig({
   testDir: './tests/e2e',
+  globalSetup: './tests/e2e/vorbereitung.mjs',
   outputDir: './tests/e2e/ergebnisse/playwright',
   fullyParallel: false,
   workers: 1,

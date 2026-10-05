@@ -649,7 +649,9 @@ def tokens_fuer_healthchecks(tokens_css: str, dunkel: str) -> str:
     """Hell auf :root und body, dunkel auf dem dunklen Selektor von Healthchecks.
 
     Auf body stehen die Tokens zusätzlich, damit abgeleitete Tokens wie
-    --bc-link-hover dort mit den dunklen Werten neu berechnet werden.
+    --bc-link-hover dort mit den dunklen Werten neu berechnet werden. Der dunkle
+    Block gilt auch für :root, solange body dunkel ist; sonst bliebe die Fläche
+    unter dem Inhalt hell.
     """
     b = token_bloecke(tokens_css)
     return "\n".join([
@@ -661,7 +663,8 @@ def tokens_fuer_healthchecks(tokens_css: str, dunkel: str) -> str:
         "}",
         "",
         "/* Tokens der Hausschrift: Werkbank dunkel */",
-        f"{dunkel} {{",
+        f"{dunkel},",
+        f":root:has({dunkel}) {{",
         b["dunkel"],
         "}",
     ])
