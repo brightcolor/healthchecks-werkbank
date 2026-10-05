@@ -41,11 +41,33 @@ VORGABEN = {
     "WB_ZIEL": "bc/werkbank.css",
     "WB_ZIEL_FARBEN": "bc/farben.css",
     "WB_DUNKEL_SELEKTOR": "body.dark",
+    # Grundgröße in px, mit der die Hausschrift rem meint. Bootstrap 3 in Healthchecks
+    # setzt html auf 10 px; rem-Werte der Hausschrift werden deshalb beim Bau in px umgerechnet.
+    "WB_REM_BASIS": "16",
 }
 
 
 def einstellung(name: str) -> str:
     return os.environ.get(name, VORGABEN[name])
+
+
+def rem_basis() -> float:
+    roh = einstellung("WB_REM_BASIS")
+    try:
+        wert = float(roh)
+    except ValueError:
+        wert = 0.0
+    if not 1 <= wert <= 64:
+        raise FarbFehler(f"WB_REM_BASIS ist {roh!r}. Erwartet ist die Grundgröße in px als Zahl von 1 bis 64, etwa 16.")
+    return wert
+
+
+REM_RE = re.compile(r"(?<![\w.-])(-?\d*\.?\d+)rem\b")
+
+
+def rem_zu_px(css: str, basis: float) -> str:
+    """rem-Werte in px mit der gegebenen Grundgröße; Bootstrap 3 setzt html auf 10 px."""
+    return REM_RE.sub(lambda m: f"{float(m.group(1)) * basis:g}px", css)
 
 
 class FarbFehler(Exception):
@@ -645,16 +667,16 @@ def aufloesen(ausdruck: str, werte: dict[str, str], tiefe: int = 0) -> str:
     return ausdruck
 
 
-def tokens_fuer_healthchecks(tokens_css: str, dunkel: str) -> str:
+def tokens_fuer_healthchecks(tokens_css: str, dunkel: str, basis: float = 16.0) -> str:
     """Hell auf :root und body, dunkel auf dem dunklen Selektor von Healthchecks.
 
     Auf body stehen die Tokens zusätzlich, damit abgeleitete Tokens wie
     --bc-link-hover dort mit den dunklen Werten neu berechnet werden. Der dunkle
     Block gilt auch für :root, solange body dunkel ist; sonst bliebe die Fläche
-    unter dem Inhalt hell.
+    unter dem Inhalt hell. rem-Werte stehen in px (siehe WB_REM_BASIS).
     """
     b = token_bloecke(tokens_css)
-    return "\n".join([
+    return rem_zu_px("\n".join([
         "/* Tokens der Hausschrift: Grundwerte und Werkbank hell, auf :root und body */",
         ":root,",
         "body {",
@@ -667,7 +689,7 @@ def tokens_fuer_healthchecks(tokens_css: str, dunkel: str) -> str:
         f":root:has({dunkel}) {{",
         b["dunkel"],
         "}",
-    ])
+    ]), basis)
 
 
 def schriften(fonts_css: str) -> str:
@@ -719,6 +741,7 @@ def bauen(wurzel: Path, hausschrift: Path, werkbank: Path, fassung: str) -> tupl
     static = wurzel / einstellung("WB_STATIC")
     dunkel = einstellung("WB_DUNKEL_SELEKTOR")
     variablen_rel = einstellung("WB_VARIABLEN_CSS")
+    basis = rem_basis()
     zuordnung = Zuordnung.lade(werkbank / "farben.json")
     variablen_css = lies(werkbank / "variablen.css")
 
@@ -748,14 +771,14 @@ def bauen(wurzel: Path, hausschrift: Path, werkbank: Path, fassung: str) -> tupl
     werkbank_css = "\n".join([
         kopf,
         schriften(lies(hausschrift / "assets" / "css" / "bc-fonts.css")),
-        tokens_fuer_healthchecks(lies(hausschrift / "assets" / "css" / "bc-tokens.css"), dunkel),
+        tokens_fuer_healthchecks(lies(hausschrift / "assets" / "css" / "bc-tokens.css"), dunkel, basis),
         lies(werkbank / "rollen.css"),
         variablen_css,
         "/* Feste Farben von Healthchecks, auf Werkbank-Rollen umgeleitet */",
         *abgeleitet,
         "/* Bausteine der Hausschrift: bc-workbench.css */",
-        werkbank_bausteine(lies(hausschrift / "assets" / "css" / "bc-workbench.css"), dunkel),
-        lies(werkbank / "stil.css"),
+        rem_zu_px(werkbank_bausteine(lies(hausschrift / "assets" / "css" / "bc-workbench.css"), dunkel), basis),
+        rem_zu_px(lies(werkbank / "stil.css"), basis),
     ]) + "\n"
     bericht = {
         "fassung": fassung,

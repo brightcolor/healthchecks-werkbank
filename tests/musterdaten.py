@@ -56,6 +56,8 @@ sued = projekt("Projekt Süd", "wb-sued")
 
 def check(projekt_, name, **felder):
     c = Check.objects.filter(project=projekt_, name=name).first() or Check(project=projekt_, name=name)
+    # Das Log zeigt nur Ereignisse ab dem Anlagedatum des Checks; die Pings liegen bis zu zwei Tage zurück.
+    felder.setdefault("created", jetzt - timedelta(days=30))
     for schluessel, wert in felder.items():
         setattr(c, schluessel, wert)
     c.save()

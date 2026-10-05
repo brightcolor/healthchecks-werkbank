@@ -14,9 +14,7 @@ body {
 	--wb-info-rand: color-mix(in srgb, var(--bc-cyan) 55%, var(--bc-surface));
 	--wb-schatten: rgba(17, 17, 17, .08);
 	--wb-fokus-hof: color-mix(in srgb, var(--bc-focus) 22%, transparent);
-	/* Hausampel als Symbol: Limette und Gelb als Textton, im Dunkeln rein. */
-	--wb-zustand-up: var(--bc-ok-text);
-	--wb-zustand-grace: var(--bc-warn-text);
+	/* Hausampel für down und started; up und grace stehen als Scheibe in stil.css. */
 	--wb-zustand-down: var(--bc-pink);
 	--wb-zustand-started: var(--bc-focus);
 }

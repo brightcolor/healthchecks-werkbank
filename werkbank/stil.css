@@ -68,8 +68,13 @@ body:has(.wb-app) > .container-fluid { max-width: none; }
    begänne sie hinter dem Innenabstand und ragte rechts hinaus. */
 body:has(.wb-app) > .footer { right: 0; left: var(--bc-rail-w); width: auto; }
 
+/* Healthchecks gibt der Fußzeile eine feste Höhe; die Zeile steht darin mittig. */
+.footer { display: flex; align-items: center; }
+.footer > :is(.container, .container-fluid) { flex: 1; }
+.footer ul { margin: 0; }
+
 body:has(.wb-app) > .footer > .container,
-body:has(.wb-app) > .footer > .container-fluid { width: auto; margin-left: 0; padding: 16px 32px; }
+body:has(.wb-app) > .footer > .container-fluid { width: auto; margin-left: 0; padding: 0 32px; }
 
 /* Leiste --------------------------------------------------------------------- */
 
@@ -112,6 +117,15 @@ body:has(.wb-app) > .footer > .container-fluid { width: auto; margin-left: 0; pa
 /* Kopfzeile -------------------------------------------------------------------- */
 
 .wb-kopf form.bc-user { margin: 0; }
+
+/* Lange Pfade: Die Links kürzen sich vor der aktuellen Seite, der volle Name steht im
+   Tooltip. Auf dem Handy nennt die Kopfzeile nur die aktuelle Seite; den Weg dorthin
+   zeigen die Leiste und der Pfad im Inhalt. */
+.bc-crumbs > a { min-width: 0; overflow: hidden; text-overflow: ellipsis; flex-shrink: 4; }
+
+@media (max-width: 640px) {
+	.bc-crumbs > :not([aria-current]) { display: none; }
+}
 
 .wb-meldung {
 	margin: 0;
@@ -198,7 +212,7 @@ body.page-login > .footer > .container { width: auto; }
 	body:has(.wb-app) > .container-fluid { padding: 20px 16px 40px; }
 
 	body:has(.wb-app) > .footer > .container,
-	body:has(.wb-app) > .footer > .container-fluid { padding: 16px; }
+	body:has(.wb-app) > .footer > .container-fluid { padding: 0 16px; }
 
 	body:has(.wb-app) > .footer,
 	body.page-login > .footer { left: 0; }
@@ -214,4 +228,353 @@ body.page-login > .footer > .container { width: auto; }
 	.bc-rail,
 	.bc-rail__chev,
 	.bc-rail__item { transition: none !important; }
+}
+
+/* Schrift ---------------------------------------------------------------------- */
+
+h1, h2, .h1, .h2, .modal-title {
+	font-family: var(--bc-font-display);
+	font-weight: 400;
+	line-height: 1.06;
+	letter-spacing: .02em;
+	text-transform: uppercase;
+	color: var(--bc-text-loud);
+}
+
+h1, .h1 { font-size: var(--bc-size-h1); }
+h2, .h2 { font-size: var(--bc-size-h2); letter-spacing: .03em; }
+.modal-title { font-size: 19px; letter-spacing: .03em; }
+
+h3, h4, h5, h6, .h3, .h4, .h5, .h6 { font-family: var(--bc-font-text); font-weight: 700; color: var(--bc-text-loud); }
+
+/* Zusätze und Knöpfe in Titeln stehen in der Textschrift. */
+:is(h1, h2, .modal-title) :is(small, .btn, .btn-group) {
+	font-family: var(--bc-font-text);
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+:is(h1, h2) small { color: var(--bc-text-quiet); font-size: 13px; font-weight: 400; }
+
+code, kbd, pre, samp, .my-checks-url, .cron-expression, .highlight { font-family: var(--bc-font-mono); }
+
+/* Healthchecks gibt der Spalte der Ping-Adresse mindestens 420 px. Neben der Leiste
+   fehlt dieser Platz; die Adresse bricht deshalb an jeder Stelle um. */
+#checks-table td:nth-child(3) { min-width: 0; }
+#checks-table .my-checks-url { overflow-wrap: anywhere; }
+code { padding: .05em .35em; background: var(--bc-head); border: 1px solid var(--bc-rule); border-radius: 4px; color: var(--bc-text); font-size: .875em; }
+pre { border-color: var(--bc-rule); border-radius: var(--bc-radius-sm); }
+pre code { padding: 0; background: transparent; border: 0; }
+
+/* Karten, Dialoge, Menüs ------------------------------------------------------- */
+
+.panel { background-color: var(--panel-bg); border: 1px solid var(--bc-rule); border-radius: var(--bc-radius); box-shadow: var(--bc-shadow); }
+.panel > .panel-heading { border-radius: var(--bc-radius) var(--bc-radius) 0 0; }
+.panel > .panel-footer { border-radius: 0 0 var(--bc-radius) var(--bc-radius); }
+.panel-heading, .panel-footer { border-color: var(--bc-rule); }
+
+.modal-content { background-color: var(--modal-content-bg); border: 1px solid var(--bc-rule); border-radius: var(--bc-radius); box-shadow: var(--bc-shadow-pop); }
+.modal-header, .modal-footer { border-color: var(--bc-rule); }
+
+.dropdown-menu { border: 1px solid var(--bc-rule); border-radius: var(--bc-radius-sm); box-shadow: var(--bc-shadow-pop); }
+
+.tooltip-inner { background-color: var(--bc-ink); border-radius: 6px; color: var(--bc-white); }
+.tooltip.top .tooltip-arrow { border-top-color: var(--bc-ink); }
+.tooltip.right .tooltip-arrow { border-right-color: var(--bc-ink); }
+.tooltip.bottom .tooltip-arrow { border-bottom-color: var(--bc-ink); }
+.tooltip.left .tooltip-arrow { border-left-color: var(--bc-ink); }
+
+.nav-tabs { border-bottom-color: var(--bc-rule); }
+.nav-tabs > li > a { border-radius: 0; color: var(--bc-text-quiet); }
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+	background: transparent;
+	border: 0;
+	border-bottom: 3px solid var(--bc-magenta);
+	color: var(--bc-text-loud);
+	font-weight: 700;
+}
+
+/* Knöpfe ------------------------------------------------------------------------ */
+
+.btn { border-radius: var(--bc-radius-sm); font-weight: 700; }
+.btn:where(:not(.btn-sm, .btn-xs, .btn-lg, .btn-link)) { padding-top: 8px; padding-bottom: 8px; }
+
+.btn-primary,
+.btn-primary:focus,
+.btn-primary.focus { background-color: var(--bc-primary); border-color: var(--bc-primary); color: var(--bc-on-primary); }
+
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary.active,
+.btn-primary:active:hover,
+.btn-primary:active:focus,
+.open > .dropdown-toggle.btn-primary { background-color: var(--bc-primary-deep); border-color: var(--bc-primary-deep); color: var(--bc-on-primary); }
+
+.btn-primary.disabled,
+.btn-primary[disabled],
+.btn-primary.disabled:hover,
+.btn-primary[disabled]:hover { background-color: var(--bc-primary); border-color: var(--bc-primary); color: var(--bc-on-primary); }
+
+.btn-success,
+.btn-success:focus { background-color: var(--bc-lime); border-color: var(--bc-lime); color: var(--bc-ink); }
+
+.btn-success:hover,
+.btn-success:active,
+.btn-success.active { background-color: var(--bc-ok-deep); border-color: var(--bc-ok-deep); color: var(--bc-ink); }
+
+.btn-warning,
+.btn-warning:focus { background-color: var(--bc-yellow); border-color: var(--bc-yellow); color: var(--bc-ink); }
+
+.btn-warning:hover,
+.btn-warning:active,
+.btn-warning.active { background-color: var(--bc-primary-deep); border-color: var(--bc-primary-deep); color: var(--bc-ink); }
+
+.btn-info,
+.btn-info:focus { background-color: var(--bc-cyan); border-color: var(--bc-cyan); color: var(--bc-deep); }
+
+.btn-info:hover,
+.btn-info:active,
+.btn-info.active { background-color: var(--bc-cyan); border-color: var(--bc-deep); color: var(--bc-deep); }
+
+.btn-danger,
+.btn-danger:focus { background-color: var(--bc-pink); border-color: var(--bc-pink); color: var(--bc-white); }
+
+.btn-danger:hover,
+.btn-danger:active,
+.btn-danger.active,
+.btn-danger:active:hover { background-color: var(--bc-bad-deep); border-color: var(--bc-bad-deep); color: var(--bc-white); }
+
+/* Felder ------------------------------------------------------------------------ */
+
+.form-control {
+	background-color: var(--bc-control);
+	border-color: var(--bc-field-edge);
+	border-radius: var(--bc-radius-sm);
+	box-shadow: none;
+	color: var(--bc-text);
+}
+
+.form-control:where(:not(.input-sm, .input-lg, textarea, select[multiple])) { height: 38px; }
+.form-control:focus { border-color: var(--bc-focus); box-shadow: 0 0 0 3px var(--wb-fokus-hof); outline: 0; }
+.form-control::placeholder { color: var(--bc-text-quiet); opacity: 1; }
+
+.input-group-addon { background-color: var(--bc-head); border-color: var(--bc-field-edge); color: var(--bc-text-quiet); font-weight: 700; }
+
+.input-group .form-control:first-child,
+.input-group-addon:first-child,
+.input-group-btn:first-child > .btn { border-radius: var(--bc-radius-sm) 0 0 var(--bc-radius-sm); }
+
+.input-group .form-control:last-child,
+.input-group-addon:last-child,
+.input-group-btn:last-child > .btn { border-radius: 0 var(--bc-radius-sm) var(--bc-radius-sm) 0; }
+
+/* Kontrollkästchen, Optionsfelder und Schieber des Browsers tragen die Schriftfarbe. */
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"] { accent-color: var(--bc-text-loud); }
+
+.help-block { color: var(--bc-text-quiet); }
+.has-error .form-control { border-color: var(--bc-pink); }
+.has-error .form-control:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--bc-pink) 18%, transparent); }
+.has-error .help-block, .has-error .control-label { color: var(--bc-bad-text); }
+
+/* Etiketten und Zustände ---------------------------------------------------------- */
+
+.label { padding: .2em .7em .25em; border-radius: 99px; font-size: 11.5px; font-weight: 700; letter-spacing: .02em; }
+.label-success, .label-primary { background-color: var(--bc-lime); color: var(--bc-ink); }
+.label-warning { background-color: var(--bc-yellow); color: var(--bc-ink); }
+.label-danger { background-color: var(--bc-pink); color: var(--bc-white); }
+.label-info { background-color: var(--bc-cyan); color: var(--bc-deep); }
+.label-default { background-color: var(--bc-head); box-shadow: inset 0 0 0 1px var(--bc-rule); color: var(--bc-text-quiet); }
+
+/* Schalter der Integrationen auf der Detailseite: an in Limette mit Tinte, aus leise mit Rand. */
+.details-integrations .label { background-color: var(--bc-head); box-shadow: inset 0 0 0 1px var(--bc-rule); color: var(--bc-text-quiet); }
+.details-integrations .on .label { background-color: var(--bc-lime); box-shadow: none; color: var(--bc-ink); }
+
+/* Healthchecks zeichnet up und grace als gefüllte Kreise mit ausgespartem Zeichen.
+   Die Scheibe trägt die Ampelfarbe, durch die Aussparung scheint Tinte: so bleibt
+   das Zeichen auf Limette und Gelb lesbar, und beide Zustände sind klar getrennt. */
+.status.ic-up,
+.status.ic-grace { background-color: var(--bc-ink); border-radius: 50%; line-height: 1; }
+.status.ic-up { color: var(--bc-lime); }
+.status.ic-grace { color: var(--bc-yellow); }
+.status.ic-down { color: var(--wb-zustand-down); }
+.status.ic-new, .status.ic-paused { color: var(--status-new-color); }
+
+/* Tags der Checks behalten die Maße von Healthchecks. */
+.label.label-tag { padding: .1em .5em .15em; font-size: 75%; font-weight: 500; letter-spacing: 0; }
+
+.spinner.started { animation-name: wb-puls; }
+
+@keyframes wb-puls {
+	0%, 100% {
+		background: color-mix(in srgb, var(--wb-zustand-started) 30%, transparent);
+		box-shadow: 8px 0 var(--wb-zustand-started), -8px 0 transparent;
+	}
+	50% {
+		background: var(--wb-zustand-started);
+		box-shadow: 8px 0 transparent, -8px 0 var(--wb-zustand-started);
+	}
+}
+
+/* Hinweise -------------------------------------------------------------------- */
+
+.alert { background-color: var(--bc-surface); border: 1px solid var(--bc-rule); border-left-width: 4px; border-radius: var(--bc-radius-sm); color: var(--bc-text); }
+.alert a, .alert .alert-link { color: var(--bc-link); }
+.alert-success { background-color: var(--wb-ok-tint); border-left-color: var(--bc-lime); }
+.alert-info { background-color: var(--wb-info-tint); border-left-color: var(--bc-cyan); }
+.alert-warning { background-color: var(--wb-warn-tint); border-left-color: var(--bc-yellow); }
+.alert-danger { background-color: var(--bc-bad-tint); border-color: var(--bc-pink); }
+
+/* Tabellen -------------------------------------------------------------------- */
+
+.table > tbody > tr > td,
+.table > thead > tr > th { border-top-color: var(--bc-rule-soft); vertical-align: middle; }
+
+#checks-table > tbody > tr:first-child > th,
+.channels-table > tbody > tr:first-child > th,
+.table > thead > tr > th {
+	background-color: var(--bc-head);
+	border-bottom: 1px solid var(--bc-rule);
+	color: var(--bc-text-quiet);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: .12em;
+	text-transform: uppercase;
+}
+
+#checks-table > tbody > tr:first-child > th a { color: var(--bc-text-quiet); }
+
+/* Weitere Integrationen: Healthchecks setzt den Knopf (139 px) absolut an den rechten
+   Rand. Titel und Text halten seinen Platz frei und brechen vor ihm um. */
+.add-integration h2,
+.add-integration p { padding-right: 171px; }
+
+/* Listen auf dem Handy: oben der Titel, darunter leise der Rest --------------------- */
+
+@media (max-width: 640px) {
+	#checks-table,
+	#checks-table > tbody,
+	.channels-table,
+	.channels-table > tbody,
+	#log,
+	#log > tbody { display: block; }
+
+	#checks-table > tbody > tr:first-child,
+	.channels-table > tbody > tr:first-child { display: none; }
+
+	#checks-table > tbody > tr.checks-row {
+		position: relative;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 2px 6px;
+		padding: 10px 76px 10px 32px;
+		border-top: 1px solid var(--bc-rule-soft);
+	}
+
+	#checks-table > tbody > tr.checks-row > td { display: block; padding: 0; border: 0; }
+	#checks-table > tbody > tr.checks-row > td:nth-child(1) { position: absolute; top: 12px; left: 4px; }
+	#checks-table > tbody > tr.checks-row > td:nth-child(2) { flex: 1 0 100%; min-width: 0; font-weight: 700; }
+
+	#checks-table > tbody > tr.checks-row > td:nth-child(3),
+	#checks-table > tbody > tr.checks-row > td:nth-child(4) { display: none !important; }
+
+	#checks-table > tbody > tr.checks-row > td.hidden-xs:nth-child(5),
+	#checks-table > tbody > tr.checks-row > td.hidden-xs:nth-child(6) { display: block !important; color: var(--bc-text-quiet); font-size: 13px; }
+
+	#checks-table > tbody > tr.checks-row > td:nth-child(6) { order: 1; }
+	#checks-table > tbody > tr.checks-row > td:nth-child(5) { order: 2; min-width: 0; }
+	#checks-table > tbody > tr.checks-row > td:nth-child(5)::before { content: "· "; }
+	#checks-table > tbody > tr.checks-row > td:nth-child(7) { position: absolute; top: 8px; right: 4px; }
+
+	#checks-table > tbody > tr.checks-row br,
+	#checks-table > tbody > tr.checks-row .checks-subline { display: none; }
+
+	#checks-table > tbody > tr.checks-row .cron-expression,
+	#checks-table > tbody > tr.checks-row .timeout-grace,
+	#checks-table > tbody > tr.checks-row .last-ping { display: inline; }
+
+	.channels-table > tbody > tr.channel-row {
+		position: relative;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 2px 6px;
+		padding: 12px 4px 12px 44px;
+		border-top: 1px solid var(--bc-rule-soft);
+	}
+
+	.channels-table > tbody > tr.channel-row > td { display: block; padding: 0; border: 0; color: var(--bc-text-quiet); font-size: 13px; }
+	.channels-table > tbody > tr.channel-row > td:nth-child(1) { position: absolute; top: 12px; left: 4px; }
+	.channels-table > tbody > tr.channel-row > td:nth-child(2) { flex: 1 0 100%; min-width: 0; color: var(--bc-text); font-size: inherit; font-weight: 700; }
+	.channels-table > tbody > tr.channel-row > td:nth-child(3)::before { content: "Checks "; }
+	.channels-table > tbody > tr.channel-row .edit-checks { display: inline; }
+
+	.channels-table > tbody > tr.channel-row > td:nth-child(4)::before,
+	.channels-table > tbody > tr.channel-row > td:nth-child(5)::before { content: "· "; }
+
+	.channels-table > tbody > tr.channel-row > td:nth-child(6) { flex: 1 0 100%; margin-top: 8px; }
+	.channels-table > tbody > tr.channel-row > td.actions form { display: inline; }
+
+	/* Healthchecks rückt das Symbol in seiner 40 px breiten Zelle ein; in der Zeile steht es bündig. */
+	.channels-table > tbody > tr.channel-row .icon-cell img { margin-left: 0; }
+
+	/* Weitere Integrationen: Der Textknopf wird zum kompakten Plus am rechten Rand, der
+	   Text daneben behält seine Breite. Der Knopf heißt weiter „Add Integration“. */
+	.add-integration li { padding: 12px 56px 12px 0; }
+	.add-integration .icon { left: 0; }
+	.add-integration h2,
+	.add-integration p { margin-left: 56px; padding-right: 0; }
+	.add-integration a.btn { right: 4px; width: 44px; height: 44px; margin-top: -22px; font-size: 0; line-height: 44px; }
+	.add-integration a.btn::before { content: "+"; content: "+" / ""; font-size: 24px; font-weight: 700; }
+
+	#log > tbody > tr {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 2px 8px;
+		padding: 8px 0;
+		border-top: 1px solid var(--bc-rule-soft);
+	}
+
+	#log > tbody > tr > td { display: block; padding: 0; border: 0; white-space: normal; }
+
+	/* Für die Tabelle begrenzt Healthchecks Ereignis- und Detailspalte (width 1 %,
+	   max-width 0). In der Zeilenansicht nimmt jede Zelle ihren natürlichen Platz. */
+	#log > tbody > tr:is(.ok, .flip, .missing) > td:nth-child(n) { width: auto; max-width: none; overflow: visible; text-align: left; }
+	#log > tbody > tr > td:empty { display: none; }
+	#log > tbody > tr > td:nth-child(1) { color: var(--bc-text-quiet); font-size: 12px; }
+	#log > tbody > tr > td:nth-child(4) { order: -1; }
+	#log > tbody > tr > td:last-child { flex: 1 0 100%; color: var(--bc-text-quiet); font-size: 13px; overflow-wrap: anywhere; }
+
+	/* Projekte im Konto und Team eines Projekts: oben Name bzw. E-Mail, darunter Rolle · Aktion. */
+	:is(#my-projects, #team-table),
+	:is(#my-projects, #team-table) > tbody { display: block; }
+	:is(#my-projects, #team-table) > tbody > tr:first-child { display: none; }
+
+	:is(#my-projects, #team-table) > tbody > tr {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 2px 8px;
+		padding: 10px 0;
+		border-top: 1px solid var(--bc-rule-soft);
+	}
+
+	:is(#my-projects, #team-table) > tbody > tr > td { display: block; padding: 0; border: 0; }
+	:is(#my-projects, #team-table) > tbody > tr > td:empty { display: none; }
+	:is(#my-projects, #team-table) > tbody > tr > td:nth-child(1) { flex: 1 0 100%; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
+	:is(#my-projects, #team-table) > tbody > tr > td:nth-child(2) { color: var(--bc-text-quiet); font-size: 13px; }
+	:is(#my-projects, #team-table) > tbody > tr > td:nth-child(3) { font-size: 13px; }
+	:is(#my-projects, #team-table) > tbody > tr > td:nth-child(3)::before { content: "· "; color: var(--bc-text-quiet); }
+	/* Bootstrap setzt .pull-right mit !important; in der Zeile folgt der Link dem Punkt. */
+	:is(#my-projects, #team-table) > tbody > tr > td:nth-child(3) .pull-right { float: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.spinner.started { animation: none; background: var(--wb-zustand-started); }
 }

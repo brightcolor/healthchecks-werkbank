@@ -2,7 +2,7 @@
 """Lokaler Aufbau von Healthchecks mit der Werkbank, ohne Docker.
 
   python tools/dev.py vorbereiten   Quelle holen, venv füllen, Werkbank einsetzen, Datenbank und Musterdaten
-  python tools/dev.py einsetzen     Werkbank neu einsetzen (nach Änderungen an Vorlagen; danach Server neu starten)
+  python tools/dev.py einsetzen     Vorlagen und Stil neu einsetzen, Arbeitskopie bleibt (danach Server neu starten)
   python tools/dev.py stil          nur werkbank.css und leiste.js neu bauen; der Server läuft weiter
   python tools/dev.py starten       Server auf WB_DEV_ADRESSE starten (vorher vorbereiten)
   python tools/dev.py pruefen       Browserprüfung gegen den laufenden Server
@@ -72,7 +72,17 @@ def quelle(version: str) -> Path:
 def arbeitskopie(version: str) -> Path:
     ziel = UPSTREAM / f"arbeit-{version}"
     if ziel.exists():
-        shutil.rmtree(ziel)
+        alt = ziel.with_name(f"{ziel.name}-alt")
+        if alt.exists():
+            shutil.rmtree(alt)
+        try:
+            # Unter Windows scheitert das Umbenennen, solange eine Datei darin offen ist.
+            # So bleibt die Arbeitskopie ganz, wenn der Server noch läuft.
+            ziel.rename(alt)
+        except OSError as err:
+            raise DevFehler(f"{ziel} ist in Benutzung ({err.strerror}). Den Server beenden "
+                            "(Strg+C im Fenster von tools/dev.py starten) und den Befehl wiederholen.") from err
+        shutil.rmtree(alt)
     shutil.copytree(quelle(version), ziel, ignore=shutil.ignore_patterns(".git", "static-collected"))
     return ziel
 
@@ -187,7 +197,12 @@ def nur_stil(version: str) -> None:
 
 
 def nur_einsetzen(version: str) -> None:
-    arbeit = arbeitskopie(version)
+    """Vorlagen und Stil der Werkbank neu einsetzen; die übrigen Dateien der Arbeitskopie bleiben."""
+    arbeit = UPSTREAM / f"arbeit-{version}"
+    if not (arbeit / "manage.py").is_file():
+        raise DevFehler(f"{arbeit} fehlt. Zuerst python tools/dev.py vorbereiten ausführen.")
+    vorlage = einbau.lade_plan(einbau.PLAN_VORGABE).vorlage
+    shutil.copy2(quelle(version) / vorlage, arbeit / vorlage)
     einsetzen(arbeit)
     lokale_einstellungen(arbeit)
     print("Den Server neu starten, damit Django die Vorlagen neu lädt: python tools/dev.py starten")

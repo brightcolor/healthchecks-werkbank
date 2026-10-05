@@ -58,3 +58,32 @@ export async function kontrast(page) {
 export async function werkbankGeladen(page) {
   return page.evaluate(() => [...document.styleSheets].some((blatt) => (blatt.href || '').includes('/bc/werkbank.css')));
 }
+
+// Sucht in jeder Zeile Teile, die einander überdecken. Bei Text zählen die Textzeilen,
+// denn Blockkästen reichen immer bis zum rechten Rand; Bilder, Knöpfe und Etiketten
+// zählen mit ihrem ganzen Kasten.
+export async function ueberdeckungen(page, zeilen, teile) {
+  return page.evaluate(([zeilen, teile]) => {
+    const flaechen = (el) => {
+      if (el.tagName === 'IMG' || el.matches('.btn, .label')) return [el.getBoundingClientRect()];
+      const bereich = document.createRange();
+      bereich.selectNodeContents(el);
+      return [...bereich.getClientRects()].filter((r) => r.width > 1 && r.height > 1);
+    };
+    const schneiden = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+    const befunde = [];
+    for (const zeile of document.querySelectorAll(zeilen)) {
+      const sichtbar = [...zeile.querySelectorAll(teile)].filter((el) => el.getBoundingClientRect().width > 0);
+      for (let i = 0; i < sichtbar.length; i++) {
+        for (let j = i + 1; j < sichtbar.length; j++) {
+          const [a, b] = [sichtbar[i], sichtbar[j]];
+          if (a.contains(b) || b.contains(a)) continue;
+          if (flaechen(a).some((x) => flaechen(b).some((y) => schneiden(x, y)))) {
+            befunde.push(`„${zeile.textContent.trim().split(/\s+/)[0]}“: ${a.tagName.toLowerCase()} überdeckt ${b.tagName.toLowerCase()}`);
+          }
+        }
+      }
+    }
+    return befunde;
+  }, [zeilen, teile]);
+}

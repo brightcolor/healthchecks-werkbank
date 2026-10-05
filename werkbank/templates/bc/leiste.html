@@ -73,13 +73,13 @@ Texte englisch wie Healthchecks; Adressen nur über {% url %}.
         <span class="bc-sr">Menu</span>
     </button>
     <nav class="bc-crumbs" aria-label="Breadcrumb">
-        {% if project %}<a href="{% url 'hc-checks' project.code %}">{{ project }}</a><span aria-hidden="true">›</span>{% endif %}
+        {% if project %}<a href="{% url 'hc-checks' project.code %}" title="{{ project }}">{{ project }}</a><span aria-hidden="true">›</span>{% endif %}
         {% if page == "details" or page == "log" %}
             <a href="{% url 'hc-checks' project.code %}">Checks</a><span aria-hidden="true">›</span>
             {% if page == "log" %}
-            <a href="{% url 'hc-details' check.code %}">{{ check.name_then_code }}</a><span aria-hidden="true">›</span><span aria-current="page">Log</span>
+            <a href="{% url 'hc-details' check.code %}" title="{{ check.name_then_code }}">{{ check.name_then_code }}</a><span aria-hidden="true">›</span><span aria-current="page">Events</span>
             {% else %}
-            <span aria-current="page">{{ check.name_then_code }}</span>
+            <span aria-current="page" title="{{ check.name_then_code }}">{{ check.name_then_code }}</span>
             {% endif %}
         {% elif page == "checks" %}<span aria-current="page">Checks</span>
         {% elif page == "channels" %}<span aria-current="page">Integrations</span>

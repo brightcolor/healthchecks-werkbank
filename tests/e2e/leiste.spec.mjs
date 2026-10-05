@@ -43,7 +43,19 @@ test('Brotkrumen nennen Projekt und Seite', async ({ page }) => {
   await page.goto(daten.seiten.log);
   const krumen = page.locator('.bc-crumbs');
   await expect(krumen).toContainText(daten.projekte[0].name);
-  await expect(krumen.locator('[aria-current="page"]')).toHaveText('Log');
+  await expect(krumen.locator('[aria-current="page"]')).toHaveText('Events');
+});
+
+test('Brotkrumen auf dem Handy zeigen die aktuelle Seite ganz', async ({ page }) => {
+  await anmelden(page, 'hell');
+  await page.setViewportSize({ width: 320, height: 800 });
+  for (const seite of ['log', 'details']) {
+    await page.goto(daten.seiten[seite]);
+    await page.evaluate(() => document.fonts.ready);
+    const aktuell = page.locator('.bc-crumbs [aria-current="page"]');
+    await expect(aktuell).toBeInViewport({ ratio: 1 });
+    expect(await aktuell.evaluate((el) => el.scrollWidth <= el.clientWidth), `Seitenname auf ${seite} ungekürzt`).toBe(true);
+  }
 });
 
 test('Sprunglink ist das erste Ziel der Tastatur', async ({ page }) => {

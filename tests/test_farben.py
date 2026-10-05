@@ -172,6 +172,31 @@ def test_tokens_auf_root_body_und_dunkel():
     assert "html.nacht,\n:root:has(html.nacht) {" in farben.tokens_fuer_healthchecks(TOKENS, "html.nacht")
 
 
+def test_rem_werte_der_hausschrift_werden_px():
+    # Bootstrap 3 setzt html auf 10 px; die Hausschrift meint rem mit 16 px.
+    assert farben.rem_zu_px("a: .9375rem; b: clamp(2.6rem, 1.5rem + 4.4vw, 5.2rem)", 16) == \
+        "a: 15px; b: clamp(41.6px, 24px + 4.4vw, 83.2px)"
+    assert farben.rem_zu_px("a: 2rem; remove: 1em", 10) == "a: 20px; remove: 1em"
+
+
+def test_tokens_in_px():
+    t = farben.tokens_fuer_healthchecks(TOKENS, "body.dark")
+    assert "--bc-size-body: 15px;" in t
+    assert "--bc-size-h1: 38px;" in t
+    assert "rem" not in t.replace("remain", "")
+
+
+def test_rem_basis_als_einstellung(tmp_path, monkeypatch):
+    monkeypatch.setenv("WB_REM_BASIS", "10")
+    hc = mini_healthchecks(tmp_path / "hc")
+    werkbank = mini_werkbank(tmp_path / "werkbank")
+    css, _, _ = farben.bauen(hc, WURZEL / "vendor/hausschrift", werkbank, "x")
+    assert "--bc-size-body: 9.375px;" in css
+    monkeypatch.setenv("WB_REM_BASIS", "null")
+    with pytest.raises(farben.FarbFehler, match="WB_REM_BASIS"):
+        farben.bauen(hc, WURZEL / "vendor/hausschrift", werkbank, "x")
+
+
 def test_tokens_ohne_werkbank_block_melden_sich():
     with pytest.raises(farben.FarbFehler, match="fehlen die Blöcke"):
         farben.token_bloecke(":root { --bc-ink: #111111; }")
