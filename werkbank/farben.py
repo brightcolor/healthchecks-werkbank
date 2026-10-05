@@ -249,6 +249,11 @@ def colours_in(value: str) -> list[str]:
     return [c for c in COLOUR_RE.findall(SCHUTZ_RE.sub(" ", value)) if c.lower() not in KEEP]
 
 
+def _kappe(wert: float, oben: float) -> float:
+    """Werte außerhalb des Bereichs kappt der Browser; farben.py tut dasselbe."""
+    return min(max(wert, 0.0), oben)
+
+
 def normalise(colour: str) -> str:
     c = colour.strip().lower()
     if c in NAMED:
@@ -265,14 +270,14 @@ def normalise(colour: str) -> str:
         return c
     teile = [p for p in re.split(r"[,\s/]+", m.group(2).strip()) if p]
     if m.group(1).startswith("hsl"):
-        h = float(teile[0].removesuffix("deg")) / 360
-        s = float(teile[1].rstrip("%")) / 100
-        l = float(teile[2].rstrip("%")) / 100
-        r, g, b = (round(x * 255) for x in colorsys.hls_to_rgb(h, l, s))
+        h = float(teile[0].removesuffix("deg")) / 360 % 1
+        s = _kappe(float(teile[1].rstrip("%")) / 100, 1)
+        l = _kappe(float(teile[2].rstrip("%")) / 100, 1)
+        r, g, b = (round(_kappe(x, 1) * 255) for x in colorsys.hls_to_rgb(h, l, s))
     else:
-        r, g, b = (round(float(p.rstrip("%")) * (2.55 if p.endswith("%") else 1)) for p in teile[:3])
+        r, g, b = (round(_kappe(float(p.rstrip("%")) * (2.55 if p.endswith("%") else 1), 255)) for p in teile[:3])
     a = teile[3] if len(teile) > 3 else "1"
-    alpha = float(a.rstrip("%")) / (100 if a.endswith("%") else 1)
+    alpha = _kappe(float(a.rstrip("%")) / (100 if a.endswith("%") else 1), 1)
     if alpha >= 1:
         return "#%02x%02x%02x" % (r, g, b)
     return "rgba(%d,%d,%d,%s)" % (r, g, b, "%g" % alpha)
@@ -587,3 +592,268 @@ def ableiten(css: str, zuordnung: Zuordnung, datei: str, dunkel_merkmal: str) ->
     for f in funde:
         f.datei = datei
     return Ableitung(zeilen, funde, zahl)
+
+
+# --- Tokens, Variablen, Bündel ---------------------------------------------------------
+
+TOKEN_BLOECKE = {
+    ":root": "grund",
+    '[data-bc-variant="workbench"]': "werkbank",
+    '[data-bc-variant="workbench"][data-theme="dark"]': "dunkel",
+}
+
+
+def token_bloecke(tokens_css: str) -> dict[str, str]:
+    """Die Deklarationen der Blöcke :root, Werkbank hell und Werkbank dunkel aus bc-tokens.css."""
+    gefunden: dict[str, str] = {}
+    for rule in walk_rules(parse_css(tokens_css)):
+        name = TOKEN_BLOECKE.get(re.sub(r"\s+", "", rule.selector))
+        if name:
+            gefunden[name] = "\n".join(f"\t{d.prop}: {d.value};" for d in rule.decls)
+    fehlt = [n for n in TOKEN_BLOECKE.values() if n not in gefunden]
+    if fehlt:
+        raise FarbFehler(
+            f"In bc-tokens.css fehlen die Blöcke {', '.join(fehlt)}. Die Datei muss eine unveränderte Kopie "
+            "aus der Hausschrift sein (vendor/hausschrift/QUELLE.md)."
+        )
+    return gefunden
+
+
+def token_werte(*koerper: str) -> dict[str, str]:
+    werte: dict[str, str] = {}
+    for k in koerper:
+        for d in parse_decls(k.replace("\n", ";")):
+            if d.prop.startswith("--"):
+                werte[d.prop] = d.value
+    return werte
+
+
+def aufloesen(ausdruck: str, werte: dict[str, str], tiefe: int = 0) -> str:
+    if tiefe > 12:
+        raise FarbFehler(f"Die Rolle {ausdruck} verweist im Kreis auf sich selbst. Die Tokens prüfen.")
+    ausdruck = ausdruck.strip()
+    m = re.fullmatch(r"var\(\s*(--[\w-]+)\s*(?:,\s*(.+))?\)", ausdruck)
+    if m:
+        name, ersatz = m.group(1), m.group(2)
+        if name in werte:
+            return aufloesen(werte[name], werte, tiefe + 1)
+        if ersatz:
+            return aufloesen(ersatz, werte, tiefe + 1)
+        raise FarbFehler(f"Die Rolle {name} gibt es in den Tokens nicht. Die Schreibweise prüfen.")
+    if ausdruck.startswith("--"):
+        return aufloesen(f"var({ausdruck})", werte, tiefe + 1)
+    return ausdruck
+
+
+def tokens_fuer_healthchecks(tokens_css: str, dunkel: str) -> str:
+    """Hell auf :root und body, dunkel auf dem dunklen Selektor von Healthchecks.
+
+    Auf body stehen die Tokens zusätzlich, damit abgeleitete Tokens wie
+    --bc-link-hover dort mit den dunklen Werten neu berechnet werden.
+    """
+    b = token_bloecke(tokens_css)
+    return "\n".join([
+        "/* Tokens der Hausschrift: Grundwerte und Werkbank hell, auf :root und body */",
+        ":root,",
+        "body {",
+        b["grund"],
+        b["werkbank"],
+        "}",
+        "",
+        "/* Tokens der Hausschrift: Werkbank dunkel */",
+        f"{dunkel} {{",
+        b["dunkel"],
+        "}",
+    ])
+
+
+def schriften(fonts_css: str) -> str:
+    """bc-fonts.css liegt in css/, werkbank.css liegt neben fonts/."""
+    return fonts_css.replace("../fonts/", "fonts/")
+
+
+def werkbank_bausteine(css: str, dunkel: str) -> str:
+    """bc-workbench.css schaltet dunkel über [data-theme="dark"], Healthchecks über body.dark."""
+    return css.replace('[data-theme="dark"]', dunkel)
+
+
+def stylesheets(base_html: str) -> list[str]:
+    m = re.search(r"{%\s*compress\s+css\s*%}(.*?){%\s*endcompress\s*%}", base_html, re.S)
+    if not m:
+        raise FarbFehler(
+            "In templates/base.html fehlt der Block {% compress css %}. Healthchecks hat die Vorlage umgebaut: "
+            "werkbank/farben.py an die neue Fassung anpassen."
+        )
+    return re.findall(r"{%\s*static\s+['\"]([^'\"]+\.css)['\"]\s*%}", m.group(1))
+
+
+def variablen_namen(css: str) -> dict[str, set[str]]:
+    namen: dict[str, set[str]] = {}
+    for rule in walk_rules(parse_css(css)):
+        selektor = re.sub(r"\s+", " ", rule.selector.strip())
+        namen.setdefault(selektor, set()).update(d.prop for d in rule.decls if d.prop.startswith("--"))
+    return namen
+
+
+def pruefe_variablen(oben_css: str, zuordnung_css: str, dunkel: str) -> tuple[dict[str, list[str]], list[str]]:
+    """Neue Variablen von Healthchecks, getrennt nach hell und dunkel, und entfallene der Zuordnung."""
+    oben = variablen_namen(oben_css)
+    hell, dunkel_namen = oben.get(":root", set()), oben.get(dunkel, set())
+    unsere: set[str] = set().union(*variablen_namen(zuordnung_css).values())
+    neu = {"hell": sorted(hell - unsere), "dunkel": sorted(dunkel_namen - unsere)}
+    return neu, sorted(unsere - hell - dunkel_namen)
+
+
+def lies(pfad: Path) -> str:
+    try:
+        return pfad.read_text(encoding="utf-8")
+    except FileNotFoundError as err:
+        raise FarbFehler(f"{pfad} fehlt. Die Pfade --wurzel, --hausschrift und --werkbank prüfen.") from err
+
+
+def bauen(wurzel: Path, hausschrift: Path, werkbank: Path, fassung: str) -> tuple[str, str, dict]:
+    """werkbank.css, farben.css und Bericht; schreibt nichts."""
+    static = wurzel / einstellung("WB_STATIC")
+    dunkel = einstellung("WB_DUNKEL_SELEKTOR")
+    variablen_rel = einstellung("WB_VARIABLEN_CSS")
+    zuordnung = Zuordnung.lade(werkbank / "farben.json")
+    variablen_css = lies(werkbank / "variablen.css")
+
+    neu, entfallen = pruefe_variablen(lies(static / variablen_rel), variablen_css, dunkel)
+    if neu["hell"] or neu["dunkel"]:
+        alle = sorted(set(neu["hell"]) | set(neu["dunkel"]))
+        raise FarbFehler(
+            f"Healthchecks bringt neue Variablen mit, die werkbank/variablen.css noch nicht zuordnet: {', '.join(alle)} "
+            f"(hell: {', '.join(neu['hell']) or 'keine'}; dunkel: {', '.join(neu['dunkel']) or 'keine'}). "
+            "Jede braucht dort eine Zeile mit einer Werkbank-Rolle."
+        )
+
+    abgeleitet: list[str] = []
+    funde: list[Fund] = []
+    zahl = 0
+    dateien = [rel for rel in stylesheets(lies(wurzel / einstellung("WB_BASIS_VORLAGE"))) if rel != variablen_rel]
+    for rel in dateien:
+        ergebnis = ableiten(lies(static / rel), zuordnung, rel, dunkel)
+        if ergebnis.zeilen:
+            abgeleitet += [f"/* {rel} */", *ergebnis.zeilen]
+        funde += ergebnis.funde
+        zahl += ergebnis.deklarationen
+
+    kopf = (f"/* healthchecks-werkbank {fassung}. Erzeugt von werkbank/farben.py; "
+            "Änderungen in werkbank/ vornehmen und neu bauen. */")
+    farben_css = "\n".join([kopf, *abgeleitet]) + "\n"
+    werkbank_css = "\n".join([
+        kopf,
+        schriften(lies(hausschrift / "assets" / "css" / "bc-fonts.css")),
+        tokens_fuer_healthchecks(lies(hausschrift / "assets" / "css" / "bc-tokens.css"), dunkel),
+        lies(werkbank / "rollen.css"),
+        variablen_css,
+        "/* Feste Farben von Healthchecks, auf Werkbank-Rollen umgeleitet */",
+        *abgeleitet,
+        "/* Bausteine der Hausschrift: bc-workbench.css */",
+        werkbank_bausteine(lies(hausschrift / "assets" / "css" / "bc-workbench.css"), dunkel),
+        lies(werkbank / "stil.css"),
+    ]) + "\n"
+    bericht = {
+        "fassung": fassung,
+        "stylesheets": len(dateien),
+        "deklarationen": zahl,
+        "automatisch": [asdict(f) for f in funde],
+        "variablen_entfallen": entfallen,
+    }
+    return werkbank_css, farben_css, bericht
+
+
+def schreibe(wurzel: Path, werkbank_css: str, farben_css: str) -> None:
+    static = wurzel / einstellung("WB_STATIC")
+    for rel, inhalt in ((einstellung("WB_ZIEL"), werkbank_css), (einstellung("WB_ZIEL_FARBEN"), farben_css)):
+        ziel = static / rel
+        ziel.parent.mkdir(parents=True, exist_ok=True)
+        ziel.write_text(inhalt, encoding="utf-8")
+
+
+def inventur(wurzel: Path) -> list[dict]:
+    """Jede feste Farbe je Art und Modus mit Fundstellen, als Grundlage für farben.json."""
+    static = wurzel / einstellung("WB_STATIC")
+    dunkel = einstellung("WB_DUNKEL_SELEKTOR")
+    variablen_rel = einstellung("WB_VARIABLEN_CSS")
+    gesehen: dict[tuple[str, str, bool], dict] = {}
+    for rel in stylesheets(lies(wurzel / einstellung("WB_BASIS_VORLAGE"))):
+        if rel == variablen_rel:
+            continue
+        for rule in walk_rules(parse_css(lies(static / rel))):
+            ist = ist_dunkel(rule.selector, dunkel)
+            for d in rule.decls:
+                art = COLOUR_PROPS.get(d.prop)
+                if not art:
+                    continue
+                for c in colours_in(d.value):
+                    schluessel = (normalise(c), art, ist)
+                    e = gesehen.setdefault(schluessel, {"farbe": schluessel[0], "art": art, "dunkel": ist,
+                                                        "anzahl": 0, "beispiele": []})
+                    e["anzahl"] += 1
+                    if len(e["beispiele"]) < 4:
+                        e["beispiele"].append(f"{rel}: {rule.selector} {{ {d.prop}: {d.value} }}")
+    return sorted(gesehen.values(), key=lambda e: (e["dunkel"], e["farbe"], e["art"]))
+
+
+def vorschlag(wurzel: Path, behalte: Path | None) -> dict:
+    alt = json.loads(behalte.read_text(encoding="utf-8")) if behalte and behalte.is_file() else {}
+    daten = {
+        "_info": ("Zuordnung fester Farben von Healthchecks zu Werkbank-Rollen. Erzeugt mit 'farben.py vorschlag', "
+                  "danach von Hand verfeinert. selektoren geht vor farben; farben gilt für helle Regeln, "
+                  "farben_dunkel für Regeln unter body.dark."),
+        "selektoren": alt.get("selektoren", {}),
+        "farben": dict(alt.get("farben", {})),
+        "farben_dunkel": dict(alt.get("farben_dunkel", {})),
+    }
+    for e in inventur(wurzel):
+        ziel = daten["farben_dunkel" if e["dunkel"] else "farben"].setdefault(e["farbe"], {})
+        ziel.setdefault(e["art"], auto_rolle(e["farbe"], e["art"], e["dunkel"]))
+    for teil in ("farben", "farben_dunkel"):
+        daten[teil] = dict(sorted(daten[teil].items()))
+    return daten
+
+
+def main(argv: list[str] | None = None) -> int:
+    sys.stdout.reconfigure(encoding="utf-8")
+    p = argparse.ArgumentParser(description="Baut werkbank.css aus den Stylesheets von Healthchecks.")
+    unter = p.add_subparsers(dest="befehl", required=True)
+    b = unter.add_parser("bauen", help="werkbank.css und farben.css schreiben")
+    b.add_argument("--wurzel", required=True, help="Ordner von Healthchecks")
+    b.add_argument("--hausschrift", required=True, help="Kopie der Hausschrift (vendor/hausschrift)")
+    b.add_argument("--werkbank", required=True, help="Ordner werkbank/ mit farben.json, rollen.css, variablen.css, stil.css")
+    b.add_argument("--fassung", required=True, help="Fassung des Images, etwa 4.4-wb1.0.0")
+    b.add_argument("--bericht", help="Bericht zusätzlich als JSON in diese Datei schreiben")
+    i = unter.add_parser("inventur", help="alle festen Farben mit Fundstellen als JSON ausgeben")
+    i.add_argument("--wurzel", required=True)
+    v = unter.add_parser("vorschlag", help="farben.json aus der Inventur vorschlagen")
+    v.add_argument("--wurzel", required=True)
+    v.add_argument("--behalte", help="vorhandene farben.json; ihre Einträge bleiben")
+    args = p.parse_args(argv)
+    try:
+        if args.befehl == "bauen":
+            css, farben_css, bericht = bauen(Path(args.wurzel), Path(args.hausschrift), Path(args.werkbank), args.fassung)
+            schreibe(Path(args.wurzel), css, farben_css)
+            if args.bericht:
+                Path(args.bericht).write_text(json.dumps(bericht, indent=2, ensure_ascii=False), encoding="utf-8")
+            print(f"werkbank.css gebaut: {bericht['deklarationen']} Farbangaben aus {bericht['stylesheets']} "
+                  f"Stylesheets, {len(bericht['automatisch'])} automatisch zugeordnet.")
+            if bericht["variablen_entfallen"]:
+                print("Hinweis: Diese Variablen gibt es in Healthchecks nicht mehr: "
+                      + ", ".join(bericht["variablen_entfallen"]))
+        elif args.befehl == "inventur":
+            print(json.dumps(inventur(Path(args.wurzel)), indent=2, ensure_ascii=False))
+        else:
+            daten = vorschlag(Path(args.wurzel), Path(args.behalte) if args.behalte else None)
+            print(json.dumps(daten, indent=2, ensure_ascii=False))
+            print(f"Vorschlag: {len(daten['farben'])} Farben in hellen Regeln, "
+                  f"{len(daten['farben_dunkel'])} in dunklen.", file=sys.stderr)
+    except FarbFehler as err:
+        print(f"Abbruch: {err}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

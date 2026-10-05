@@ -1,0 +1,88 @@
+/* healthchecks-werkbank: die Variablen von Healthchecks (static/css/variables.css)
+   auf Werkbank-Rollen. Ein Block für beide Modi: die Rollen selbst wechseln mit
+   body.dark. body.dark steht im Selektor, damit dieser Block den dunklen Block
+   von Healthchecks überschreibt. Bringt ein Update eine neue Variable, bricht
+   farben.py ab und nennt sie; dann hier eine Zeile ergänzen. */
+
+:root,
+body,
+body.dark {
+	--account-warning-bg: var(--bc-yellow);
+	--alert-no-data-bg: var(--bc-head);
+	--alert-no-data-border: var(--bc-rule);
+	--alert-no-data-color: var(--bc-text-quiet);
+	--alert-success-bg: var(--wb-ok-tint);
+	--alert-success-border: var(--wb-ok-rand);
+	--alert-success-color: var(--bc-text);
+	--body-bg: var(--bc-ground);
+	--border-color: var(--bc-rule);
+	--border-muted: var(--bc-rule-soft);
+	--breadcrumb-active-color: var(--bc-text-quiet);
+	--breadcrumb-bg: var(--bc-head);
+	--btn-active-bg: var(--bc-hover);
+	--btn-active-border: var(--bc-text-quiet);
+	--btn-active-color: var(--bc-text-loud);
+	--btn-default-bg: var(--bc-control);
+	--btn-default-border: var(--bc-field-edge);
+	--btn-default-color: var(--bc-text-loud);
+	--btn-remove-bg: var(--bc-control);
+	--btn-remove-color: var(--bc-bad-text);
+	--btn-remove-hover: var(--bc-bad-tint);
+	--channel-off-color: var(--bc-rule);
+	--channel-off-inside-color: var(--bc-surface);
+	--cheatsheet-example-bg: var(--bc-head);
+	--cheatsheet-dotted-color: var(--bc-rule-loud);
+	--close-color: var(--bc-text-loud);
+	--debug-warning-bg: var(--bc-bad-tint);
+	--dropdown-bg: var(--bc-overlay);
+	--dropdown-link-hover-bg: var(--bc-hover);
+	--get-started-bg: var(--bc-head);
+	--input-bg-disabled: var(--bc-head);
+	--input-border: var(--bc-field-edge);
+	--input-color: var(--bc-text);
+	--input-group-addon-bg: var(--bc-head);
+	--jumbotron-bg: var(--bc-head);
+	--label-ign-bg: var(--bc-head);
+	--label-ign-color: var(--bc-text);
+	--label-start-color: var(--bc-ok-text);
+	--link-color: var(--bc-link);
+	--link-hover-color: var(--bc-link-hover);
+	--log-flip-bg: var(--bc-head);
+	--modal-content-bg: var(--bc-overlay);
+	--nav-link-hover-bg: var(--bc-hover);
+	--panel-bg: var(--bc-surface);
+	--panel-default-heading-bg: var(--bc-head);
+	--panel-success-bg: var(--wb-ok-tint);
+	--plan-business-border: var(--bc-cyan);
+	--plan-business-color: var(--bc-text);
+	--plan-business-plus-border: var(--bc-violet);
+	--plan-business-plus-color: var(--bc-text);
+	--plan-hobbyist-border: var(--bc-lime);
+	--plan-hobbyist-color: var(--bc-text);
+	--plan-supporter-border: var(--bc-yellow);
+	--plan-supporter-color: var(--bc-text);
+	--pre-bg: var(--bc-head);
+	--ts-tag-bg: var(--bc-head);
+	--small-text-color: var(--bc-text-loud);
+	--state-info-bg: var(--wb-info-tint);
+	--state-info-border: var(--wb-info-rand);
+	--state-info-color: var(--bc-text);
+	--status-new-color: var(--bc-text-quiet);
+	--table-bg-hover: var(--bc-hover);
+	--tag-bg: var(--bc-head);
+	--tag-checked-bg: var(--bc-text-loud);
+	--tag-checked-border: var(--bc-text-loud);
+	--tag-checked-color: var(--bc-surface);
+	--tag-checked-shadow: var(--bc-rule);
+	--tag-color: var(--bc-text);
+	--tag-up-bg: var(--bc-surface);
+	--tag-up-border: var(--bc-rule);
+	--tag-up-color: var(--bc-text);
+	--text-color: var(--bc-text);
+	--text-muted: var(--bc-text-quiet);
+	--text-success: var(--bc-ok-text);
+	--text-warning: var(--bc-warn-text);
+	--text-danger: var(--bc-bad-text);
+	--log-new-row-bg: var(--wb-info-tint);
+	--log-new-row-border: var(--wb-info-rand);
+}

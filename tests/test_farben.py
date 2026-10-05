@@ -29,6 +29,11 @@ def text(css, zuordnung=LEER):
     ("#aaaaaaff", "#aaaaaa"),
     ("hsl(0, 0%, 100%)", "#ffffff"),
     ("hsl(120, 100%, 25%)", "#008000"),
+    # Werte außerhalb des Bereichs kappt der Browser; tom-select liefert etwa 118,6 % Helligkeit.
+    ("hsl(0, 0%, 118.6274509804%)", "#ffffff"),
+    ("hsl(480, 100%, 25%)", "#008000"),
+    ("rgb(300, -5, 128)", "#ff0080"),
+    ("rgba(0, 0, 0, 1.5)", "#000000"),
 ])
 def test_normalise(roh, erwartet):
     assert farben.normalise(roh) == erwartet
@@ -153,3 +158,145 @@ def test_zuordnung_meldet_kaputtes_json(tmp_path):
 def test_unlesbare_farbe_meldet_sich():
     with pytest.raises(farben.FarbFehler, match="kann farben.py nicht lesen"):
         farben.rgba("lab(50% 40 59)")
+
+
+TOKENS = (WURZEL / "vendor/hausschrift/assets/css/bc-tokens.css").read_text(encoding="utf-8")
+
+
+def test_tokens_auf_root_body_und_dunkel():
+    t = farben.tokens_fuer_healthchecks(TOKENS, "body.dark")
+    assert ":root,\nbody {" in t
+    assert "--bc-primary: var(--bc-yellow);" in t
+    assert t.index("body.dark {") < t.index("--bc-surface: #141415;")
+    assert "html.nacht {" in farben.tokens_fuer_healthchecks(TOKENS, "html.nacht")
+
+
+def test_tokens_ohne_werkbank_block_melden_sich():
+    with pytest.raises(farben.FarbFehler, match="fehlen die Blöcke"):
+        farben.token_bloecke(":root { --bc-ink: #111111; }")
+
+
+def test_aufloesen_folgt_verweisen():
+    werte = {"--a": "var(--b)", "--b": "#fed329"}
+    assert farben.aufloesen("--a", werte) == "#fed329"
+    with pytest.raises(farben.FarbFehler, match="gibt es in den Tokens nicht"):
+        farben.aufloesen("--fehlt", werte)
+
+
+def test_neue_und_entfallene_variablen():
+    oben = ":root { --a: #fff; --b: #000 } body.dark { --a: #111; --c: #222 }"
+    unsere = ":root, body, body.dark { --a: var(--bc-text); --alt: var(--bc-text) }"
+    neu, entfallen = farben.pruefe_variablen(oben, unsere, "body.dark")
+    assert neu == {"hell": ["--b"], "dunkel": ["--c"]}
+    assert entfallen == ["--alt"]
+
+
+def test_variablen_css_deckt_healthchecks_ab():
+    quellen = sorted((WURZEL / ".upstream").glob("v*/static/css/variables.css"))
+    if not quellen:
+        pytest.skip("Keine Quelle von Healthchecks unter .upstream/.")
+    unsere = (WURZEL / "werkbank/variablen.css").read_text(encoding="utf-8")
+    neu, entfallen = farben.pruefe_variablen(quellen[-1].read_text(encoding="utf-8"), unsere, "body.dark")
+    assert neu == {"hell": [], "dunkel": []}
+    assert entfallen == []
+
+
+def test_stylesheets_in_reihenfolge():
+    base = ("{% compress css %}<link href=\"{% static 'css/a.css' %}\"><link href=\"{% static 'css/b.css' %}\">"
+            "{% endcompress %}{% compress js %}<script src=\"{% static 'js/x.js' %}\"></script>{% endcompress %}")
+    assert farben.stylesheets(base) == ["css/a.css", "css/b.css"]
+
+
+def test_stylesheets_ohne_compress_block_melden_sich():
+    with pytest.raises(farben.FarbFehler, match="compress css"):
+        farben.stylesheets("<html></html>")
+
+
+def mini_healthchecks(ordner, variablen=":root { --text-color: #333 } body.dark { --text-color: #eee }"):
+    (ordner / "templates").mkdir(parents=True)
+    (ordner / "static/css").mkdir(parents=True)
+    (ordner / "templates/base.html").write_text(
+        "{% compress css %}<link href=\"{% static 'css/variables.css' %}\">"
+        "<link href=\"{% static 'css/base.css' %}\">{% endcompress %}", encoding="utf-8")
+    (ordner / "static/css/variables.css").write_text(variablen, encoding="utf-8")
+    (ordner / "static/css/base.css").write_text(
+        ".status.ic-up { color: #22bc66 } .btn-primary { color: #fff; background-color: #22bc66 }",
+        encoding="utf-8")
+    return ordner
+
+
+def mini_werkbank(ordner, variablen_css=":root,\nbody,\nbody.dark {\n\t--text-color: var(--bc-text);\n}\n"):
+    ordner.mkdir(parents=True)
+    for name in ("rollen.css", "stil.css"):
+        (ordner / name).write_text((WURZEL / "werkbank" / name).read_text(encoding="utf-8"), encoding="utf-8")
+    (ordner / "variablen.css").write_text(variablen_css, encoding="utf-8")
+    (ordner / "farben.json").write_text("{}", encoding="utf-8")
+    return ordner
+
+
+def test_bauen_setzt_alles_in_reihenfolge(tmp_path):
+    hc = mini_healthchecks(tmp_path / "hc")
+    werkbank = mini_werkbank(tmp_path / "werkbank")
+    css, farben_css, bericht = farben.bauen(hc, WURZEL / "vendor/hausschrift", werkbank, "4.4-wb1.0.0")
+    marken = ['url("fonts/anton-400.woff2")', ":root,\nbody {", "--wb-ok-tint:", "--text-color: var(--bc-text)",
+              "/* css/base.css */", ".bc-rail {", "/* healthchecks-werkbank: Stilschicht"]
+    stellen = [css.index(m) for m in marken]
+    assert stellen == sorted(stellen)
+    assert "body.dark .bc-mode" in css
+    assert '[data-theme="dark"]' not in css
+    assert "/* css/variables.css */" not in css
+    assert bericht["stylesheets"] == 1
+    assert bericht["deklarationen"] == 3
+    assert {(f["farbe"], f["art"]) for f in bericht["automatisch"]} == {("#22bc66", "text"), ("#22bc66", "background")}
+    assert farben_css.startswith("/* healthchecks-werkbank 4.4-wb1.0.0.")
+
+
+def test_bauen_bricht_bei_neuer_variable_ab(tmp_path):
+    hc = mini_healthchecks(tmp_path / "hc", ":root { --text-color: #333; --neu-farbe: #f00 }")
+    werkbank = mini_werkbank(tmp_path / "werkbank")
+    with pytest.raises(farben.FarbFehler, match="--neu-farbe"):
+        farben.bauen(hc, WURZEL / "vendor/hausschrift", werkbank, "4.4-wb1.0.0")
+
+
+def test_bauen_mit_anderem_dunklen_selektor(tmp_path, monkeypatch):
+    monkeypatch.setenv("WB_DUNKEL_SELEKTOR", "html.nacht")
+    hc = mini_healthchecks(tmp_path / "hc", ":root { --text-color: #333 } html.nacht { --text-color: #eee }")
+    werkbank = mini_werkbank(tmp_path / "werkbank")
+    css, _, _ = farben.bauen(hc, WURZEL / "vendor/hausschrift", werkbank, "x")
+    assert "html.nacht .bc-mode" in css
+    assert "html.nacht {" in css
+
+
+def test_schreibe_legt_beide_dateien_ab(tmp_path):
+    farben.schreibe(tmp_path, "A", "B")
+    assert (tmp_path / "static/bc/werkbank.css").read_text(encoding="utf-8") == "A"
+    assert (tmp_path / "static/bc/farben.css").read_text(encoding="utf-8") == "B"
+
+
+def test_vorschlag_behaelt_vorhandene_eintraege(tmp_path):
+    hc = mini_healthchecks(tmp_path / "hc")
+    alt = tmp_path / "alt.json"
+    alt.write_text('{"selektoren": {".x": {"text": {"#fff": "var(--bc-ink)"}}},'
+                   ' "farben": {"#22bc66": {"text": "var(--bc-text)"}}}', encoding="utf-8")
+    daten = farben.vorschlag(hc, alt)
+    assert daten["selektoren"] == {".x": {"text": {"#fff": "var(--bc-ink)"}}}
+    assert daten["farben"]["#22bc66"]["text"] == "var(--bc-text)"
+    assert daten["farben"]["#22bc66"]["background"] == "var(--bc-lime)"
+    assert daten["farben"]["#ffffff"]["text"] == "var(--bc-white)"
+
+
+def test_echte_ableitung_ohne_automatik():
+    quellen = sorted(p.parents[2] for p in (WURZEL / ".upstream").glob("v*/static/css/variables.css"))
+    if not quellen:
+        pytest.skip("Keine Quelle von Healthchecks unter .upstream/.")
+    css, _, bericht = farben.bauen(quellen[-1], WURZEL / "vendor/hausschrift", WURZEL / "werkbank", "test")
+    assert bericht["automatisch"] == [], bericht["automatisch"][:5]
+    assert bericht["deklarationen"] > 500
+    assert "var(--bc-lime)" in css
+
+
+def test_kommandozeile_bauen_meldet_fehlende_wurzel(tmp_path, capsys):
+    rc = farben.main(["bauen", "--wurzel", str(tmp_path / "fehlt"), "--hausschrift",
+                      str(WURZEL / "vendor/hausschrift"), "--werkbank", str(WURZEL / "werkbank"), "--fassung", "x"])
+    assert rc == 1
+    assert "Abbruch:" in capsys.readouterr().err

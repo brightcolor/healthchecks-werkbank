@@ -1,0 +1,26 @@
+/* healthchecks-werkbank: eigene Rollen neben den Tokens der Hausschrift.
+   Hell auf :root und body, dunkel auf body.dark. Die Tönungen mischen die
+   Signalfarben mit der Kartenfläche und folgen so dem Modus. */
+
+:root,
+body {
+	--wb-ok-tint: color-mix(in srgb, var(--bc-lime) 24%, var(--bc-surface));
+	--wb-warn-tint: color-mix(in srgb, var(--bc-yellow) 26%, var(--bc-surface));
+	--wb-info-tint: color-mix(in srgb, var(--bc-cyan) 16%, var(--bc-surface));
+	--wb-signal-tint: color-mix(in srgb, var(--bc-violet) 14%, var(--bc-surface));
+	--wb-ok-rand: color-mix(in srgb, var(--bc-lime) 65%, var(--bc-surface));
+	--wb-warn-rand: color-mix(in srgb, var(--bc-yellow) 75%, var(--bc-surface));
+	--wb-bad-rand: color-mix(in srgb, var(--bc-pink) 45%, var(--bc-surface));
+	--wb-info-rand: color-mix(in srgb, var(--bc-cyan) 55%, var(--bc-surface));
+	--wb-schatten: rgba(17, 17, 17, .08);
+	--wb-fokus-hof: color-mix(in srgb, var(--bc-focus) 22%, transparent);
+	/* Hausampel als Symbol: Limette und Gelb als Textton, im Dunkeln rein. */
+	--wb-zustand-up: var(--bc-ok-text);
+	--wb-zustand-grace: var(--bc-warn-text);
+	--wb-zustand-down: var(--bc-pink);
+	--wb-zustand-started: var(--bc-focus);
+}
+
+body.dark {
+	--wb-schatten: rgba(0, 0, 0, .5);
+}
