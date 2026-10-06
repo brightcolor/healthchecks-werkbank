@@ -6,6 +6,7 @@
 - Nur-Text-Mails lassen Platz für längere Namen und Adressen und bleiben bei 78 Zeichen je Zeile.
 - Browserprüfung mit dem Namen „bright color | health“ wie auf hc.bcsrv.de; ein neuer Test meldet Markennamen in Versalien auf jeder Seite und in jeder Mail.
 - CI: Actions mit Node 24 (checkout v7, setup-python v7, setup-node v7, upload-artifact v7, download-artifact v8, docker/login-action v4, docker/setup-buildx-action v4), alle Jobs auf `ubuntu-24.04`.
+- CI: Hochladen und Tag-Setzen bei ghcr.io mit bis zu drei Versuchen (`tools/ci/wiederholen.sh`, `WB_VERSUCHE`, `WB_VERSUCH_PAUSE`); ghcr.io bricht gelegentlich mit „unknown blob“ ab.
 - Einheitstests sammeln auch ohne Django: Die Django-Tests prüfen auf `django.core`.
 
 ## 1.1.0 (5. Oktober 2026)

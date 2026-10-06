@@ -34,6 +34,9 @@ env:
   ZIEL_IMAGE: ghcr.io/${{ github.repository_owner }}/healthchecks-werkbank
   NODE_VERSION: '22'
   PYTHON_VERSION: '3.13'
+  # Schreibzugriffe auf ghcr.io (tools/ci/wiederholen.sh): Versuche und Pause in Sekunden.
+  WB_VERSUCHE: '3'
+  WB_VERSUCH_PAUSE: '20'
 
 defaults:
   run:
@@ -192,7 +195,7 @@ jobs:
         if: env.VEROEFFENTLICHEN == 'true'
         run: |
           docker tag wb-test:lokal "$ZIEL_IMAGE:ci-$WB_ARCH"
-          docker push -q "$ZIEL_IMAGE:ci-$WB_ARCH"
+          tools/ci/wiederholen.sh -- docker push -q "$ZIEL_IMAGE:ci-$WB_ARCH"
           mkdir -p digest
           docker inspect -f '{{index .RepoDigests 0}}' "$ZIEL_IMAGE:ci-$WB_ARCH" > "digest/$WB_ARCH.txt"
           cat "digest/$WB_ARCH.txt"
@@ -231,7 +234,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Tags für beide Plattformen setzen
         run: |
-          docker buildx imagetools create \
+          tools/ci/wiederholen.sh -- docker buildx imagetools create \
             -t "$ZIEL_IMAGE:$FASSUNG" -t "$ZIEL_IMAGE:${HC_TAG#v}" -t "$ZIEL_IMAGE:latest" \
             "$(cat digest/amd64.txt)" "$(cat digest/arm64.txt)"
           docker buildx imagetools inspect "$ZIEL_IMAGE:$FASSUNG"

@@ -158,7 +158,7 @@ Die CI schaut viermal täglich nach einem neuen Release. Liegt das Basis-Image a
 - jede Mail mit Musterdaten bei 360, 390 und 760 px, mit Kontrast, Layout, deutschem Betreff und Textzeilen bis 78 Zeichen,
 - die Update-Probe gegen eine lokale Registry: Wechsel, gleiche Fassung, Rückweg mit Datenbank, Auslassen der zurückgenommenen Fassung, `--erneut`, ungültige und abweichende Einstellungen.
 
-Ist alles grün, gehen die Tags nach ghcr.io. Ist etwas rot, geht nichts raus: Ein Issue mit dem Label `theme-rot` nennt die gescheiterte Prüfung mit Auszug und Link zum Lauf, und GitHub schickt eine Mail. Nach der Anpassung und einem Push auf `main` schließt der nächste grüne Lauf das Issue.
+Ist alles grün, gehen die Tags nach ghcr.io; scheitert ein Schreibzugriff dort, versucht die CI es bis zu `WB_VERSUCHE`-mal (Vorgabe 3, Pause `WB_VERSUCH_PAUSE` mit Vorgabe 20 Sekunden). Ist etwas rot, geht nichts raus: Ein Issue mit dem Label `theme-rot` nennt die gescheiterte Prüfung mit Auszug und Link zum Lauf, und GitHub schickt eine Mail. Nach der Anpassung und einem Push auf `main` schließt der nächste grüne Lauf das Issue.
 
 Texte, die der Katalog in einer neuen Version nicht findet, halten nichts auf: Sie erscheinen englisch, die Fassung geht raus, und ein Issue mit dem Label `uebersetzung` (`WB_HINWEIS_LABEL`) nennt die Stellen mit Datei und Text, je Tabelle höchstens `WB_BERICHT_ZEILEN` Zeilen (Vorgabe 50). Die Zusammenfassung jedes Laufs zeigt denselben Abschnitt. Sobald der Katalog ergänzt und `stand` in `katalog.toml` auf die neue Version gesetzt ist, schließt der nächste Lauf ohne Hinweise das Issue.
 
