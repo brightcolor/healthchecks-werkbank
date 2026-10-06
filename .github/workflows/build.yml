@@ -42,7 +42,7 @@ defaults:
 jobs:
   entscheiden:
     name: Entscheiden
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: read
@@ -52,7 +52,7 @@ jobs:
       bauen: ${{ steps.e.outputs.bauen }}
       veroeffentlichen: ${{ steps.e.outputs.veroeffentlichen }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - id: e
         name: Version und Auftrag bestimmen
         env:
@@ -86,9 +86,9 @@ jobs:
       VEROEFFENTLICHEN: ${{ needs.entscheiden.outputs.veroeffentlichen }}
       WB_ARCH: ${{ matrix.arch }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       - name: Image bauen
         run: |
@@ -99,7 +99,7 @@ jobs:
             --label "org.opencontainers.image.licenses=BSD-3-Clause AND BSD-2-Clause AND OFL-1.1" \
             .
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         if: matrix.arch == 'amd64'
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -124,7 +124,7 @@ jobs:
         if: matrix.arch == 'arm64'
         run: tools/ci/schritt.sh anmeldeseite -- bash -c 'curl -fsS http://localhost:8000/accounts/login/ | grep -q "bc/werkbank.css"'
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         if: matrix.arch == 'amd64'
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -156,7 +156,7 @@ jobs:
 
       - name: Bericht für das Hinweis-Issue sichern
         if: always() && matrix.arch == 'amd64'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bericht
           path: artefakte/werkbank-bericht.json
@@ -164,7 +164,7 @@ jobs:
 
       - name: Ergebnisse sichern
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pruefung-${{ matrix.arch }}
           path: |
@@ -174,7 +174,7 @@ jobs:
 
       - name: Auszug für das Issue sichern
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fehler-${{ matrix.arch }}
           path: fehler/
@@ -182,7 +182,7 @@ jobs:
 
       - name: Bei ghcr.io anmelden
         if: env.VEROEFFENTLICHEN == 'true'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -199,7 +199,7 @@ jobs:
 
       - name: Digest weitergeben
         if: env.VEROEFFENTLICHEN == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: digest-${{ matrix.arch }}
           path: digest/
@@ -208,7 +208,7 @@ jobs:
     name: Veröffentlichen
     needs: [entscheiden, bauen]
     if: needs.entscheiden.outputs.veroeffentlichen == 'true' && needs.bauen.result == 'success'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -217,14 +217,14 @@ jobs:
       HC_TAG: ${{ needs.entscheiden.outputs.hc_tag }}
       FASSUNG: ${{ needs.entscheiden.outputs.fassung }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           pattern: digest-*
           merge-multiple: true
           path: digest
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -248,7 +248,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           LAUF_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: tools/ci/meldung.sh gruen
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: bericht
@@ -268,7 +268,7 @@ jobs:
     if: >-
       always() && github.event_name != 'pull_request' &&
       (needs.entscheiden.result == 'failure' || needs.bauen.result == 'failure' || needs.veroeffentlichen.result == 'failure')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       issues: write
@@ -276,8 +276,8 @@ jobs:
       HC_TAG: ${{ needs.entscheiden.outputs.hc_tag }}
       FASSUNG: ${{ needs.entscheiden.outputs.fassung }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           pattern: fehler-*
