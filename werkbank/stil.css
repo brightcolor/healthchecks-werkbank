@@ -247,6 +247,9 @@ h2, .h2 { font-size: var(--bc-size-h2); letter-spacing: .03em; }
 
 h3, h4, h5, h6, .h3, .h4, .h5, .h6 { font-family: var(--bc-font-text); font-weight: 700; color: var(--bc-text-loud); }
 
+/* Markenname in Versalien: steht so, wie er geschrieben ist (Tag werkbank_name, WB_MARKEN). */
+.bc-brand { text-transform: none; font-variant-caps: normal; }
+
 /* Zusätze und Knöpfe in Titeln stehen in der Textschrift. */
 :is(h1, h2, .modal-title) :is(small, .btn, .btn-group) {
 	font-family: var(--bc-font-text);

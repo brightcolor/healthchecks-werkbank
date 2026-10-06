@@ -10,7 +10,7 @@ Texte englisch wie Healthchecks; Adressen nur über {% url %}.
 <aside class="wb-marke" aria-label="{{ site_name }}">
     <img src="{% static 'bc/logo/bc-logo-light-noclaim.svg' %}" alt="bright color" width="170" height="28">
     <p class="wb-marke__gruss" aria-hidden="true">Moin.</p>
-    <p class="wb-marke__name">{{ site_name }}</p>
+    <p class="wb-marke__name">{% werkbank_name %}</p>
 </aside>
 {% else %}
 {% with muster="00000000-0000-0000-0000-000000000000" %}
@@ -26,7 +26,7 @@ Texte englisch wie Healthchecks; Adressen nur über {% url %}.
     <nav class="bc-rail" id="wb-leiste" aria-label="Navigation">
         <div class="bc-rail__brand">
             <a href="{% url 'hc-index' %}"><img src="{% static 'bc/logo/bc-logo-light-noclaim.svg' %}" alt="bright color: {{ site_name }}" width="170" height="28"></a>
-            <span class="bc-rail__area">{{ site_name }}</span>
+            <span class="bc-rail__area">{% werkbank_name %}</span>
         </div>
         {% if request.user.is_authenticated %}
         <ul class="bc-rail__nav wb-projekte">

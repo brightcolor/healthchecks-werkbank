@@ -9,6 +9,8 @@ export const breiten = (process.env.WB_BREITEN || '320,390,768,1024,1280,1440').
 export const angemeldeteSeiten = Object.entries(daten.seiten).filter(([name]) => name !== 'anmeldung');
 // Sitzungen der Musterkonten; liegen außerhalb von ergebnisse/, damit sie nicht mit den Bildern hochgeladen werden.
 export const sitzungen = process.env.WB_SITZUNGEN || 'tests/e2e/.sitzungen';
+// Markennamen, die überall so erscheinen, wie sie geschrieben sind (Vorgabe wie WB_MARKEN der Instanz).
+export const marken = (process.env.WB_MARKEN ?? 'bright color').split(',').map((m) => m.trim()).filter(Boolean);
 
 const erlaubt = process.env.WB_KONSOLE_ERLAUBT ? new RegExp(process.env.WB_KONSOLE_ERLAUBT) : null;
 const kontrastSkript = readFileSync('vendor/hausschrift/scripts/check-contrast.js', 'utf8');
@@ -86,6 +88,32 @@ export async function ueberdeckungen(page, zeilen, teile) {
     }
     return befunde;
   }, [zeilen, teile]);
+}
+
+// Sucht Textstellen mit einem Markennamen, die die Seite in Versalien oder Kapitälchen setzt
+// oder anders schreibt als den Namen selbst. Versteckte Teile wie Dialoge zählen mit.
+export async function markenVerstoesse(page) {
+  return page.evaluate((marken) => {
+    const befunde = new Set();
+    const kapitaelchen = /small-caps|petite-caps|unicase|titling-caps/;
+    const gang = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let knoten = gang.nextNode(); knoten; knoten = gang.nextNode()) {
+      const el = knoten.parentElement;
+      if (!el || el.closest('script, style, template, noscript')) continue;
+      for (const marke of marken) {
+        const muster = new RegExp(marke.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        for (const treffer of knoten.textContent.matchAll(muster)) {
+          const stil = getComputedStyle(el);
+          const klassen = typeof el.className === 'string' && el.className.trim() ? `.${el.className.trim().split(/\s+/).join('.')}` : '';
+          const wo = `„${treffer[0]}“ in ${el.tagName.toLowerCase()}${klassen}`;
+          if (treffer[0] !== marke) befunde.add(`${wo}: geschrieben als „${treffer[0]}“, erwartet „${marke}“`);
+          if (stil.textTransform !== 'none') befunde.add(`${wo}: text-transform ${stil.textTransform}`);
+          if (kapitaelchen.test(stil.fontVariantCaps)) befunde.add(`${wo}: font-variant-caps ${stil.fontVariantCaps}`);
+        }
+      }
+    }
+    return [...befunde];
+  }, marken);
 }
 
 // Healthchecks-Version, für die der Katalog vollständig ist, und die geprüfte Version.

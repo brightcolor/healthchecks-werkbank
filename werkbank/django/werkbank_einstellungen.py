@@ -18,6 +18,7 @@ __all__ = [
     "WB_MAIL_ANSCHRIFT",
     "WB_MAIL_IMPRESSUM_URL",
     "WB_MAIL_DATENSCHUTZ_URL",
+    "WERKBANK_MARKEN",
 ]
 
 # Vom Bau gesetzt: WB_SPRACHE und die Wörtertabellen [zustaende], [arten] und [rollen] des Katalogs.
@@ -71,3 +72,28 @@ def _mail_einstellung(name: str) -> str:
 WB_MAIL_ANSCHRIFT = _mail_einstellung("WB_MAIL_ANSCHRIFT")
 WB_MAIL_IMPRESSUM_URL = _mail_einstellung("WB_MAIL_IMPRESSUM_URL")
 WB_MAIL_DATENSCHUTZ_URL = _mail_einstellung("WB_MAIL_DATENSCHUTZ_URL")
+
+# Markennamen, die an Stellen in Versalien so erscheinen, wie sie geschrieben sind (Tag werkbank_name).
+# WB_MARKEN nennt sie mit Komma getrennt; leer schaltet die Sonderbehandlung ab.
+MARKEN_VORGABE = "bright color"
+MARKEN_HOECHSTENS = 10
+MARKE_ZEICHEN_HOECHSTENS = 64
+
+
+def _marken() -> list[str]:
+    marken = [m.strip() for m in os.environ.get("WB_MARKEN", MARKEN_VORGABE).split(",") if m.strip()]
+    if len(marken) > MARKEN_HOECHSTENS:
+        raise ImproperlyConfigured(
+            f"WB_MARKEN nennt {len(marken)} Namen. Erlaubt sind höchstens {MARKEN_HOECHSTENS}; "
+            "die Liste kürzen, Namen mit Komma getrennt, etwa „bright color, Beispiel GmbH“."
+        )
+    for marke in marken:
+        if len(marke) > MARKE_ZEICHEN_HOECHSTENS:
+            raise ImproperlyConfigured(
+                f"WB_MARKEN enthält „{marke[:20]}…“ mit {len(marke)} Zeichen. Erlaubt sind höchstens "
+                f"{MARKE_ZEICHEN_HOECHSTENS} Zeichen je Name; den Namen kürzen."
+            )
+    return marken
+
+
+WERKBANK_MARKEN = _marken()

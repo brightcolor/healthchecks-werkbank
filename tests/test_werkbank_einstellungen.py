@@ -27,7 +27,7 @@ def laden(sprache_="de", zustaende='{"down": "ausgefallen"}', arten='{"shell": "
 
 @pytest.fixture(autouse=True)
 def ohne_mail_umgebung(monkeypatch):
-    for name in MAIL:
+    for name in (*MAIL, "WB_MARKEN"):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -79,6 +79,32 @@ def test_ungueltige_mail_einstellungen(monkeypatch, name, wert, meldung):
         laden()
 
 
+def test_marken_vorgabe_ist_bright_color():
+    namen = laden()
+    assert namen["WERKBANK_MARKEN"] == ["bright color"]
+    assert "WERKBANK_MARKEN" in namen["__all__"]
+
+
+@pytest.mark.parametrize("wert, erwartet", [
+    ("acme, Beispiel GmbH ,", ["acme", "Beispiel GmbH"]),
+    ("", []),
+    (" , ", []),
+])
+def test_marken_aus_der_umgebung(monkeypatch, wert, erwartet):
+    monkeypatch.setenv("WB_MARKEN", wert)
+    assert laden()["WERKBANK_MARKEN"] == erwartet
+
+
+@pytest.mark.parametrize("wert, meldung", [
+    (",".join(f"marke{i}" for i in range(11)), "nennt 11 Namen. Erlaubt sind höchstens 10"),
+    ("x" * 65, "mit 65 Zeichen. Erlaubt sind höchstens 64"),
+])
+def test_ungueltige_marken(monkeypatch, wert, meldung):
+    monkeypatch.setenv("WB_MARKEN", wert)
+    with pytest.raises(ImproperlyConfigured, match=meldung):
+        laden()
+
+
 def test_formatmodul_haelt_den_dezimalpunkt():
     namen: dict = {"__file__": str(VORLAGE)}
     exec(compile(FORMATE.read_text(encoding="utf-8"), str(FORMATE), "exec"), namen)
@@ -86,11 +112,10 @@ def test_formatmodul_haelt_den_dezimalpunkt():
     assert "DATE_FORMAT" not in namen
 
 
-def test_erweiterung_trifft_hc_extras_der_standversion():
+def test_erweiterungen_treffen_die_standversion():
     stand = tomllib.loads((WURZEL / "werkbank" / "deutsch" / "katalog.toml").read_text(encoding="utf-8"))["katalog"]["stand"]
-    ziel = WURZEL / ".upstream" / stand / "hc" / "front" / "templatetags" / "hc_extras.py"
-    if not ziel.is_file():
+    quelle = WURZEL / ".upstream" / stand
+    if not (quelle / "hc" / "front" / "templatetags" / "hc_extras.py").is_file():
         pytest.skip(f"Keine Quelle von Healthchecks {stand} unter .upstream/.")
-    text = sprache.lies(ziel)[0]
     for e in sprache.lade_eintraege(WURZEL / "werkbank" / "erweiterungen.toml"):
-        assert text.count(e.en) == e.anzahl, e.herkunft
+        assert sprache.lies(quelle / e.datei)[0].count(e.en) == e.anzahl, e.herkunft

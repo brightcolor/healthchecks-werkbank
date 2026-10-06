@@ -487,9 +487,9 @@ lang="de"'''
 datei = "templates/accounts/login.html"
 anzahl = 1
 en = '''
-<h1>Log In to {{ site_name }}</h1>'''
+<h1>Log In to {% werkbank_name %}</h1>'''
 de = '''
-<h1>Bei {{ site_name }} anmelden</h1>'''
+<h1>Bei {% werkbank_name %} anmelden</h1>'''
 
 [[quelltext]]
 datei = "templates/accounts/login.html"

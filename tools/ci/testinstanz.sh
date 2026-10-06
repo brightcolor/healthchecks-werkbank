@@ -10,13 +10,15 @@ PORT="${WB_TESTPORT:-8000}"
 ERGEBNIS="${WB_MUSTERDATEN:-tests/e2e/ergebnisse/musterdaten.json}"
 FRIST="${WB_START_FRIST:-180}"
 MAILS="${WB_MAILS:-tests/e2e/ergebnisse/mails}"
+# Wie auf hc.bcsrv.de; tests/e2e/marke.spec.mjs prüft daran, wie die Werkbank den Markennamen setzt.
+SEITENNAME="${WB_TEST_SITE_NAME:-bright color | health}"
 
 passwort="$(openssl rand -hex 16)"
 echo "::add-mask::${passwort}"
 docker rm -f "$NAME" >/dev/null 2>&1 || true
 docker run -d --name "$NAME" -p "127.0.0.1:${PORT}:8000" \
 	-e SECRET_KEY="$(openssl rand -hex 32)" -e DEBUG=False -e SITE_ROOT="http://localhost:${PORT}" \
-	-e DB_NAME=/data/hc.sqlite -e REGISTRATION_OPEN=False -e SITE_NAME=Healthchecks \
+	-e DB_NAME=/data/hc.sqlite -e REGISTRATION_OPEN=False -e SITE_NAME="$SEITENNAME" \
 	"$BILD" >/dev/null
 
 zustand=""

@@ -1,5 +1,13 @@
 # Änderungen
 
+## 1.1.1 (6. Oktober 2026)
+
+- Name der Instanz: Enthält `SITE_NAME` einen Namen aus `WB_MARKEN` (Vorgabe „bright color“), erscheint er in Leiste, Anmeldung und Doku so, wie er geschrieben ist. Das Tag `werkbank_name` setzt ihn dort in `<span class="bc-brand">`.
+- Nur-Text-Mails lassen Platz für längere Namen und Adressen und bleiben bei 78 Zeichen je Zeile.
+- Browserprüfung mit dem Namen „bright color | health“ wie auf hc.bcsrv.de; ein neuer Test meldet Markennamen in Versalien auf jeder Seite und in jeder Mail.
+- CI: Actions mit Node 24 (checkout v7, setup-python v7, setup-node v7, upload-artifact v7, download-artifact v8, docker/login-action v4, docker/setup-buildx-action v4), alle Jobs auf `ubuntu-24.04`.
+- Einheitstests sammeln auch ohne Django: Die Django-Tests prüfen auf `django.core`.
+
 ## 1.1.0 (5. Oktober 2026)
 
 - Oberfläche auf Deutsch: Seiten, Dialoge, Meldungen, Skripte, Integrationen und Alarme. Zustände heißen in Ordnung, verspätet und ausgefallen, Period heißt Intervall, Grace Time Kulanz. Die Doku bleibt englisch.

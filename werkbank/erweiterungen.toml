@@ -1,6 +1,7 @@
 # Erweiterungen, die der Bau in jeder Sprache einsetzt (sprache.py bauen).
 # en ist der Anker in Healthchecks, de der Ersatz. Greift ein Eintrag nicht, bricht der
-# Bau ab: Die Vorlagen der Werkbank nutzen die Filter zustand, art und rolle sowie das Tag werkbank_mail.
+# Bau ab: Die Vorlagen der Werkbank nutzen die Filter zustand, art und rolle sowie die Tags
+# werkbank_mail und werkbank_name. Der Katalog läuft danach und sieht die Vorlagen mit diesen Ersetzungen.
 
 [[quelltext]]
 datei = "hc/front/templatetags/hc_extras.py"
@@ -34,4 +35,46 @@ def rolle(mitglied) -> str:
 def werkbank_mail(name: str) -> str:
     """Wert einer Mail-Einstellung der Werkbank, etwa WB_MAIL_IMPRESSUM_URL; leer, wenn nicht gesetzt."""
     return getattr(settings, name, "")
+
+
+@register.simple_tag
+def werkbank_name() -> str:
+    """SITE_NAME für Stellen in Versalien. Enthält er einen Namen aus WERKBANK_MARKEN, steht er in
+    <span class="bc-brand"> und bleibt so geschrieben, wie er eingetragen ist. format_html und
+    escape importiert hc_extras selbst."""
+    name = settings.SITE_NAME
+    if any(marke.casefold() in name.casefold() for marke in getattr(settings, "WERKBANK_MARKEN", [])):
+        return format_html('<span class="bc-brand">{}</span>', name)
+    return escape(name)
+'''
+
+# Überschrift der Anmeldung; der Katalog übersetzt danach den ganzen Satz.
+[[quelltext]]
+datei = "templates/accounts/login.html"
+anzahl = 1
+en = '''
+<h1>Log In to {{ site_name }}</h1>'''
+de = '''
+<h1>Log In to {% werkbank_name %}</h1>'''
+
+# Überschrift der Doku: Der Platzhalter WERKBANK_NAME trägt den Namen wie das Tag werkbank_name.
+[[quelltext]]
+datei = "templates/docs/introduction.html-fragment"
+anzahl = 1
+en = '''
+<h1>SITE_NAME Documentation</h1>'''
+de = '''
+<h1>WERKBANK_NAME Documentation</h1>'''
+
+[[quelltext]]
+datei = "hc/front/views.py"
+anzahl = 1
+en = '''
+    replaces = {
+'''
+de = '''
+    from hc.front.templatetags.hc_extras import werkbank_name
+
+    replaces = {
+        "WERKBANK_NAME": werkbank_name(),
 '''

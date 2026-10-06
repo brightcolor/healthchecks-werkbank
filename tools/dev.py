@@ -39,6 +39,8 @@ VORGABEN = {
     "HC_REPO": "https://github.com/healthchecks/healthchecks.git",
     "WB_DEV_ADRESSE": "127.0.0.1:8000",
     "WB_DEV_SITE_ROOT": "http://localhost:8000",
+    # Wie auf hc.bcsrv.de; die Browserprüfung sieht so, wie die Werkbank den Markennamen setzt.
+    "WB_DEV_SITE_NAME": "bright color | health",
     "WB_BROWSER_KANAL": "msedge",
 }
 
@@ -141,7 +143,7 @@ def umgebung(version: str) -> dict[str, str]:
         ALLOWED_HOSTS="localhost,127.0.0.1",
         DB_NAME=str(UPSTREAM / f"dev-{version}.sqlite"),
         REGISTRATION_OPEN="False",
-        SITE_NAME="Healthchecks",
+        SITE_NAME=einstellung("WB_DEV_SITE_NAME"),
         PYTHONUTF8="1",
         PYTHONIOENCODING="utf-8",
         WB_TEST_PASSWORT=zugang(),

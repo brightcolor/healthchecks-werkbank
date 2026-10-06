@@ -11,7 +11,7 @@ Die Oberfläche spricht Deutsch, die Mails kommen im Hausdesign. Das Image baut 
 
 <img src="docs/bilder/mail-alarm.png" alt="Alarm-Mail auf dem Handy" width="260"> <img src="docs/bilder/mail-bericht.png" alt="Monatsbericht auf dem Handy" width="240">
 
-**Stand: 1.1.0**, geprüft gegen Healthchecks v4.4.
+**Stand: 1.1.1**, geprüft gegen Healthchecks v4.4.
 
 ## Was es macht
 
@@ -127,11 +127,21 @@ Die drei Werte kommen als Umgebungsvariablen in den Container, etwa über die `.
 | `WB_MAIL_LOGO` | `assets/logo/png/bc-logo-light-noclaim.png` | Logo für den Tinte-Balken | Pfad in `vendor/hausschrift/` |
 | `WB_MAIL_LOGO_ZIEL` | `static/bc/logo/bc-logo-light-noclaim.png` | Ziel des Logos | Pfad in Healthchecks |
 
+## Name der Instanz
+
+Healthchecks zeigt `SITE_NAME` in Leiste, Anmeldung, Seitentiteln, Doku und Mails. An den Stellen in Versalien (Leiste, Etikett der Anmeldefläche, Überschriften von Anmeldung und Doku) setzt die Werkbank den Namen über das Tag `werkbank_name`: Enthält er einen Namen aus `WB_MARKEN`, steht er dort in `<span class="bc-brand">` und erscheint so, wie er in `SITE_NAME` steht. So bleibt „bright color“ klein, wie die Hausschrift es verlangt.
+
+| Einstellung | Vorgabe | Bedeutung | Grenzen |
+|---|---|---|---|
+| `WB_MARKEN` | `bright color` | Markennamen, die in Versal-Stellen so bleiben, wie sie geschrieben sind; mit Komma getrennt, leer schaltet das ab | höchstens 10 Namen, je bis 64 Zeichen |
+
+`WB_MARKEN` kommt wie `SITE_NAME` als Umgebungsvariable in den Container. Die Browserprüfung läuft lokal und in der CI mit dem Namen `bright color | health` (`WB_DEV_SITE_NAME`, `WB_TEST_SITE_NAME`) und meldet jede Stelle, an der ein Markenname in Versalien oder Kapitälchen erscheint.
+
 ## Fassungen und Tags
 
 | Tag | Bedeutung |
 |---|---|
-| `4.4-wb1.1.0` | Healthchecks 4.4 mit Werkbank 1.1.0; bleibt unverändert und trägt den Rückweg |
+| `4.4-wb1.1.1` | Healthchecks 4.4 mit Werkbank 1.1.1; bleibt unverändert und trägt den Rückweg |
 | `4.4` | neueste Werkbank für Healthchecks 4.4 |
 | `latest` | neueste Fassung insgesamt; diesem Tag folgt das Update-Skript |
 
@@ -144,6 +154,7 @@ Die CI schaut viermal täglich nach einem neuen Release. Liegt das Basis-Image a
 - Einheitstests, Shellcheck und Lint der Hausschrift, dazu die Vollständigkeit des Katalogs gegen die Version aus `katalog.toml`,
 - jede Vorlage kompiliert in der Testinstanz,
 - jede Seite hell und dunkel im Browser mit Kontrastlauf, sechs Breiten ohne Querscrollen, Listen auf dem Handy, Knöpfe mit ganzer Beschriftung,
+- jede Seite und jede Mail ohne Markennamen in Versalien,
 - jede Mail mit Musterdaten bei 360, 390 und 760 px, mit Kontrast, Layout, deutschem Betreff und Textzeilen bis 78 Zeichen,
 - die Update-Probe gegen eine lokale Registry: Wechsel, gleiche Fassung, Rückweg mit Datenbank, Auslassen der zurückgenommenen Fassung, `--erneut`, ungültige und abweichende Einstellungen.
 
@@ -161,7 +172,8 @@ services:
 ```
 und in der `.env`:
 ```
-HC_IMAGE_TAG=4.4-wb1.1.0
+HC_IMAGE_TAG=4.4-wb1.1.1
+SITE_NAME=bright color | health
 ```
 
 Das Update-Skript und seine Einbindung:
@@ -219,7 +231,7 @@ python tools/dev.py starten
 npm ci
 python tools/dev.py pruefen
 ```
-`vorbereiten` legt `.venv/` an, holt Healthchecks nach `.upstream/`, setzt die Werkbank ein und legt Musterdaten an; der Zugang der Musterkonten steht in `.upstream/dev-zugang.txt`. Nach Änderungen an `stil.css`, `rollen.css`, `variablen.css`, `farben.json` oder `leiste.js` baut `python tools/dev.py stil` neu, der Server läuft weiter. Nach Änderungen an Vorlagen, am Katalog oder an den Mails setzt `python tools/dev.py einsetzen` alles neu ein und meldet englische Reste; danach den Server neu starten. `python tools/dev.py vorlagen` kompiliert jede Vorlage, `python tools/dev.py mails` rendert jede Mail mit den Musterdaten nach `tests/e2e/ergebnisse/mails/`. Unter Windows bricht `vorbereiten` bei laufendem Server ab, bevor es die Arbeitskopie ersetzt.
+`vorbereiten` legt `.venv/` an, holt Healthchecks nach `.upstream/`, setzt die Werkbank ein und legt Musterdaten an; der Zugang der Musterkonten steht in `.upstream/dev-zugang.txt`. Nach Änderungen an `stil.css`, `rollen.css`, `variablen.css`, `farben.json` oder `leiste.js` baut `python tools/dev.py stil` neu, der Server läuft weiter. Nach Änderungen an Vorlagen, am Katalog oder an den Mails setzt `python tools/dev.py einsetzen` alles neu ein und meldet englische Reste; danach den Server neu starten. `python tools/dev.py vorlagen` kompiliert jede Vorlage, `python tools/dev.py mails` rendert jede Mail mit den Musterdaten nach `tests/e2e/ergebnisse/mails/`. Unter Windows bricht `vorbereiten` bei laufendem Server ab, bevor es die Arbeitskopie ersetzt. Der lokale Server heißt wie hc.bcsrv.de `bright color | health`; `WB_DEV_SITE_NAME` setzt einen anderen Namen.
 
 Weitere Prüfungen:
 ```bash
